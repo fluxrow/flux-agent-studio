@@ -23,6 +23,7 @@ import Alerts from "./pages/Alerts";
 import Channels from "./pages/Channels";
 import Forms from "./pages/Forms";
 import Settings from "./pages/Settings";
+import Simulator from "./pages/Simulator";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/channels" element={<Channels />} />
             <Route path="/forms" element={<Forms />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/simulator" element={<Simulator />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

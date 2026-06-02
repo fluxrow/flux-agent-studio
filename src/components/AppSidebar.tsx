@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Bot, Users, MessageSquare,
   BarChart3, LayoutTemplate, Settings, Sparkles,
-  Activity, Target, DollarSign, Bell, Plug,
+  Activity, Target, DollarSign, Bell, Plug, PlayCircle,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -22,6 +22,7 @@ const main = [
 ];
 
 const intel = [
+  { title: "Simulator",   url: "/simulator",   icon: PlayCircle },
   { title: "Tracking",    url: "/tracking",    icon: Activity },
   { title: "Attribution", url: "/attribution", icon: Target },
   { title: "Revenue",     url: "/revenue",     icon: DollarSign },

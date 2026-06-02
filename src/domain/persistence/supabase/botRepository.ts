@@ -10,6 +10,9 @@ const mapRow = (r: any): Bot => ({
   description: r.description ?? "",
   status: r.status,
   channel: r.channel,
+  slug: r.slug ?? null,
+  publishedSnapshot: r.published_snapshot ?? null,
+  publishedAt: r.published_at ?? null,
   metrics: {
     conversations: r.conversations_count ?? 0,
     conversions: r.conversions_count ?? 0,

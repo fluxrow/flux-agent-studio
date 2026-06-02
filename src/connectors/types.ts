@@ -174,7 +174,11 @@ export type ConnectorEventType =
   | "connector_disconnected"
   | "connector_disabled"
   | "connector_error"
+  | "connector_action_started"
+  | "connector_action_completed"
+  | "connector_action_failed"
   | "connector_action_executed"
+  | "connector_retry"
   | "connector_trigger_received";
 
 export interface ConnectorEvent {

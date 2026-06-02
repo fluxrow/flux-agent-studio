@@ -12,11 +12,12 @@ import type {
 
 const KEY_CONNECTORS = "fluxbot.connectors.v1";
 const KEY_CREDENTIALS = "fluxbot.connector_credentials.v1";
+const KEY_CREDENTIAL_VALUES = "fluxbot.connector_credential_values.v1"; // dev-only raw values (will move to Secrets in prod)
 
 type ConnectorsBlob = Record<string, Connector[]>;     // workspaceId -> []
 type CredentialsBlob = Record<string, ConnectorCredential[]>; // workspaceId -> []
 
-function read<T extends Record<string, unknown[]>>(key: string): T {
+function read<T>(key: string): T {
   try {
     const raw = typeof localStorage !== "undefined" ? localStorage.getItem(key) : null;
     return raw ? (JSON.parse(raw) as T) : ({} as T);
@@ -110,14 +111,27 @@ class ConnectorStore {
     const blob = read<CredentialsBlob>(KEY_CREDENTIALS);
     blob[input.workspaceId] = [...(blob[input.workspaceId] ?? []), cred];
     write(KEY_CREDENTIALS, blob);
+    // Dev-only: persist raw values locally so adapters can execute.
+    // Production deployment will swap this for the Lovable Cloud secrets vault.
+    const rawBlob = read<Record<string, Record<string, Record<string, string>>>>(KEY_CREDENTIAL_VALUES);
+    rawBlob[input.workspaceId] = { ...(rawBlob[input.workspaceId] ?? {}), [cred.id]: input.values };
+    write(KEY_CREDENTIAL_VALUES, rawBlob);
     this.notify();
     return cred;
+  }
+
+  /** Dev-only resolver for raw credential values used by adapters. */
+  resolveCredentialValues(workspaceId: string, credentialId: string): Record<string, string> {
+    const rawBlob = read<Record<string, Record<string, Record<string, string>>>>(KEY_CREDENTIAL_VALUES);
+    return rawBlob[workspaceId]?.[credentialId] ?? {};
   }
 
   removeCredential(workspaceId: string, credentialId: string) {
     const blob = read<CredentialsBlob>(KEY_CREDENTIALS);
     blob[workspaceId] = (blob[workspaceId] ?? []).filter((c) => c.id !== credentialId);
     write(KEY_CREDENTIALS, blob);
+    const rawBlob = read<Record<string, Record<string, Record<string, string>>>>(KEY_CREDENTIAL_VALUES);
+    if (rawBlob[workspaceId]) { delete rawBlob[workspaceId][credentialId]; write(KEY_CREDENTIAL_VALUES, rawBlob); }
     this.notify();
   }
 

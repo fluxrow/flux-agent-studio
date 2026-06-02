@@ -743,3 +743,49 @@ block has no real execution yet).
 Every manifest contains `id`, `name`, `description`, `category`, `version`,
 `author`, `permissions`, `actions`, `triggers`, and optional `tags` — making
 the same shape valid for a future Lovable marketplace import/export.
+
+## Phase 17 — Real Connectors (Wave 1)
+
+Replaces the mocked Wave-0 adapters with real implementations, while keeping
+Runtime, CRM, Tracking, AI and Knowledge completely untouched. All execution
+flows through the Connector Hub abstraction added in Phase 16.
+
+### Adapter contract (`src/connectors/adapters/`)
+- **`types.ts`** — `ConnectorAdapter.execute(action, ctx)` is the single
+  entry point. `ctx` carries decrypted credentials, parameters, manifest, and
+  an `AbortSignal`.
+- **`registry.ts`** — `adapterRegistry` keyed by `manifest.id`.
+- **`webhook.ts`** — universal HTTP client. Supports `GET/POST/PUT/PATCH/DELETE`,
+  headers, query params, JSON body, timeout, and four auth modes:
+  `bearer`, `basic`, `api_key`, or `none`.
+- **`googleSheets.ts`** — Sheets v4 REST: `append_row`, `create_row`,
+  `update_row`, `list_rows`, `lookup_row`. Bearer token sourced from the
+  Phase-11 OAuth foundation.
+- **`telegram.ts`** — Bot API: `send_message`, `send_photo`,
+  `send_document`. Exposes a `webhookReceiverPath` for future inbound
+  forwarding.
+- **`slack.ts`** — Web API: `send_message`, `lookup_channel`,
+  `lookup_user`.
+
+### Connector Runtime (`src/connectors/runtime/`)
+- **`executor.ts`** — `executeConnectorAction()` resolves the installation +
+  manifest + adapter, applies the retry policy (`attempts`, `backoffMs`),
+  honors the error policy (`stop_on_error | continue_on_error | fallback`),
+  emits lifecycle events (`connector_action_started`,
+  `connector_action_completed`, `connector_action_failed`, `connector_retry`)
+  and appends each run to `connectorExecutionLog`.
+- **`variableMapping.ts`** — `mapResponseToVariables()` resolves dotted paths
+  like `response.data.id` or `data.items[0].sku` against the adapter envelope
+  so Flow variables are populated declaratively.
+
+### Connector Inspector
+`/connectors → Inspector` tab (`ConnectorInspector` component). Pick any
+installed connector, choose an action, edit the JSON parameters and the
+variable mapping, set retry/backoff/policy and execute. The right panel shows
+recent runs with action, duration, attempts, HTTP status, request payload,
+response payload and resolved variables.
+
+### Event Bus
+New `ConnectorEventType` values are emitted through `runtimeEventBus`, so the
+Event Inspector, Tracking destinations and any future Supabase realtime
+listener already see the new stream.

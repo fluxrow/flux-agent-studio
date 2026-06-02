@@ -53,6 +53,36 @@ single source of truth for QA.
   without crashing — stub adapters return empty collections, RLS
   filters by workspace.
 
+## Phase 6 — CRM Engine
+- **Leads schema** extended with `company`, `owner_id`, `notes`,
+  `last_activity_at` (+ touch trigger). `events.lead_id` added so the
+  timeline can be filtered per lead.
+- **Repository contract** for leads is now full CRUD: `create`,
+  `update`, `remove`, `addTag`, `removeTag`, plus `timeline(leadId)`,
+  `conversations(leadId)` and `crmStats()`. Mock and Supabase adapters
+  both implement it end-to-end.
+- **`useCreateLead` / `useUpdateLead` / `useDeleteLead` / `useLead` /
+  `useLeadTimeline` / `useLeadConversations` / `useCrmStats` /
+  `useAddLeadTag` / `useRemoveLeadTag`** — hooks layer points at the
+  persistence facade so it flips with `VITE_USE_SUPABASE`.
+- **Pipeline Kanban** (`/leads`): 5 stages, "Novo lead" dialog, cards
+  link to detail, hover reveals a "Mover para…" stage select that
+  writes to the DB.
+- **Lead Detail** (`/leads/:id`): sidebar with data / score slider /
+  tag editor + delete; tabs for Timeline, Conversas and Notas. Stage
+  changes, tag edits and score updates emit `lead_updated` events
+  that populate the timeline automatically.
+- **Runtime → CRM bridge** (`src/lib/crm-bridge.ts`): subscribes to
+  the runtime event bus, accumulates `lead.*` variables per session
+  and persists a real lead on `conversation_completed` /
+  `flow_completed`. Session is linked back to the lead so its
+  conversations show up on the detail page.
+- **CRM Dashboard widget** on `/dashboard`: totals, taxa de ganho,
+  funil por estágio e leads recentes — tudo via `useCrmStats()`.
+- **Ownership groundwork**: `owner_id` column + index in place to
+  support team assignment in a later phase.
+
+
 ---
 
 ## Manual Smoke Test (Phase 5.5)

@@ -12,12 +12,13 @@
 import type {
   Bot, BotCreateInput,
   Flow, Block, Connection,
-  Lead, PipelineStage, LeadStage,
+  Lead, LeadCreateInput, PipelineStage, LeadStage, CrmStats,
   Conversation, Session, Message,
   Template,
   Channel,
   Variable,
   ID, ListParams, Paginated,
+  ExecutionEvent,
 } from "@/types";
 
 export interface BotRepository {
@@ -40,6 +41,14 @@ export interface LeadRepository {
   byStage(): Promise<Record<LeadStage, Lead[]>>;
   stages(): Promise<PipelineStage[]>;
   updateStage(id: ID, stage: LeadStage): Promise<Lead>;
+  create(input: LeadCreateInput): Promise<Lead>;
+  update(id: ID, patch: Partial<Lead>): Promise<Lead>;
+  remove(id: ID): Promise<void>;
+  addTag(id: ID, tag: string): Promise<Lead>;
+  removeTag(id: ID, tag: string): Promise<Lead>;
+  timeline(leadId: ID): Promise<ExecutionEvent[]>;
+  conversations(leadId: ID): Promise<Conversation[]>;
+  crmStats(): Promise<CrmStats>;
 }
 
 export interface ConversationRepository {

@@ -236,6 +236,7 @@ export type Database = {
           created_at: string
           flow_id: string | null
           id: string
+          lead_id: string | null
           occurred_at: string
           payload: Json
           session_id: string | null
@@ -248,6 +249,7 @@ export type Database = {
           created_at?: string
           flow_id?: string | null
           id?: string
+          lead_id?: string | null
           occurred_at?: string
           payload?: Json
           session_id?: string | null
@@ -260,6 +262,7 @@ export type Database = {
           created_at?: string
           flow_id?: string | null
           id?: string
+          lead_id?: string | null
           occurred_at?: string
           payload?: Json
           session_id?: string | null
@@ -447,10 +450,14 @@ export type Database = {
       leads: {
         Row: {
           bot_id: string | null
+          company: string | null
           created_at: string
           email: string | null
           id: string
+          last_activity_at: string
           name: string
+          notes: string | null
+          owner_id: string | null
           phone: string | null
           score: number
           source: string
@@ -462,10 +469,14 @@ export type Database = {
         }
         Insert: {
           bot_id?: string | null
+          company?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          last_activity_at?: string
           name: string
+          notes?: string | null
+          owner_id?: string | null
           phone?: string | null
           score?: number
           source?: string
@@ -477,10 +488,14 @@ export type Database = {
         }
         Update: {
           bot_id?: string | null
+          company?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          last_activity_at?: string
           name?: string
+          notes?: string | null
+          owner_id?: string | null
           phone?: string | null
           score?: number
           source?: string

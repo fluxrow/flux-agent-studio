@@ -12,6 +12,7 @@ import Bots from "./pages/Bots";
 import BotNew from "./pages/BotNew";
 import Builder from "./pages/Builder";
 import Leads from "./pages/Leads";
+import LeadDetail from "./pages/LeadDetail";
 import Conversations from "./pages/Conversations";
 import Analytics from "./pages/Analytics";
 import Templates from "./pages/Templates";
@@ -56,6 +57,7 @@ const App = () => (
                 <Route path="/bots/new" element={<BotNew />} />
                 <Route path="/builder/:id" element={<Builder />} />
                 <Route path="/leads" element={<Leads />} />
+                <Route path="/leads/:id" element={<LeadDetail />} />
                 <Route path="/conversations" element={<Conversations />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/tracking" element={<Tracking />} />

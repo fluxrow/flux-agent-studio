@@ -1,18 +1,25 @@
 /**
  * Connector installation store.
  *
- * Workspace-scoped, persists to localStorage today. Designed to migrate 1:1 to
- * a `connectors` table in Lovable Cloud once integrations go live.
+ * Workspace-scoped. Public metadata (manifest id, lifecycle, preview masks)
+ * persists to localStorage so the UI feels stable across reloads. Raw
+ * credential values are routed through the in-memory Secret Vault and are
+ * NEVER written to disk (Phase 18.6 / BUG-01). The persisted credential
+ * record only carries an obfuscated `preview` for display.
  */
 import type {
   Connector,
   ConnectorCredential,
   ConnectorLifecycle,
 } from "./types";
+import {
+  putSecrets,
+  getSecrets,
+  clearSecrets,
+} from "@/security/secretVault";
 
 const KEY_CONNECTORS = "fluxbot.connectors.v1";
 const KEY_CREDENTIALS = "fluxbot.connector_credentials.v1";
-const KEY_CREDENTIAL_VALUES = "fluxbot.connector_credential_values.v1"; // dev-only raw values (will move to Secrets in prod)
 
 type ConnectorsBlob = Record<string, Connector[]>;     // workspaceId -> []
 type CredentialsBlob = Record<string, ConnectorCredential[]>; // workspaceId -> []
@@ -111,27 +118,27 @@ class ConnectorStore {
     const blob = read<CredentialsBlob>(KEY_CREDENTIALS);
     blob[input.workspaceId] = [...(blob[input.workspaceId] ?? []), cred];
     write(KEY_CREDENTIALS, blob);
-    // Dev-only: persist raw values locally so adapters can execute.
-    // Production deployment will swap this for the Lovable Cloud secrets vault.
-    const rawBlob = read<Record<string, Record<string, Record<string, string>>>>(KEY_CREDENTIAL_VALUES);
-    rawBlob[input.workspaceId] = { ...(rawBlob[input.workspaceId] ?? {}), [cred.id]: input.values };
-    write(KEY_CREDENTIAL_VALUES, rawBlob);
+    // Raw values go to the in-memory vault — never localStorage.
+    putSecrets("connector", cred.id, input.values);
     this.notify();
     return cred;
   }
 
-  /** Dev-only resolver for raw credential values used by adapters. */
-  resolveCredentialValues(workspaceId: string, credentialId: string): Record<string, string> {
-    const rawBlob = read<Record<string, Record<string, Record<string, string>>>>(KEY_CREDENTIAL_VALUES);
-    return rawBlob[workspaceId]?.[credentialId] ?? {};
+  /**
+   * Resolves the raw credential values for an adapter call. Values live in
+   * the in-memory Secret Vault (Phase 18.6); they are wiped on tab close
+   * and must be re-entered. This seam will become an async edge-function
+   * call once the Cloud secrets resolver lands.
+   */
+  resolveCredentialValues(_workspaceId: string, credentialId: string): Record<string, string> {
+    return getSecrets("connector", credentialId);
   }
 
   removeCredential(workspaceId: string, credentialId: string) {
     const blob = read<CredentialsBlob>(KEY_CREDENTIALS);
     blob[workspaceId] = (blob[workspaceId] ?? []).filter((c) => c.id !== credentialId);
     write(KEY_CREDENTIALS, blob);
-    const rawBlob = read<Record<string, Record<string, Record<string, string>>>>(KEY_CREDENTIAL_VALUES);
-    if (rawBlob[workspaceId]) { delete rawBlob[workspaceId][credentialId]; write(KEY_CREDENTIAL_VALUES, rawBlob); }
+    clearSecrets("connector", credentialId);
     this.notify();
   }
 

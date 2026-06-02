@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Loader2, Mail, Phone, Building2, Tag as TagIcon, Plus,
-  Trash2, Flame, Snowflake, Thermometer, MessageSquare, Clock,
+  Trash2, Flame, Snowflake, Thermometer, MessageSquare, Clock, Brain,
 } from "lucide-react";
+import { LeadIntelligencePanel } from "@/components/intelligence/LeadIntelligencePanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";

@@ -138,17 +138,17 @@ export async function executeConnectorAction(opts: ExecuteOptions): Promise<Exec
         workspaceId: opts.workspaceId, connectorId: installation.id, action,
         parameters, outcome: "success",
       });
-      emitConnectorEvent("connector_action_executed", {
+      emitConnectorEvent("connector_action_completed", {
         connectorId: installation.id, manifestId: manifest.id, workspaceId: opts.workspaceId,
-        payload: { action: action.key, phase: "completed", durationMs: rec.durationMs, attempts: i },
+        payload: { action: action.key, durationMs: rec.durationMs, attempts: i },
       });
       return rec;
     } catch (err) {
       lastError = err;
       if (i < attempts) {
-        emitConnectorEvent("connector_action_executed", {
+        emitConnectorEvent("connector_retry", {
           connectorId: installation.id, manifestId: manifest.id, workspaceId: opts.workspaceId,
-          payload: { action: action.key, phase: "retry", attempt: i, error: String((err as Error).message) },
+          payload: { action: action.key, attempt: i, error: String((err as Error).message) },
         });
         await sleep(backoffMs * i);
       }

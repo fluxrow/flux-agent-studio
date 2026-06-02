@@ -27,6 +27,7 @@ import Forms from "./pages/Forms";
 import Settings from "./pages/Settings";
 import Simulator from "./pages/Simulator";
 import DebugRepositories from "./pages/DebugRepositories";
+import ChannelsDebug from "./pages/ChannelsDebug";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";

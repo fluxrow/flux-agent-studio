@@ -104,10 +104,19 @@ export const builtInConnectors: ConnectorManifest[] = [
       { key: "secret", label: "Secret (HMAC)", type: "password", required: false },
     ]},
     actions: [
-      { key: "send", name: "Enviar requisição", parameters: [
+      { key: "send_request", name: "Enviar requisição HTTP", parameters: [
         { key: "url", label: "URL", type: "string", required: true },
-        { key: "method", label: "Método", type: "select", options: ["GET","POST","PUT","DELETE"], defaultValue: "POST" },
+        { key: "method", label: "Método", type: "select", options: ["GET","POST","PUT","PATCH","DELETE"], defaultValue: "POST" },
+        { key: "headers", label: "Headers (JSON)", type: "json" },
+        { key: "query_params", label: "Query params (JSON)", type: "json" },
         { key: "body", label: "Body (JSON)", type: "json" },
+        { key: "timeout_ms", label: "Timeout (ms)", type: "number", defaultValue: 15000 },
+        { key: "auth_mode", label: "Autenticação", type: "select", options: ["none","bearer","basic","api_key"], defaultValue: "none" },
+        { key: "bearer_token", label: "Bearer token", type: "string" },
+        { key: "basic_user", label: "Basic user", type: "string" },
+        { key: "basic_pass", label: "Basic pass", type: "string" },
+        { key: "api_key", label: "API key", type: "string" },
+        { key: "api_key_header", label: "API key header", type: "string", defaultValue: "X-API-Key" },
       ]},
     ],
     triggers: [

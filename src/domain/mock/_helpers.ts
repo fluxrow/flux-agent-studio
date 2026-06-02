@@ -13,7 +13,7 @@ export const paginate = <T>(items: T[], page = 1, pageSize = 50) => ({
   pageSize,
 });
 
-export const filterBySearch = <T extends Record<string, unknown>>(
+export const filterBySearch = <T>(
   items: T[],
   search: string | undefined,
   fields: (keyof T)[],
@@ -21,6 +21,6 @@ export const filterBySearch = <T extends Record<string, unknown>>(
   if (!search) return items;
   const q = search.toLowerCase();
   return items.filter((it) =>
-    fields.some((f) => String(it[f] ?? "").toLowerCase().includes(q)),
+    fields.some((f) => String((it as Record<string, unknown>)[f as string] ?? "").toLowerCase().includes(q)),
   );
 };

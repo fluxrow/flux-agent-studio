@@ -48,6 +48,33 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Smart alerts */}
+      <div className="rounded-2xl border border-border bg-card/60 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-semibold flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary-glow" /> Alertas inteligentes</h3>
+            <p className="text-xs text-muted-foreground">A IA monitorou 2.847 eventos nas últimas 24h</p>
+          </div>
+          <Link to="/app/alerts" className="text-xs text-primary-glow flex items-center gap-1">Ver todos <ArrowUpRight className="h-3 w-3" /></Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {smartAlerts.map((a) => (
+            <div key={a.id} className={`rounded-xl border p-4 ${alertTone[a.tone]}`}>
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-background/50 border border-current/20 flex items-center justify-center flex-shrink-0">
+                  <a.icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-foreground">{a.title}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{a.desc}</div>
+                  <Link to={a.to} className="text-[11px] mt-2 inline-flex items-center gap-1 hover:underline">{a.cta} <ArrowUpRight className="h-3 w-3" /></Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* chart */}
         <div className="lg:col-span-2 rounded-2xl border border-border bg-card/60 p-6">

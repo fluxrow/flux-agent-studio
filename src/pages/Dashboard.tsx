@@ -185,6 +185,10 @@ export default function Dashboard() {
           </div>
 
           <LeadIntelligenceWidget />
+
+          <div className="flex justify-end">
+            <ContextualFeedback surface="dashboard" />
+          </div>
         </>
       )}
     </div>

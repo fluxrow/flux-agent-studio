@@ -171,12 +171,7 @@ export default function Knowledge() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => {
-                    if (confirm("Apagar esta base e seus chunks?")) {
-                      knowledgeStore.deleteBase(activeBase.id);
-                      setActiveBaseId(null);
-                    }
-                  }}
+                  onClick={() => setConfirmAction({ kind: "base", id: activeBase.id, name: activeBase.name })}
                   className="text-destructive"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

@@ -81,7 +81,7 @@ const instrumented = Object.fromEntries(
     domain,
     instrumentRepository(domain, chosen[domain] as object),
   ]),
-) as Persistence;
+) as unknown as Persistence;
 
 export const persistence: Persistence = instrumented;
 

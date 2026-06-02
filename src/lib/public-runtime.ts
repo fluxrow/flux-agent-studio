@@ -160,3 +160,81 @@ export async function recordPublicLead(sessionId: string, botId: string, workspa
   }
   return data as string;
 }
+
+/* ---------------- Tracking (Phase 7) ---------------- */
+
+export interface PublicVisitorProfileInput {
+  browser?: string;
+  os?: string;
+  deviceType?: string;
+  language?: string;
+  timezone?: string;
+  referrer?: string;
+  landingPage?: string;
+  userAgent?: string;
+}
+
+export async function recordPublicVisitorProfile(slug: string, visitorId: string, profile: PublicVisitorProfileInput) {
+  if (!USE_SUPABASE) return;
+  const { error } = await supabase.rpc("record_public_visitor_profile" as any, {
+    _slug: slug,
+    _visitor_id: visitorId,
+    _browser: profile.browser ?? null,
+    _os: profile.os ?? null,
+    _device_type: profile.deviceType ?? null,
+    _language: profile.language ?? null,
+    _timezone: profile.timezone ?? null,
+    _referrer: profile.referrer ?? null,
+    _landing_page: profile.landingPage ?? null,
+    _user_agent: profile.userAgent ?? null,
+  });
+  if (error) console.warn("[publicRuntime] visitor failed:", error.message);
+}
+
+export interface PublicAttributionInput {
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  utmTerm?: string;
+  fbclid?: string;
+  gclid?: string;
+  ttclid?: string;
+  msclkid?: string;
+  referrer?: string;
+  landingPage?: string;
+}
+
+export async function recordPublicAttribution(slug: string, visitorId: string, sessionId: string | null, attr: PublicAttributionInput) {
+  if (!USE_SUPABASE) return;
+  const hasAny = Object.values(attr).some((v) => v != null && v !== "");
+  if (!hasAny) return;
+  const { error } = await supabase.rpc("record_public_attribution" as any, {
+    _slug: slug,
+    _visitor_id: visitorId,
+    _session_id: sessionId,
+    _utm_source: attr.utmSource ?? null,
+    _utm_medium: attr.utmMedium ?? null,
+    _utm_campaign: attr.utmCampaign ?? null,
+    _utm_content: attr.utmContent ?? null,
+    _utm_term: attr.utmTerm ?? null,
+    _fbclid: attr.fbclid ?? null,
+    _gclid: attr.gclid ?? null,
+    _ttclid: attr.ttclid ?? null,
+    _msclkid: attr.msclkid ?? null,
+    _referrer: attr.referrer ?? null,
+    _landing_page: attr.landingPage ?? null,
+  });
+  if (error) console.warn("[publicRuntime] attribution failed:", error.message);
+}
+
+export async function attachAttributionToLead(sessionId: string, leadId: string, visitorId: string) {
+  if (!USE_SUPABASE) return;
+  const { error } = await supabase.rpc("attach_public_attribution_to_lead" as any, {
+    _session_id: sessionId,
+    _lead_id: leadId,
+    _visitor_id: visitorId,
+  });
+  if (error) console.warn("[publicRuntime] attach attribution failed:", error.message);
+}
+

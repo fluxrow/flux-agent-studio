@@ -10,10 +10,15 @@ import {
   recordPublicEvent,
   recordPublicMessage,
   recordPublicLead,
+  recordPublicVisitorProfile,
+  recordPublicAttribution,
+  attachAttributionToLead,
   getOrCreateVisitorId,
   type PublicBot as PublicBotType,
 } from "@/lib/public-runtime";
+import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/tracking";
 import type { Flow } from "@/types";
+
 
 type LoadState =
   | { kind: "loading" }
@@ -92,9 +97,30 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
     (async () => {
       try {
         const visitorId = getOrCreateVisitorId(bot.slug);
+        const profile = detectBrowser();
+        const attribution = captureAttributionFromUrl();
+        // Best-effort visitor capture (Supabase mode only — no-op in mock).
+        recordPublicVisitorProfile(bot.slug, visitorId, {
+          browser: profile.browser,
+          os: profile.os,
+          deviceType: profile.deviceType,
+          language: profile.language,
+          timezone: profile.timezone,
+          referrer: profile.referrer,
+          landingPage: profile.landingPage,
+          userAgent: profile.userAgent,
+        }).catch(() => undefined);
+
         const sid = await startPublicSession(bot.slug, bot.id, bot.workspaceId, visitorId);
         if (cancelled) return;
         sessionIdRef.current = sid;
+        if (attribution) {
+          recordPublicAttribution(bot.slug, visitorId, sid, attribution).catch(() => undefined);
+        }
+        trackingEngine.recordCustom("bot_loaded", { slug: bot.slug }, {
+          sessionId: sid, botId: bot.id, workspaceId: bot.workspaceId,
+        });
+        recordPublicEvent(sid, "bot_loaded", { slug: bot.slug });
         engine.start();
       } catch (err) {
         console.error("[publicBot] failed to start session", err);
@@ -119,13 +145,18 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         const candidate = d.name || d["lead.name"];
         if (candidate && !leadCreatedRef.current) {
           leadCreatedRef.current = true;
-          await recordPublicLead(sid, bot.id, bot.workspaceId, {
+          const leadId = await recordPublicLead(sid, bot.id, bot.workspaceId, {
             name: candidate,
             email: d.email || d["lead.email"],
             phone: d.phone || d["lead.phone"],
             company: d.company || d["lead.company"],
           });
+          if (leadId) {
+            const visitorId = getOrCreateVisitorId(bot.slug);
+            attachAttributionToLead(sid, leadId, visitorId).catch(() => undefined);
+          }
         }
+
         recordPublicEvent(sid, "flow_completed", {});
         recordPublicEvent(sid, "conversation_completed", {});
       }

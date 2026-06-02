@@ -12,6 +12,31 @@ completos por fase.
 - `.env.example` documentando variáveis públicas
 - `.editorconfig` para consistência entre editores
 
+## Phase 18.7 — Critical Truth Sprint
+
+### Security
+- **BUG-01 (resíduo)**: `src/tracking/destinations/registry.ts` deixou de
+  persistir credenciais sensíveis em `localStorage`. Campos listados em
+  `SENSITIVE_KEYS` (`accessToken`, `apiKey`, `token`, …) agora são roteados
+  para o `secretVault` (RAM) via `mergeSecrets("tracking", id, …)`. O storage
+  guarda apenas metadados públicos (`pixelId`, `accountId`, `enabled`, `mock`).
+- `loadFromStorage()` agora **purga** qualquer segredo legado encontrado em
+  builds anteriores e emite warning identificando o destino afetado.
+- Novo `getPublicConfig(id)` separa o config seguro (UI / telemetria) de
+  `getConfig(id)` (usado pelo `dispatch` para injetar segredos do vault).
+
+### Evidência
+- Arquivo: `src/tracking/destinations/registry.ts`
+- Métodos novos/alterados: `splitCredentials()`, `getPublicConfig()`,
+  `setConfig()`, `loadFromStorage()`, `saveToStorage()`.
+- Dependência removida do storage: campos sensíveis em
+  `fluxbot.tracking.destinations.v1`.
+- Validar: abrir DevTools → Application → Local Storage; configurar Meta CAPI
+  com `accessToken` em **Settings → Destinations**; recarregar; conferir que
+  o JSON salvo não contém `accessToken`, apenas `pixelId`.
+
+
+
 ## Sprint 2 — Builder Core + UX Blockers
 
 ### Builder

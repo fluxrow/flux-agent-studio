@@ -21,9 +21,25 @@ import {
 import { metaAdapter } from "./meta";
 import { googleAdapter } from "./google";
 import { linkedinAdapter, n8nAdapter, tiktokAdapter, webhookAdapter } from "./stubs";
+import {
+  SENSITIVE_KEYS,
+  getSecrets,
+  mergeSecrets,
+} from "@/security/secretVault";
 
 const STORAGE_KEY = "fluxbot.tracking.destinations.v1";
 const MAX_RECORDS = 200;
+
+/** Split credentials into (publicMeta, secrets) using the shared vault rules. */
+function splitCredentials(creds: Record<string, string> = {}) {
+  const publicMeta: Record<string, string> = {};
+  const secrets: Record<string, string> = {};
+  for (const [key, value] of Object.entries(creds)) {
+    if (SENSITIVE_KEYS.has(key)) secrets[key] = String(value);
+    else publicMeta[key] = String(value);
+  }
+  return { publicMeta, secrets };
+}
 
 interface RegistryState {
   configs: Record<string, DestinationConfig>;
@@ -56,7 +72,19 @@ class DestinationRegistry {
   /* ------------ Public surface ------------ */
 
   list(): DestinationAdapter[] { return [...this.adapters]; }
-  getConfig(id: string): DestinationConfig { return this.state.configs[id] ?? { ...DEFAULT_CONFIG }; }
+  /**
+   * Returns the full config including secrets pulled live from the vault.
+   * Adapters call this through `dispatch`; UI should use `getPublicConfig`.
+   */
+  getConfig(id: string): DestinationConfig {
+    const cfg = this.state.configs[id] ?? { ...DEFAULT_CONFIG };
+    const vaulted = getSecrets("tracking", id);
+    return { ...cfg, credentials: { ...(cfg.credentials ?? {}), ...vaulted } };
+  }
+  /** Same as getConfig but never includes secret fields — safe for UI/telemetry. */
+  getPublicConfig(id: string): DestinationConfig {
+    return this.state.configs[id] ?? { ...DEFAULT_CONFIG };
+  }
   getRecords(): DispatchRecord[] { return [...this.state.records].reverse(); }
   getQueueSize(): number { return this.state.queue; }
 
@@ -77,11 +105,17 @@ class DestinationRegistry {
   }
 
   setConfig(id: string, patch: Partial<DestinationConfig>) {
-    const current = this.getConfig(id);
+    const current = this.getPublicConfig(id);
+    // BUG-01: route secret fields (accessToken, apiKey, …) to the in-memory
+    // vault so they never touch localStorage. Public meta (pixelId, accountId)
+    // continues to live in the persisted state.
+    const incomingCreds = patch.credentials ?? {};
+    const { publicMeta, secrets } = splitCredentials(incomingCreds);
+    if (Object.keys(secrets).length > 0) mergeSecrets("tracking", id, secrets);
     this.state.configs[id] = {
       ...current,
       ...patch,
-      credentials: { ...current.credentials, ...(patch.credentials ?? {}) },
+      credentials: { ...(current.credentials ?? {}), ...publicMeta },
     };
     this.saveToStorage();
     this.emit();
@@ -153,7 +187,13 @@ class DestinationRegistry {
       const parsed = JSON.parse(raw) as { configs?: Record<string, DestinationConfig> };
       if (parsed.configs) {
         for (const [id, cfg] of Object.entries(parsed.configs)) {
-          this.state.configs[id] = { ...DEFAULT_CONFIG, ...cfg, credentials: cfg.credentials ?? {} };
+          // Defensive: even if a previous (pre-18.7) build persisted secrets,
+          // strip them on read so we never reload tokens from disk.
+          const { publicMeta, secrets } = splitCredentials(cfg.credentials ?? {});
+          if (Object.keys(secrets).length > 0) {
+            console.warn(`[destinations] purged ${Object.keys(secrets).length} legacy secret(s) for ${id}`);
+          }
+          this.state.configs[id] = { ...DEFAULT_CONFIG, ...cfg, credentials: publicMeta };
         }
       }
     } catch (e) {
@@ -164,7 +204,13 @@ class DestinationRegistry {
   private saveToStorage() {
     if (typeof localStorage === "undefined") return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ configs: this.state.configs }));
+      // Only public metadata is serialized — sensitive keys live in the vault.
+      const safeConfigs: Record<string, DestinationConfig> = {};
+      for (const [id, cfg] of Object.entries(this.state.configs)) {
+        const { publicMeta } = splitCredentials(cfg.credentials ?? {});
+        safeConfigs[id] = { ...cfg, credentials: publicMeta };
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ configs: safeConfigs }));
     } catch (e) {
       console.warn("[destinations] failed to persist config", e);
     }

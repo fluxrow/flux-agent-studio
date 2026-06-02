@@ -456,6 +456,69 @@ export type Database = {
           },
         ]
       }
+      lead_attribution: {
+        Row: {
+          created_at: string
+          fbclid: string | null
+          gclid: string | null
+          id: string
+          landing_page: string | null
+          lead_id: string | null
+          msclkid: string | null
+          referrer: string | null
+          session_id: string | null
+          ttclid: string | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          visitor_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          fbclid?: string | null
+          gclid?: string | null
+          id?: string
+          landing_page?: string | null
+          lead_id?: string | null
+          msclkid?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          ttclid?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          fbclid?: string | null
+          gclid?: string | null
+          id?: string
+          landing_page?: string | null
+          lead_id?: string | null
+          msclkid?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          ttclid?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           bot_id: string | null
@@ -676,6 +739,69 @@ export type Database = {
           },
         ]
       }
+      visitor_profiles: {
+        Row: {
+          browser: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          first_seen_at: string
+          id: string
+          landing_page: string | null
+          language: string | null
+          last_seen_at: string
+          os: string | null
+          referrer: string | null
+          state: string | null
+          timezone: string | null
+          updated_at: string
+          user_agent: string | null
+          visitor_id: string
+          workspace_id: string
+        }
+        Insert: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          first_seen_at?: string
+          id?: string
+          landing_page?: string | null
+          language?: string | null
+          last_seen_at?: string
+          os?: string | null
+          referrer?: string | null
+          state?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          visitor_id: string
+          workspace_id: string
+        }
+        Update: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          first_seen_at?: string
+          id?: string
+          landing_page?: string | null
+          language?: string | null
+          last_seen_at?: string
+          os?: string | null
+          referrer?: string | null
+          state?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          visitor_id?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       workspace_members: {
         Row: {
           created_at: string
@@ -746,6 +872,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      attach_public_attribution_to_lead: {
+        Args: { _lead_id: string; _session_id: string; _visitor_id: string }
+        Returns: undefined
+      }
       get_public_bot: { Args: { _slug: string }; Returns: Json }
       has_workspace_role: {
         Args: {
@@ -789,6 +919,25 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      record_public_attribution: {
+        Args: {
+          _fbclid?: string
+          _gclid?: string
+          _landing_page?: string
+          _msclkid?: string
+          _referrer?: string
+          _session_id?: string
+          _slug: string
+          _ttclid?: string
+          _utm_campaign?: string
+          _utm_content?: string
+          _utm_medium?: string
+          _utm_source?: string
+          _utm_term?: string
+          _visitor_id: string
+        }
+        Returns: string
+      }
       record_public_event: {
         Args: {
           _block_key?: string
@@ -821,6 +970,21 @@ export type Database = {
       }
       record_public_session: {
         Args: { _slug: string; _variables?: Json; _visitor_id: string }
+        Returns: string
+      }
+      record_public_visitor_profile: {
+        Args: {
+          _browser?: string
+          _device_type?: string
+          _landing_page?: string
+          _language?: string
+          _os?: string
+          _referrer?: string
+          _slug: string
+          _timezone?: string
+          _user_agent?: string
+          _visitor_id: string
+        }
         Returns: string
       }
       slugify: { Args: { _input: string }; Returns: string }

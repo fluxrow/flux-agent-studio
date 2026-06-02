@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import {
   knowledgeStore, knowledgeCost, createKnowledgeBase, ingestDocument,
@@ -14,6 +19,11 @@ import {
 import type {
   KnowledgeBase, KnowledgeDocument, KnowledgeSearchResult, KnowledgeSourceKind,
 } from "@/knowledge/types";
+
+type Confirm =
+  | { kind: "base"; id: string; name: string }
+  | { kind: "doc"; id: string; title: string }
+  | null;
 
 export default function Knowledge() {
   const { workspace } = useWorkspace();

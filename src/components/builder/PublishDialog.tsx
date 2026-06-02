@@ -27,6 +27,7 @@ export function PublishDialog({ open, onOpenChange }: Props) {
   const { id: botId } = useParams();
   const { flow, validation } = useBuilder();
   const { data: bot, refetch } = useBot(botId);
+  const { workspace } = useWorkspace();
 
   const [slug, setSlug] = useState(bot?.slug ?? slugify(bot?.name ?? flow.metadata?.name ?? "meu-bot"));
   const [note, setNote] = useState("");
@@ -46,6 +47,7 @@ export function PublishDialog({ open, onOpenChange }: Props) {
       const result = await persistence.bots.publish(botId, flow as Flow, slug || undefined, note || undefined);
       setPublishedSlug(result.slug ?? slug);
       toast.success("Bot publicado!");
+      recordActivation(workspace?.id ?? "ws_local_demo", "first_bot_published");
       refetch();
     } catch (err: any) {
       toast.error(err?.message ?? "Falha ao publicar");

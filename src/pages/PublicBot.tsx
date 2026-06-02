@@ -1,8 +1,6 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Send, Sparkles, Bot, Loader2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
 import { useEngine } from "@/hooks/useEngine";
 import {
   loadPublicBot,
@@ -18,6 +16,7 @@ import {
 } from "@/lib/public-runtime";
 import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/tracking";
 import type { Flow } from "@/types";
+import { getRenderer, listRenderers, resolveVariant, type RendererId } from "@/renderers";
 
 
 type LoadState =

@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Bot, GitBranch, Variable, Users, MessageSquare,
-  BarChart3, LayoutTemplate, Settings, Sparkles,
+  BarChart3, LayoutTemplate, Settings, Sparkles, Activity, Target, DollarSign, Bell,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -14,7 +14,14 @@ const main = [
   { title: "Bots", url: "/app/bots", icon: Bot },
   { title: "Leads", url: "/app/leads", icon: Users },
   { title: "Conversas", url: "/app/conversations", icon: MessageSquare },
+];
+
+const intel = [
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
+  { title: "Tracking", url: "/app/tracking", icon: Activity },
+  { title: "Attribution", url: "/app/attribution", icon: Target },
+  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
+  { title: "Alertas", url: "/app/alerts", icon: Bell },
 ];
 
 const build = [
@@ -54,6 +61,27 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {main.map((i) => (
+                <SidebarMenuItem key={i.title}>
+                  <SidebarMenuButton asChild isActive={isActive(i.url)} tooltip={i.title}
+                    className="data-[active=true]:bg-primary/15 data-[active=true]:text-primary-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary">
+                    <NavLink to={i.url}>
+                      <i.icon className="h-4 w-4" />
+                      <span>{i.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="text-[11px] uppercase tracking-widest text-muted-foreground/70">
+            Intelligence
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {intel.map((i) => (
                 <SidebarMenuItem key={i.title}>
                   <SidebarMenuButton asChild isActive={isActive(i.url)} tooltip={i.title}
                     className="data-[active=true]:bg-primary/15 data-[active=true]:text-primary-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary">

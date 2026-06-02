@@ -15,6 +15,10 @@ import Analytics from "./pages/Analytics";
 import Templates from "./pages/Templates";
 import Variables from "./pages/Variables";
 import PublicBot from "./pages/PublicBot";
+import Tracking from "./pages/Tracking";
+import Attribution from "./pages/Attribution";
+import Revenue from "./pages/Revenue";
+import Alerts from "./pages/Alerts";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +38,10 @@ const App = () => (
             <Route path="leads" element={<Leads />} />
             <Route path="conversations" element={<Conversations />} />
             <Route path="analytics" element={<Analytics />} />
+            <Route path="tracking" element={<Tracking />} />
+            <Route path="attribution" element={<Attribution />} />
+            <Route path="revenue" element={<Revenue />} />
+            <Route path="alerts" element={<Alerts />} />
             <Route path="templates" element={<Templates />} />
             <Route path="variables" element={<Variables />} />
           </Route>

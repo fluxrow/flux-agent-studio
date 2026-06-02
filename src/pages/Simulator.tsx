@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { useBots, useFlow } from "@/domain/hooks";
 import { useEngine } from "@/hooks/useEngine";
 import { RuntimeInspector } from "@/components/runtime/RuntimeInspector";
+import { EventInspector } from "@/components/runtime/EventInspector";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 export default function Simulator() {
@@ -162,9 +164,20 @@ export default function Simulator() {
           </footer>
         </section>
 
-        {/* Inspector */}
+        {/* Inspector + Events */}
         <aside>
-          <RuntimeInspector state={state} />
+          <Tabs defaultValue="state">
+            <TabsList className="w-full grid grid-cols-2 bg-secondary/40">
+              <TabsTrigger value="state">State</TabsTrigger>
+              <TabsTrigger value="events">Events</TabsTrigger>
+            </TabsList>
+            <TabsContent value="state" className="mt-3">
+              <RuntimeInspector state={state} />
+            </TabsContent>
+            <TabsContent value="events" className="mt-3">
+              <EventInspector sessionId={state?.context.sessionId ?? null} />
+            </TabsContent>
+          </Tabs>
         </aside>
       </div>
     </div>

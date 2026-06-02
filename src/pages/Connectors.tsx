@@ -85,6 +85,7 @@ export default function Connectors() {
           <TabsTrigger value="all">Todos</TabsTrigger>
           <TabsTrigger value="installed">Instalados</TabsTrigger>
           <TabsTrigger value="available">Disponíveis</TabsTrigger>
+          <TabsTrigger value="inspector">Inspector</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-4">
@@ -105,6 +106,9 @@ export default function Connectors() {
             workspaceId={workspaceId}
             onConfigure={setConfigureFor}
           />
+        </TabsContent>
+        <TabsContent value="inspector" className="mt-4">
+          <ConnectorInspector />
         </TabsContent>
       </Tabs>
 

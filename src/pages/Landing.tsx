@@ -27,7 +27,7 @@ export default function Landing() {
             <a href="#" className="hover:text-foreground transition">Preços</a>
             <a href="#" className="hover:text-foreground transition">Docs</a>
           </div>
-          <Link to="/app">
+          <Link to="/dashboard">
             <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
               Entrar no app <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
@@ -51,7 +51,7 @@ export default function Landing() {
               Capture, qualifique e converta leads em qualquer canal — sem código.
             </p>
             <div className="mt-9 flex items-center justify-center gap-3">
-              <Link to="/app">
+              <Link to="/dashboard">
                 <Button size="lg" className="gradient-primary text-primary-foreground border-0 shadow-elegant h-12 px-7">
                   Começar grátis <ArrowRight className="h-4 w-4 ml-1.5" />
                 </Button>
@@ -144,7 +144,7 @@ export default function Landing() {
             <div className="relative">
               <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight">Pronto para criar seu primeiro agente?</h2>
               <p className="mt-4 text-muted-foreground max-w-xl mx-auto">Em minutos, não meses. Templates prontos para SDR, clínicas, imobiliárias, e-commerce e mais.</p>
-              <Link to="/app">
+              <Link to="/dashboard">
                 <Button size="lg" className="mt-8 gradient-primary text-primary-foreground border-0 shadow-elegant h-12 px-8">
                   Acessar dashboard <ArrowRight className="h-4 w-4 ml-1.5" />
                 </Button>

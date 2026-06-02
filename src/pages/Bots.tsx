@@ -80,7 +80,7 @@ export default function Bots() {
               </div>
 
               <div className="mt-4 flex gap-2">
-                <Link to={`/app/builder/${b.id}`} className="flex-1">
+                <Link to={`/builder/${b.id}`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full bg-secondary/40">Abrir builder</Button>
                 </Link>
                 <Link to={`/bot/${b.id}`} target="_blank">

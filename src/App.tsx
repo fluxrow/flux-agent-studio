@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.tsx";
 import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Bots from "./pages/Bots";
+import BotNew from "./pages/BotNew";
 import Builder from "./pages/Builder";
 import Leads from "./pages/Leads";
 import Conversations from "./pages/Conversations";
@@ -34,22 +35,23 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/bot/:slug" element={<PublicBot />} />
-          <Route path="/app" element={<AppLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="bots" element={<Bots />} />
-            <Route path="builder/:id" element={<Builder />} />
-            <Route path="leads" element={<Leads />} />
-            <Route path="conversations" element={<Conversations />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="tracking" element={<Tracking />} />
-            <Route path="attribution" element={<Attribution />} />
-            <Route path="revenue" element={<Revenue />} />
-            <Route path="alerts" element={<Alerts />} />
-            <Route path="templates" element={<Templates />} />
-            <Route path="variables" element={<Variables />} />
-            <Route path="channels" element={<Channels />} />
-            <Route path="forms" element={<Forms />} />
-            <Route path="settings" element={<Settings />} />
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/bots" element={<Bots />} />
+            <Route path="/bots/new" element={<BotNew />} />
+            <Route path="/builder/:id" element={<Builder />} />
+            <Route path="/leads" element={<Leads />} />
+            <Route path="/conversations" element={<Conversations />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/tracking" element={<Tracking />} />
+            <Route path="/attribution" element={<Attribution />} />
+            <Route path="/revenue" element={<Revenue />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/variables" element={<Variables />} />
+            <Route path="/channels" element={<Channels />} />
+            <Route path="/forms" element={<Forms />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

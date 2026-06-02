@@ -10,8 +10,18 @@ import {
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useWorkspace } from "@/auth/WorkspaceProvider";
+import { isFeatureEnabled } from "@/beta/featureFlags";
+import type { FeatureKey } from "@/beta/types";
 
-const main = [
+type NavItem = {
+  title: string;
+  url: string;
+  icon: typeof LayoutDashboard;
+  flag?: FeatureKey;
+};
+
+const main: NavItem[] = [
   { title: "Dashboard",     url: "/dashboard",     icon: LayoutDashboard },
   { title: "Bots",          url: "/bots",          icon: Bot },
   { title: "Leads",         url: "/leads",         icon: Users },
@@ -19,22 +29,22 @@ const main = [
   { title: "Analytics",     url: "/analytics",     icon: BarChart3 },
   { title: "Templates",     url: "/templates",     icon: LayoutTemplate },
   { title: "Canais",        url: "/channels",      icon: Plug },
-  { title: "Conectores",    url: "/connectors",    icon: Plug },
+  { title: "Conectores",    url: "/connectors",    icon: Plug, flag: "connectors" },
   { title: "Configurações", url: "/settings",      icon: Settings },
 ];
 
-const intel = [
+const intel: NavItem[] = [
   { title: "Simulator",     url: "/simulator",     icon: PlayCircle },
-  { title: "AI Builder",    url: "/ai-builder",    icon: Wand2 },
+  { title: "AI Builder",    url: "/ai-builder",    icon: Wand2, flag: "ai_builder" },
   { title: "AI Playground", url: "/ai/playground", icon: Sparkles },
-  { title: "Knowledge",     url: "/knowledge",     icon: BookOpen },
+  { title: "Knowledge",     url: "/knowledge",     icon: BookOpen, flag: "knowledge_base" },
   { title: "Tracking",      url: "/tracking",      icon: Activity },
   { title: "Attribution",   url: "/attribution",   icon: Target },
   { title: "Revenue",       url: "/revenue",       icon: DollarSign },
   { title: "Alertas",       url: "/alerts",        icon: Bell },
 ];
 
-const beta = [
+const beta: NavItem[] = [
   { title: "Onboarding",    url: "/onboarding",    icon: Rocket },
   { title: "Beta Program",  url: "/beta",          icon: FlaskConical },
   { title: "System Health", url: "/system-health", icon: HeartPulse },

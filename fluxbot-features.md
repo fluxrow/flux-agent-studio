@@ -498,3 +498,92 @@ When real providers arrive (Meta, WhatsApp Cloud API, Telegram Bot API,
 GBP), only `src/oauth/providers.ts` changes — every consumer
 (`ConnectedAccountsPanel`, `OmnichannelWidget`, Channel adapters) keeps
 working against the same `OAuthProvider` contract.
+
+## Phase 12 — AI Block Engine
+
+Adds first-class AI to FluxBot **without changing the Runtime Engine**.
+The AI block is a normal block in the Flow; the engine dispatches to a
+provider-agnostic runner and waits for the result before advancing.
+
+### AI Provider Layer (`src/ai`)
+Single contract every provider must honour:
+```ts
+interface AIProvider {
+  id: "openai" | "anthropic" | "gemini";
+  models: AIModelInfo[];
+  generate(input): Promise<AIResponse<string>>;
+  extract(input): Promise<AIResponse<Record<string, unknown>>>;
+  classify(input): Promise<AIResponse<string>>;
+}
+```
+Stubs ship under `src/ai/providers/` (`openai`, `anthropic`, `gemini`).
+Each one returns deterministic mock answers, fake token counts and a real
+cost estimate using per-model `inputCostPer1k` / `outputCostPer1k`. Swap
+the body of `_mock.ts` with a Lovable AI Gateway call to ship real
+providers — every consumer keeps working.
+
+### AI Block (`type: "ai"`)
+Configurable through Builder → Propriedades:
+- `prompt` (with `{{variavel}}` interpolation)
+- `provider` + `model`
+- `temperature` + `maxTokens`
+- `outputSchema` (string / number / boolean / string[] + enums)
+- `mappings` (AI field → flow variable, e.g. `cidade → lead.city`)
+- `outputVariable` (raw text fallback)
+
+### Structured Outputs
+When `outputSchema` is present the runner calls `provider.extract()` and
+validates the JSON with `validateSchema` before merging into the Flow
+context. Invalid responses are rejected, logged in the Inspector with
+`ok: false`, and the engine falls through to the next block.
+
+### Runtime Integration
+`src/runtime/engine.ts` adds:
+```ts
+case "ai":
+  void this.runAiBlock(block);
+  return;
+```
+`runAiBlock` calls `runAiBlock()` from `src/ai/runner`, pushes a bot
+transcript with the response, writes mapped variables, emits
+`variable_updated` for each, and finally `advanceFrom(block.id)` — the
+exact same path every other block uses. The runner also emits a new
+`ai_block_executed` event on the runtime EventBus, so the existing
+Tracking Engine and Destinations layer pick it up automatically.
+
+### Variable Mapping → CRM
+Mappings can target lead-flavoured variables (`lead.tags`, `lead.score`,
+`lead.email`, etc.). The existing `crm-bridge` already turns those into
+real lead fields, so the AI block can update tags / score / contact data
+on a finished flow without bespoke code.
+
+### AI Inspector (Builder → tab "IA")
+`src/components/builder/AIInspectorPanel.tsx` shows every recent run:
+prompt, response (raw + parsed), provider, model, duration, token usage
+and estimated cost. Records are persisted in `localStorage` via
+`aiInspector` (ring buffer of 100).
+
+### Cost Tracking
+Each `AIRunRecord` stores:
+```
+provider, model, inputTokens, outputTokens, estimatedCost,
+durationMs, sessionId, blockId, flowId, ok, error
+```
+Aggregates show up at the top of the Inspector (runs, total tokens, $).
+
+### AI Playground (`/ai/playground`)
+Stand-alone page to test prompts and schemas without editing a flow.
+Pick provider/model, set temperature, paste a JSON schema, and run —
+results land in the same Inspector buffer used by the Builder.
+
+### Files
+- `src/ai/types.ts` — provider contract, run records, block config
+- `src/ai/schema.ts` — runtime schema validator + JSON salvager
+- `src/ai/providers/_mock.ts` — shared mock factory (latency + tokens + cost)
+- `src/ai/providers/index.ts` — openai / anthropic / gemini stubs
+- `src/ai/registry.ts` — provider lookup
+- `src/ai/inspector.ts` — localStorage run buffer + pub/sub
+- `src/ai/runner.ts` — single entry called by engine + playground
+- `src/components/builder/AIBlockEditor.tsx` — block properties UI
+- `src/components/builder/AIInspectorPanel.tsx` — Inspector tab + Playground reuse
+- `src/pages/AIPlayground.tsx` — `/ai/playground` page

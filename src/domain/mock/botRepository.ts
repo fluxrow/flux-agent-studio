@@ -1,5 +1,6 @@
-import type { Bot, BotCreateInput, ID, ListParams } from "@/types";
+import type { Bot, BotCreateInput, Flow, ID, ListParams } from "@/types";
 import type { BotRepository } from "../repositories";
+import { mockFlows } from "@/mocks";
 import { mockBots } from "@/mocks";
 import { MOCK_WORKSPACE_ID, nowIso } from "@/mocks/_shared";
 import { delay, filterBySearch, paginate } from "./_helpers";

@@ -72,6 +72,8 @@ export class RuntimeEngine {
     this.context.visitedBlocks = [];
     this.transcript = [];
     this.awaiting = null;
+    this.emitExecution("flow_started", { startBlockId: startBlock.id });
+    this.emitExecution("conversation_started", {});
     this.process(startBlock.id);
   }
 

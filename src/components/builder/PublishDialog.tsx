@@ -12,6 +12,8 @@ import { useBuilder } from "@/builder/BuilderContext";
 import { useBot } from "@/domain/hooks";
 import { toast } from "sonner";
 import type { Flow } from "@/types";
+import { recordActivation } from "@/beta/activation";
+import { useWorkspace } from "@/auth/WorkspaceProvider";
 
 interface Props {
   open: boolean;

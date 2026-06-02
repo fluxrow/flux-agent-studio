@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Auth from "./pages/Auth";
 import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Bots from "./pages/Bots";
@@ -24,6 +25,9 @@ import Channels from "./pages/Channels";
 import Forms from "./pages/Forms";
 import Settings from "./pages/Settings";
 import Simulator from "./pages/Simulator";
+import { AuthProvider } from "@/auth/AuthProvider";
+import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
+import { ProtectedRoute } from "@/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -33,30 +37,41 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/bot/:slug" element={<PublicBot />} />
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/bots" element={<Bots />} />
-            <Route path="/bots/new" element={<BotNew />} />
-            <Route path="/builder/:id" element={<Builder />} />
-            <Route path="/leads" element={<Leads />} />
-            <Route path="/conversations" element={<Conversations />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/tracking" element={<Tracking />} />
-            <Route path="/attribution" element={<Attribution />} />
-            <Route path="/revenue" element={<Revenue />} />
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/templates" element={<Templates />} />
-            <Route path="/variables" element={<Variables />} />
-            <Route path="/channels" element={<Channels />} />
-            <Route path="/forms" element={<Forms />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/simulator" element={<Simulator />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <WorkspaceProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/bot/:slug" element={<PublicBot />} />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/bots" element={<Bots />} />
+                <Route path="/bots/new" element={<BotNew />} />
+                <Route path="/builder/:id" element={<Builder />} />
+                <Route path="/leads" element={<Leads />} />
+                <Route path="/conversations" element={<Conversations />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/tracking" element={<Tracking />} />
+                <Route path="/attribution" element={<Attribution />} />
+                <Route path="/revenue" element={<Revenue />} />
+                <Route path="/alerts" element={<Alerts />} />
+                <Route path="/templates" element={<Templates />} />
+                <Route path="/variables" element={<Variables />} />
+                <Route path="/channels" element={<Channels />} />
+                <Route path="/forms" element={<Forms />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/simulator" element={<Simulator />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </WorkspaceProvider>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

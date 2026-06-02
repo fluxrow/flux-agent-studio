@@ -17,7 +17,7 @@ const KEY_CREDENTIAL_VALUES = "fluxbot.connector_credential_values.v1"; // dev-o
 type ConnectorsBlob = Record<string, Connector[]>;     // workspaceId -> []
 type CredentialsBlob = Record<string, ConnectorCredential[]>; // workspaceId -> []
 
-function read<T extends Record<string, unknown[]>>(key: string): T {
+function read<T>(key: string): T {
   try {
     const raw = typeof localStorage !== "undefined" ? localStorage.getItem(key) : null;
     return raw ? (JSON.parse(raw) as T) : ({} as T);

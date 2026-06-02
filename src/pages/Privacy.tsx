@@ -1,6 +1,4 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Sparkles } from "lucide-react";
 import { getComplianceDoc } from "@/compliance";
 import { CompliancePublicLayout, MarkdownLite } from "@/components/compliance/CompliancePublicLayout";
 

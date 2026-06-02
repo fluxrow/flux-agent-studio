@@ -59,10 +59,13 @@ export function CredentialsPanel() {
     toast.success("Credencial rotacionada.");
   };
 
-  const remove = (c: CredentialRecord) => {
-    if (!confirm(`Remover credencial ${c.label}?`)) return;
-    removeCredential(c.id);
+  const remove = (c: CredentialRecord) => setToRemove(c);
+  const confirmRemove = () => {
+    if (!toRemove) return;
+    removeCredential(toRemove.id);
+    setToRemove(null);
     refresh();
+    toast.success("Credencial removida");
   };
 
   return (

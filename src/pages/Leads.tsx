@@ -1,36 +1,46 @@
-import { leads, stages } from "@/lib/mock";
-import { Plus, Flame, Snowflake, Thermometer, MoreHorizontal, Phone, Mail } from "lucide-react";
+import { Plus, Flame, Snowflake, Thermometer, MoreHorizontal, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLeadsByStage, usePipelineStages } from "@/domain/hooks";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { PipelineColumn } from "@/components/leads/PipelineColumn";
 
 const tempIcon = { quente: Flame, morno: Thermometer, frio: Snowflake } as const;
 const tempColor = { quente: "text-destructive", morno: "text-warning", frio: "text-accent" } as const;
-const stageDot: Record<string,string> = { novo:"bg-muted-foreground", qualificado:"bg-accent", negociacao:"bg-warning", convertido:"bg-success", perdido:"bg-destructive" };
+const stageDot: Record<string, string> = {
+  novo: "bg-muted-foreground",
+  qualificado: "bg-accent",
+  negociacao: "bg-warning",
+  convertido: "bg-success",
+  perdido: "bg-destructive",
+};
 
 export default function Leads() {
+  const { data: stages = [] } = usePipelineStages();
+  const { data: byStage, isLoading } = useLeadsByStage();
+  const total = byStage ? Object.values(byStage).reduce((a, l) => a + l.length, 0) : 0;
+
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1700px] mx-auto">
-      <div className="flex items-end justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Leads</h1>
-          <p className="text-muted-foreground text-sm mt-1">Pipeline CRM · {leads.length} leads</p>
-        </div>
-        <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant"><Plus className="h-4 w-4 mr-1.5" /> Novo lead</Button>
-      </div>
+      <PageHeader
+        title="Leads"
+        description={`Pipeline CRM · ${total} leads`}
+        actions={
+          <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
+            <Plus className="h-4 w-4 mr-1.5" /> Novo lead
+          </Button>
+        }
+      />
 
-      <div className="grid grid-cols-5 gap-3 min-w-0">
-        {stages.map((s) => {
-          const items = leads.filter(l => l.stage === s.id);
-          return (
-            <div key={s.id} className="flex flex-col rounded-2xl border border-border bg-card/40 min-h-[600px]">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${stageDot[s.id]}`} />
-                  <span className="font-semibold text-sm">{s.label}</span>
-                  <span className="text-xs text-muted-foreground">{items.length}</span>
-                </div>
-                <Button size="icon" variant="ghost" className="h-7 w-7"><Plus className="h-4 w-4" /></Button>
-              </div>
-              <div className="p-2 space-y-2 flex-1">
+      {isLoading || !byStage ? (
+        <div className="flex items-center justify-center py-20 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-5 gap-3 min-w-0">
+          {stages.map((s) => {
+            const items = byStage[s.id] ?? [];
+            return (
+              <PipelineColumn key={s.id} label={s.label} count={items.length} dotColor={stageDot[s.id]}>
                 {items.map((l) => {
                   const TempIcon = tempIcon[l.temperature];
                   return (
@@ -38,11 +48,11 @@ export default function Leads() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <div className="h-8 w-8 rounded-lg gradient-accent flex items-center justify-center text-xs font-bold text-background">
-                            {l.name.split(" ").map(n=>n[0]).slice(0,2).join("")}
+                            {l.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
                           </div>
                           <div>
                             <div className="text-sm font-medium">{l.name}</div>
-                            <div className="text-[10px] text-muted-foreground">{l.bot}</div>
+                            <div className="text-[10px] text-muted-foreground">{l.botName}</div>
                           </div>
                         </div>
                         <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
@@ -52,7 +62,8 @@ export default function Leads() {
                           <TempIcon className="h-3 w-3" /> {l.temperature}
                         </div>
                         <div className="text-xs font-mono font-semibold">
-                          <span className="text-primary-glow">{l.score}</span><span className="text-muted-foreground">/100</span>
+                          <span className="text-primary-glow">{l.score}</span>
+                          <span className="text-muted-foreground">/100</span>
                         </div>
                       </div>
                       <div className="mt-2 h-1 rounded-full bg-secondary overflow-hidden">
@@ -64,11 +75,11 @@ export default function Leads() {
                     </div>
                   );
                 })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              </PipelineColumn>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

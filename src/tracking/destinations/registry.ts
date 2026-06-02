@@ -105,11 +105,17 @@ class DestinationRegistry {
   }
 
   setConfig(id: string, patch: Partial<DestinationConfig>) {
-    const current = this.getConfig(id);
+    const current = this.getPublicConfig(id);
+    // BUG-01: route secret fields (accessToken, apiKey, …) to the in-memory
+    // vault so they never touch localStorage. Public meta (pixelId, accountId)
+    // continues to live in the persisted state.
+    const incomingCreds = patch.credentials ?? {};
+    const { publicMeta, secrets } = splitCredentials(incomingCreds);
+    if (Object.keys(secrets).length > 0) mergeSecrets("tracking", id, secrets);
     this.state.configs[id] = {
       ...current,
       ...patch,
-      credentials: { ...current.credentials, ...(patch.credentials ?? {}) },
+      credentials: { ...(current.credentials ?? {}), ...publicMeta },
     };
     this.saveToStorage();
     this.emit();

@@ -53,10 +53,10 @@ export default function Alerts() {
             {alerts.map((a) => {
               const s = sev(a.severity);
               return (
-                <div key={a.id} className={`rounded-xl border bg-background/40 p-4 border-${s.color}/30 bg-gradient-to-r from-${s.color}/5 to-transparent`}>
+                <div key={a.id} className={`rounded-xl border bg-background/40 p-4 ${s.wrap}`}>
                   <div className="flex items-start gap-3">
-                    <div className={`h-9 w-9 rounded-lg bg-${s.color}/15 flex items-center justify-center flex-shrink-0`}>
-                      <s.Icon className={`h-4 w-4 text-${s.color}`} />
+                    <div className={`h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0 ${s.chip}`}>
+                      <s.Icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">

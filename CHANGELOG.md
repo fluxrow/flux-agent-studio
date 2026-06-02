@@ -12,6 +12,51 @@ completos por fase.
 - `.env.example` documentando variáveis públicas
 - `.editorconfig` para consistência entre editores
 
+## Phase 21 — Beta Experience
+
+### Onboarding guiado
+- `src/components/beta/OnboardingChecklist.tsx` (novo): checklist de 6
+  passos no Dashboard, com progresso (%) derivado dos critérios reais do
+  workspace + métricas de ativação. Some quando 100% concluído.
+
+### Workspace Health Score
+- `src/beta/healthScore.ts` (novo) + `src/components/beta/WorkspaceHealthCard.tsx`:
+  card no Dashboard com score 0–100, tier (Configuração Inicial → Avançado),
+  checklist de 8 critérios (bot, publicação, lead, conversa, tracking, IA,
+  knowledge, canal) e recomendações automáticas com CTAs.
+
+### Demo workspace
+- `src/beta/demoMode.ts` (novo) + botão "Explorar workspace demo" no
+  header do Dashboard. Toggle persistido em `localStorage` sem alterar
+  dados reais.
+
+### Central de Novidades
+- `src/pages/Updates.tsx` (novo) + rota `/updates` + item "Novidades" na
+  sidebar. Lê `src/beta/updates.ts` (lista curada alinhada com este
+  changelog).
+
+### Feedback contextual
+- `src/beta/contextualFeedback.ts` + `src/components/beta/ContextualFeedback.tsx`
+  (novos): widget 👍/👎 com persistência local. Plugado em
+  Dashboard, Docs e Analytics.
+
+### Empty states inteligentes
+- `EmptyState` no Dashboard agora oferece CTA duplo ("Criar bot" + "Ver
+  documentação"). Reaproveitado em Analytics.
+
+### Beta Banner
+- `src/components/beta/BetaBanner.tsx` (novo): banner discreto acima do
+  header do `AppLayout`, com atalhos para Feedback / Bug / Recurso e
+  dismiss persistente.
+
+### Métricas de ativação
+- `src/beta/activation.ts` (novo): registra os 6 milestones (bot criado,
+  bot publicado, lead capturado, primeira conversa, IA, knowledge) por
+  workspace em `localStorage`. Wired em `BotNew`, `PublishDialog` e
+  `crm-bridge` (lead + conversation).
+
+
+
 ## Phase 20 — UX, Tooltips e Documentação
 
 ### Zero State

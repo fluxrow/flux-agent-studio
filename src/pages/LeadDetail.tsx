@@ -221,9 +221,14 @@ export default function LeadDetail() {
           <Tabs defaultValue="timeline">
             <TabsList className="bg-card/60 border border-border h-auto p-1">
               <TabsTrigger value="timeline"><Clock className="h-3.5 w-3.5 mr-1.5" />Timeline</TabsTrigger>
+              <TabsTrigger value="intelligence"><Brain className="h-3.5 w-3.5 mr-1.5" />Intelligence</TabsTrigger>
               <TabsTrigger value="conversations"><MessageSquare className="h-3.5 w-3.5 mr-1.5" />Conversas</TabsTrigger>
               <TabsTrigger value="notes">Notas</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="intelligence" className="mt-4">
+              <LeadIntelligencePanel lead={lead} eventCount={timeline.length} />
+            </TabsContent>
 
             <TabsContent value="timeline" className="mt-4">
               <div className="rounded-2xl border border-border bg-card/60 p-5">

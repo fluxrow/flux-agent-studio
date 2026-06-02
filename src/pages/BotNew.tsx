@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Bot, Sparkles, MessageCircle, ShoppingCart, Headphones, Calendar } from "lucide-react";
+import { ArrowLeft, Bot, Sparkles, MessageCircle, ShoppingCart, Headphones, Calendar, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SectionCard } from "@/components/shared/SectionCard";
 import { cn } from "@/lib/utils";
+import { useCreateBot } from "@/domain/hooks";
+import { toast } from "sonner";
 
 const presets = [
   { id: "blank",   icon: Sparkles,      title: "Em branco",       desc: "Comece do zero com um canvas vazio." },
@@ -18,13 +20,42 @@ const presets = [
   { id: "lead",    icon: MessageCircle, title: "Captura de Lead", desc: "Formulário conversacional moderno." },
 ];
 
-const channels = ["WhatsApp", "Instagram", "Web Widget", "Telegram"];
+const channels = [
+  { label: "WhatsApp",   value: "whatsapp" },
+  { label: "Instagram",  value: "instagram" },
+  { label: "Web Widget", value: "web" },
+  { label: "Telegram",   value: "telegram" },
+];
 
 export default function BotNew() {
   const navigate = useNavigate();
+  const createBot = useCreateBot();
   const [preset, setPreset] = useState("sdr");
-  const [channel, setChannel] = useState("WhatsApp");
+  const [channel, setChannel] = useState("whatsapp");
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+
+  const submitting = createBot.isPending;
+
+  async function handleCreate() {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      toast.error("Dê um nome ao seu bot antes de continuar.");
+      return;
+    }
+    try {
+      const bot = await createBot.mutateAsync({
+        name: trimmed,
+        description: description.trim(),
+        channel,
+      });
+      toast.success(`Bot "${bot.name}" criado.`);
+      navigate(`/builder/${bot.id}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha ao criar bot.";
+      toast.error(msg);
+    }
+  }
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-5xl mx-auto">
@@ -82,16 +113,16 @@ export default function BotNew() {
             <div className="flex flex-wrap gap-2">
               {channels.map((c) => (
                 <button
-                  key={c}
-                  onClick={() => setChannel(c)}
+                  key={c.value}
+                  onClick={() => setChannel(c.value)}
                   className={cn(
                     "text-xs px-3 py-1.5 rounded-full border transition",
-                    channel === c
+                    channel === c.value
                       ? "border-primary bg-primary/15 text-primary-foreground"
                       : "border-border bg-background/40 text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  {c}
+                  {c.label}
                 </button>
               ))}
             </div>
@@ -100,6 +131,8 @@ export default function BotNew() {
             <Label htmlFor="bot-desc">Descrição (opcional)</Label>
             <Textarea
               id="bot-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Para que serve esse agente?"
               className="bg-background/60 min-h-[90px]"
             />
@@ -108,12 +141,19 @@ export default function BotNew() {
       </SectionCard>
 
       <div className="flex items-center justify-end gap-2">
-        <Button variant="ghost" onClick={() => navigate("/bots")}>Cancelar</Button>
+        <Button variant="ghost" onClick={() => navigate("/bots")} disabled={submitting}>
+          Cancelar
+        </Button>
         <Button
           className="gradient-primary text-primary-foreground border-0 shadow-elegant"
-          onClick={() => navigate("/builder/sdr-imob")}
+          onClick={handleCreate}
+          disabled={submitting || !name.trim()}
         >
-          Criar e abrir builder
+          {submitting ? (
+            <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> Criando…</>
+          ) : (
+            "Criar e abrir builder"
+          )}
         </Button>
       </div>
     </div>

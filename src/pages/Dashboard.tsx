@@ -1,5 +1,5 @@
-import { kpis, conversionsChart, channelChart, recentActivity, bots } from "@/lib/mock";
-import { TrendingUp, TrendingDown, ArrowUpRight, Bot, Activity, Zap, Sparkles, AlertTriangle, Flame, DollarSign } from "lucide-react";
+import { conversionsChart, channelChart, recentActivity, bots } from "@/lib/mock";
+import { TrendingUp, ArrowUpRight, Bot, Activity, Zap, Sparkles, AlertTriangle, Flame, DollarSign, MessageSquare, Users, Target } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
 import { LeadIntelligenceWidget } from "@/components/dashboard/LeadIntelligenceWidget";
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
+import { useBasicStats } from "@/lib/analytics-basic";
 
 function greetingFor(date: Date): string {
   const h = date.getHours();
@@ -35,8 +36,16 @@ const channelColors = ["hsl(265 89% 66%)", "hsl(190 95% 55%)", "hsl(220 95% 60%)
 export default function Dashboard() {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
+  const { data: stats, isLoading: statsLoading } = useBasicStats();
   const firstName = ((user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "").split(" ")[0];
   const greeting = greetingFor(new Date());
+
+  const kpiCards = [
+    { label: "Bots",        value: stats?.bots ?? 0,          icon: Bot },
+    { label: "Leads",       value: stats?.leads ?? 0,         icon: Users },
+    { label: "Conversas",   value: stats?.conversations ?? 0, icon: MessageSquare },
+    { label: "Conversões",  value: stats?.conversions ?? 0,   icon: Target },
+  ];
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
@@ -56,15 +65,21 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs — agregações reais do workspace */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.map((k) => (
+        {kpiCards.map((k) => (
           <div key={k.label} className="rounded-2xl border border-border bg-card/60 p-5 hover:border-primary/40 transition">
-            <div className="text-xs text-muted-foreground">{k.label}</div>
-            <div className="font-display text-3xl font-bold mt-2">{k.value}</div>
-            <div className={`mt-2 inline-flex items-center gap-1 text-xs ${k.trend === "up" ? "text-success" : "text-accent"}`}>
-              {k.trend === "up" ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-              {k.delta} <span className="text-muted-foreground">vs semana passada</span>
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-muted-foreground">{k.label}</div>
+              <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
+                <k.icon className="h-4 w-4 text-primary-foreground" />
+              </div>
+            </div>
+            <div className="font-display text-3xl font-bold mt-3 tabular-nums">
+              {statsLoading ? "—" : k.value.toLocaleString()}
+            </div>
+            <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <TrendingUp className="h-3 w-3" /> dados em tempo real
             </div>
           </div>
         ))}

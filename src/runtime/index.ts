@@ -16,3 +16,14 @@ export {
   newConnectionId,
 } from "./serialize";
 export type { SerializedFlow } from "./serialize";
+export {
+  EventBus,
+  runtimeEventBus,
+  makeEvent,
+} from "./events";
+export type {
+  ExecutionEvent,
+  ExecutionEventType,
+  ExecutionEventListener,
+  ExecutionUnsubscribe,
+} from "./events";

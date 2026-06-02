@@ -19,6 +19,8 @@ import {
 } from "./types";
 import { interpolate } from "./interpolate";
 import { evaluateCondition } from "./conditions";
+import { runtimeEventBus, makeEvent } from "./events";
+import type { ExecutionEventType } from "./events";
 
 const uid = () => `s_${Math.random().toString(36).slice(2, 10)}`;
 const now = () => new Date().toISOString();
@@ -70,6 +72,8 @@ export class RuntimeEngine {
     this.context.visitedBlocks = [];
     this.transcript = [];
     this.awaiting = null;
+    this.emitExecution("flow_started", { startBlockId: startBlock.id });
+    this.emitExecution("conversation_started", {});
     this.process(startBlock.id);
   }
 
@@ -81,8 +85,13 @@ export class RuntimeEngine {
     }
     const block = this.awaiting;
     const variable = String(block.config.variable ?? "");
-    if (variable) this.context.variables[variable] = value;
+    if (variable) {
+      this.context.variables[variable] = value;
+      this.emitExecution("variable_updated", { variable, value }, block.id);
+    }
     this.transcript.push({ kind: "user", text: value, at: now() });
+    this.emitExecution("input_received", { variable, value }, block.id);
+    this.emitExecution("block_exited", { blockId: block.id }, block.id);
     this.awaiting = null;
     this.advanceFrom(block.id);
   }
@@ -95,8 +104,13 @@ export class RuntimeEngine {
     }
     const block = this.awaiting;
     const variable = String(block.config.variable ?? "");
-    if (variable) this.context.variables[variable] = option;
+    if (variable) {
+      this.context.variables[variable] = option;
+      this.emitExecution("variable_updated", { variable, value: option }, block.id);
+    }
     this.transcript.push({ kind: "user", text: option, at: now() });
+    this.emitExecution("choice_selected", { variable, option }, block.id);
+    this.emitExecution("block_exited", { blockId: block.id }, block.id);
     this.awaiting = null;
     // Follow a connection whose `condition` label matches the option, if any.
     const labeled = this.outgoing(block.id).find(
@@ -108,10 +122,13 @@ export class RuntimeEngine {
 
   /** Force end the session. */
   end(systemNote = "Sessão encerrada"): void {
+    const wasRunning = this.context.status === "running" || this.context.status === "awaiting_input" || this.context.status === "awaiting_choice";
     this.context.status = "ended";
     this.context.endedAt = now();
     this.transcript.push({ kind: "system", text: systemNote, at: now() });
     this.emit({ type: "ended", context: this.context });
+    this.emitExecution(wasRunning ? "flow_abandoned" : "flow_completed", { note: systemNote });
+    this.emitExecution("conversation_completed", {});
     this.emitState();
   }
 
@@ -125,9 +142,11 @@ export class RuntimeEngine {
     if (!this.context.visitedBlocks.includes(block.id)) {
       this.context.visitedBlocks.push(block.id);
     }
+    this.emitExecution("block_entered", { blockId: block.id, blockType: block.type }, block.id);
 
     switch (block.type) {
       case "start":
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         this.advanceFrom(block.id);
         return;
 
@@ -135,6 +154,7 @@ export class RuntimeEngine {
         const text = interpolate(String(block.config.text ?? ""), this.context.variables);
         this.transcript.push({ kind: "bot", blockId: block.id, text, at: now() });
         this.emit({ type: "message", blockId: block.id, text });
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         this.advanceFrom(block.id);
         return;
       }
@@ -173,10 +193,16 @@ export class RuntimeEngine {
           value: (block.config.value as string | number) ?? "",
         };
         const result = evaluateCondition(cfg, this.context.variables);
+        this.emitExecution(
+          "condition_evaluated",
+          { variable: cfg.variable, operator: cfg.operator, value: cfg.value, result },
+          block.id,
+        );
         const label = result ? "true" : "false";
         const next = this.outgoing(block.id).find(
           (c) => (c.condition ?? "").toLowerCase() === label,
         );
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         if (next) this.process(next.toBlockId);
         else this.advanceFrom(block.id);
         return;
@@ -191,12 +217,15 @@ export class RuntimeEngine {
         this.context.status = "ended";
         this.context.endedAt = now();
         this.emit({ type: "ended", context: this.context });
+        this.emitExecution("flow_completed", { endBlockId: block.id }, block.id);
+        this.emitExecution("conversation_completed", {}, block.id);
         this.emitState();
         return;
       }
 
       // Unsupported types (ai, webhook, delay) auto-advance for now.
       default:
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         this.advanceFrom(block.id);
     }
   }
@@ -232,6 +261,24 @@ export class RuntimeEngine {
 
   private emitState(): void {
     this.emit({ type: "state", state: this.getState() });
+  }
+
+  private emitExecution(
+    type: ExecutionEventType,
+    payload: Record<string, unknown>,
+    blockId?: ID,
+  ): void {
+    runtimeEventBus.emit(
+      makeEvent(
+        type,
+        {
+          sessionId: this.context.sessionId,
+          flowId: this.context.flowId,
+          blockId: blockId ?? this.context.currentBlockId ?? undefined,
+        },
+        payload,
+      ),
+    );
   }
 }
 

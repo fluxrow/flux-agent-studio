@@ -1,8 +1,21 @@
 import { kpis, conversionsChart, channelChart, recentActivity, bots } from "@/lib/mock";
-import { TrendingUp, TrendingDown, ArrowUpRight, Bot, Activity, Zap, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowUpRight, Bot, Activity, Zap, Sparkles, AlertTriangle, Flame, DollarSign } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+
+const smartAlerts = [
+  { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/app/leads" },
+  { id: 2, icon: AlertTriangle, tone: "warning",     title: "Queda de 22% na qualificação IA",   desc: "Bloco 'Qualifica com IA' perdeu performance nas últimas 24h.",   cta: "Investigar",  to: "/app/analytics" },
+  { id: 3, icon: DollarSign,    tone: "success",     title: "ROAS Instagram subiu 1.4x",          desc: "Campanha Reels VSL gerou R$ 14.8k em pipeline hoje.",            cta: "Ver receita", to: "/app/revenue" },
+];
+
+const alertTone: Record<string,string> = {
+  destructive: "border-destructive/40 bg-destructive/5 text-destructive",
+  warning:     "border-warning/40 bg-warning/5 text-warning",
+  success:     "border-success/40 bg-success/5 text-success",
+};
+
 
 const channelColors = ["hsl(265 89% 66%)", "hsl(190 95% 55%)", "hsl(220 95% 60%)", "hsl(270 95% 75%)"];
 

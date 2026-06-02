@@ -176,9 +176,9 @@ export async function executeConnectorAction(opts: ExecuteOptions): Promise<Exec
     workspaceId: opts.workspaceId, connectorId: installation.id, action,
     parameters, outcome: "error", error: message,
   });
-  emitConnectorEvent("connector_action_executed", {
+  emitConnectorEvent("connector_action_failed", {
     connectorId: installation.id, manifestId: manifest.id, workspaceId: opts.workspaceId,
-    payload: { action: action.key, phase: "failed", error: message, attempts: used },
+    payload: { action: action.key, error: message, attempts: used },
   });
 
   if (policy === "stop_on_error") throw lastError;

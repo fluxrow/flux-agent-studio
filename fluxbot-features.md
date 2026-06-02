@@ -587,3 +587,46 @@ results land in the same Inspector buffer used by the Builder.
 - `src/components/builder/AIBlockEditor.tsx` — block properties UI
 - `src/components/builder/AIInspectorPanel.tsx` — Inspector tab + Playground reuse
 - `src/pages/AIPlayground.tsx` — `/ai/playground` page
+
+## Phase 13 — Knowledge Base Engine
+
+The AI Block can now answer with workspace-specific knowledge without any
+change to the Runtime Engine or the AI providers. Everything sits in
+`src/knowledge/*` and is wired into the AI runner through a single
+optional `config.knowledge` block.
+
+- **Domain (`src/knowledge/types.ts`)** — `KnowledgeBase`,
+  `KnowledgeDocument`, `KnowledgeChunk`, `KnowledgeSearchResult`,
+  `KnowledgeUsageRecord`.
+- **Storage (`src/knowledge/store.ts`)** — workspace-isolated localStorage
+  store for bases, documents and chunks. Designed to be swapped for
+  Supabase + pgvector with no consumer changes.
+- **Parsing (`src/knowledge/parsers.ts`)** — stubs for PDF, DOCX, TXT, URL
+  and pasted text. Ready for Supabase Storage + real extractors.
+- **Chunking (`src/knowledge/chunker.ts`)** — configurable strategies:
+  `fixed`, `paragraph`, `semantic` (stub falls back to paragraph).
+- **Embeddings (`src/knowledge/embeddings/*`)** — `EmbeddingProvider`
+  contract. `MockEmbeddingProvider` ships today (deterministic 64-dim
+  hash vectors); `OpenAIEmbeddingProvider` and `GeminiEmbeddingProvider`
+  are declared as stubs ready for the Lovable AI Gateway.
+- **Pipeline (`src/knowledge/pipeline.ts`)** — `ingestDocument` runs
+  parse → chunk → embed → persist with per-step status updates.
+- **Retrieval (`src/knowledge/retriever.ts`)** — `retrieveKnowledge`
+  performs cosine similarity, returns `KnowledgeSearchResult[]`, and
+  `formatContext` renders chunks as a prompt-ready block.
+- **AI integration (`src/ai/runner.ts`)** — when
+  `AIBlockConfig.knowledge.baseId` is set the runner retrieves chunks,
+  prepends them as `CONTEXTO DA BASE DE CONHECIMENTO`, and optionally
+  stores them in a flow variable. AI providers and the Runtime Engine
+  remain untouched.
+- **Workspace isolation** — all reads/writes are scoped by `workspaceId`;
+  bases never leak across workspaces.
+- **Cost tracking (`src/knowledge/cost.ts`)** — every embed and search
+  call is logged with provider, model, tokens and estimated cost.
+- **Events (`src/knowledge/events.ts`)** — emits `knowledge_uploaded`,
+  `knowledge_indexed`, `knowledge_retrieved`, `knowledge_used` on the
+  shared `runtimeEventBus`, so the existing Event Inspector and Tracking
+  Engine pick them up automatically.
+- **Playground (`src/pages/Knowledge.tsx`, route `/knowledge`)** — create
+  bases, upload/index content, inspect documents and chunks, run live
+  retrieval queries and watch cost stats update.

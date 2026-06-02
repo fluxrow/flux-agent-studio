@@ -13,6 +13,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { USE_SUPABASE } from "@/lib/runtime-config";
 import { seedDemoData } from "@/lib/seed";
+import { SystemHealthPanel } from "@/components/system/SystemHealthPanel";
 
 export default function Settings() {
   const navigate = useNavigate();

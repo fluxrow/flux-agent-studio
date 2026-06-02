@@ -12,6 +12,7 @@ import type {
 
 const KEY_CONNECTORS = "fluxbot.connectors.v1";
 const KEY_CREDENTIALS = "fluxbot.connector_credentials.v1";
+const KEY_CREDENTIAL_VALUES = "fluxbot.connector_credential_values.v1"; // dev-only raw values (will move to Secrets in prod)
 
 type ConnectorsBlob = Record<string, Connector[]>;     // workspaceId -> []
 type CredentialsBlob = Record<string, ConnectorCredential[]>; // workspaceId -> []

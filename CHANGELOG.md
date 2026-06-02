@@ -12,6 +12,31 @@ completos por fase.
 - `.env.example` documentando variáveis públicas
 - `.editorconfig` para consistência entre editores
 
+## Phase 18.6 — Stabilization Sprint
+
+### Security
+- **BUG-01**: novo `src/security/secretVault.ts` (vault em memória, não persiste).
+  `connectorStore` e `oauthStore` agora extraem `accessToken`, `refreshToken`,
+  `client_secret`, `apiKey`, etc. para o vault antes de gravar em
+  `localStorage`. Cleanup automático da chave legada
+  `fluxbot.connector_credential_values.v1`.
+- **BUG-02**: Meta CAPI passa `access_token` no corpo JSON do POST em vez de
+  query-string — nenhuma credencial mais aparece em Network URLs.
+- **BUG-10**: novo `AdminRoute` protege `/qa`, `/system-health`, `/errors`,
+  `/debug/repositories`, `/channels/debug` para `owner`/`admin` do workspace.
+
+### Persistence
+- **BUG-03**: `supabaseFlowRepository`, `supabaseConversationRepository`,
+  `supabaseVersionRepository` e `supabaseVariableRepository` implementados
+  contra o schema real. Apenas `templates` permanece em `stub` até a fase do
+  marketplace.
+
+### Beta
+- Feature flags default-off para `knowledge_base`, `omnichannel` e
+  `marketplace`; somente módulos com persistência real ficam visíveis em
+  beta fechado.
+
+
 ## Phase 18.5 — Beta Readiness Program
 - `src/beta/` (featureFlags, betaUsers, onboarding, health, errors,
   feedback, analytics, qa, smokeTemplates)

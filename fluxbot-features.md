@@ -386,3 +386,46 @@ Stacked on top of typing:
 2. Click "Instagram DM", "Messenger", "ChatGPT", "Formulário" — same conversation, different chrome.
 3. Builder → Preview — toggle renderers mid-conversation; transcript persists.
 4. Trigger a block with text containing `{{nome}}` after capturing a `name` variable — the bubble renders the personalized value.
+
+---
+
+## Phase 10 — Channel Engine
+
+Decoupled transport layer. The Runtime keeps emitting blocks; channels turn
+them into platform-specific messages without ever touching the engine.
+
+### Building blocks
+- **`src/channels/types.ts`** — `ChannelAdapter`, `ChannelMessage`
+  (text · buttons · quick_reply · image · video · audio · file · location ·
+  template), `ChannelSession`, `ChannelUser`, `ChannelEvent`.
+- **`channelRegistry`** — single index of available adapters
+  (`channelRegistry.list()`, `.get(id)`).
+- **`sessionRouter`** — `(channelId, userId) → ChannelSession`, ensuring the
+  same conversation is reused across reconnects.
+- **`channelBus`** — pub/sub for channel events; every event is mirrored into
+  `runtimeEventBus` as `channel:*` so Tracking + Inspector see it.
+- **`bootChannels()`** — registers all adapters once on app start
+  (`src/main.tsx`) and emits `channel_connected`.
+
+### Adapters
+| id          | status | notes |
+|-------------|--------|-------|
+| `web`       | active | wraps the existing public-runtime (`recordPublicMessage`) |
+| `whatsapp`  | stub   | emits events only, ready for Meta Cloud API |
+| `instagram` | stub   | ready for IG Messaging API |
+| `messenger` | stub   | ready for Messenger Platform |
+| `telegram`  | stub   | ready for Bot API |
+
+### Channel Events (mirrored into the runtime bus)
+`channel_connected`, `session_opened`, `session_closed`,
+`message_sent`, `message_received`.
+
+### Inspector
+Internal route **`/channels/debug`** lists adapters, open sessions, and a
+live stream of every sent / received message.
+
+### Public Runtime integration
+`/bot/:slug` opens a `WebChannel` session right after the runtime session
+starts and routes every bot/user message through `webChannelHelpers`.
+Visible behaviour is unchanged; the inspector and future omnichannel work
+are unlocked.

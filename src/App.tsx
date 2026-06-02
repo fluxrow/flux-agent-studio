@@ -28,6 +28,7 @@ import Settings from "./pages/Settings";
 import Simulator from "./pages/Simulator";
 import DebugRepositories from "./pages/DebugRepositories";
 import ChannelsDebug from "./pages/ChannelsDebug";
+import AIPlayground from "./pages/AIPlayground";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
@@ -71,6 +72,7 @@ const App = () => (
                 <Route path="/forms" element={<Forms />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/simulator" element={<Simulator />} />
+                <Route path="/ai/playground" element={<AIPlayground />} />
               </Route>
               <Route
                 path="/debug/repositories"

@@ -21,6 +21,8 @@ import { interpolate } from "./interpolate";
 import { evaluateCondition } from "./conditions";
 import { runtimeEventBus, makeEvent } from "./events";
 import type { ExecutionEventType } from "./events";
+import { runAiBlock } from "@/ai/runner";
+import type { AIBlockConfig } from "@/ai/types";
 
 const uid = () => `s_${Math.random().toString(36).slice(2, 10)}`;
 const now = () => new Date().toISOString();
@@ -223,11 +225,53 @@ export class RuntimeEngine {
         return;
       }
 
-      // Unsupported types (ai, webhook, delay) auto-advance for now.
+      case "ai": {
+        // Async block; fire-and-forget the runner, then advance.
+        void this.runAiBlock(block);
+        return;
+      }
+
+      // Unsupported types (webhook, delay) auto-advance for now.
       default:
         this.emitExecution("block_exited", { blockId: block.id }, block.id);
         this.advanceFrom(block.id);
     }
+  }
+
+  private async runAiBlock(block: Block): Promise<void> {
+    const cfg = block.config as AIBlockConfig;
+    const result = await runAiBlock({
+      config: cfg,
+      variables: this.context.variables,
+      sessionId: this.context.sessionId,
+      flowId: this.context.flowId,
+      blockId: block.id,
+    });
+
+    if (result.ok && result.response) {
+      const previewSource = typeof result.response.output === "string"
+        ? (result.response.output as string)
+        : result.response.rawText;
+      const text = previewSource.length > 320 ? previewSource.slice(0, 320) + "…" : previewSource;
+      this.transcript.push({ kind: "bot", blockId: block.id, text, at: now() });
+      this.emit({ type: "message", blockId: block.id, text });
+    } else if (result.error) {
+      this.transcript.push({ kind: "system", text: `[IA] ${result.error}`, at: now() });
+    }
+
+    for (const [key, value] of Object.entries(result.variableUpdates)) {
+      const coerced =
+        value === null || ["string", "number", "boolean"].includes(typeof value)
+          ? (value as string | number | boolean | null)
+          : Array.isArray(value)
+            ? value.map(String).join(", ")
+            : JSON.stringify(value);
+      this.context.variables[key] = coerced;
+      this.emitExecution("variable_updated", { variable: key, value: coerced }, block.id);
+    }
+
+    this.emitExecution("block_exited", { blockId: block.id }, block.id);
+    this.advanceFrom(block.id);
   }
 
   private advanceFrom(blockId: ID): void {

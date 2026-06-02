@@ -380,25 +380,7 @@ function PropertiesEditor({
         </>
       )}
 
-      {block.type === "ai" && (
-        <>
-          <div>
-            <label className="text-xs text-muted-foreground">Modelo</label>
-            <div className="mt-1 rounded-lg border border-border bg-background px-3 py-2 text-sm flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary-glow" /> GPT-5.2 · OpenAI
-            </div>
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Prompt</label>
-            <Textarea
-              rows={5}
-              value={String(block.config.prompt ?? "")}
-              onChange={(e) => onChange({ prompt: e.target.value })}
-              className="mt-1 bg-background border-border text-sm"
-            />
-          </div>
-        </>
-      )}
+      {block.type === "ai" && <AIBlockEditor block={block} onChange={onChange} />}
 
       {block.type === "webhook" && (
         <div>

@@ -25,11 +25,18 @@ export default function Bots() {
         title="Bots"
         description={`${data?.total ?? 0} agentes no workspace`}
         actions={
-          <Link to="/bots/new">
-            <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
-              <Plus className="h-4 w-4 mr-1.5" /> Criar bot
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link to="/ai-builder">
+              <Button variant="outline" className="bg-card/60">
+                <Wand2 className="h-4 w-4 mr-1.5" /> Gerar com IA
+              </Button>
+            </Link>
+            <Link to="/bots/new">
+              <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
+                <Plus className="h-4 w-4 mr-1.5" /> Criar bot
+              </Button>
+            </Link>
+          </div>
         }
       />
 

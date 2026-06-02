@@ -287,6 +287,27 @@ export default function Knowledge() {
           )}
         </div>
       </div>
+
+      <AlertDialog open={!!confirmAction} onOpenChange={(o) => !o && setConfirmAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction?.kind === "base" ? "Apagar base de conhecimento?" : "Apagar documento?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction?.kind === "base"
+                ? `A base "${confirmAction.name}" e todos os seus chunks serão removidos. Esta ação é permanente.`
+                : `O documento "${confirmAction?.kind === "doc" ? confirmAction.title : ""}" será removido. Esta ação é permanente.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={runConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

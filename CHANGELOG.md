@@ -12,6 +12,36 @@ completos por fase.
 - `.env.example` documentando variáveis públicas
 - `.editorconfig` para consistência entre editores
 
+## Phase 19 — First User Experience
+
+### Bot creation
+- `src/pages/BotNew.tsx`: substituído o redirecionamento estático para
+  `/builder/sdr-imob` por criação real via `useCreateBot()`. O bot é
+  persistido (mock ou Supabase, conforme `VITE_USE_SUPABASE`), e o usuário
+  é redirecionado para `/builder/{novoBotId}`. Nome, descrição e canal
+  principal (`whatsapp`/`instagram`/`web`/`telegram`) são gravados.
+
+### Analytics
+- `src/lib/analytics-basic.ts` (novo): hook `useBasicStats()` agrega
+  contagens reais de **bots**, **leads**, **conversas** e **conversões**
+  através da camada de persistência ativa.
+- `src/pages/Dashboard.tsx`: KPIs hardcoded (`kpis` do `@/lib/mock`)
+  substituídos pelas agregações reais.
+- `src/pages/Analytics.tsx`: KPIs estáticos ("4.820", "12.7%", …)
+  substituídos pelos números reais do workspace.
+
+### Tracking persistence (verificação)
+- Modo Supabase já persiste eventos (`supabaseEventRepository`),
+  sessões (`supabaseSessionRepository`) e mensagens públicas
+  (`record_public_message` em `src/lib/public-runtime.ts`). Sem
+  alterações necessárias — comportamento confirmado.
+
+### Connectors persistence (verificação)
+- `src/connectors/store.ts` mantém instalações e metadados de
+  credenciais em `localStorage` (`KEY_CONNECTORS`, `KEY_CREDENTIALS`),
+  com valores brutos roteados ao `secretVault`. Sem alterações.
+
+
 ## Phase 18.7 — Critical Truth Sprint
 
 ### Security

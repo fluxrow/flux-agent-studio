@@ -10,10 +10,15 @@ import {
   recordPublicEvent,
   recordPublicMessage,
   recordPublicLead,
+  recordPublicVisitorProfile,
+  recordPublicAttribution,
+  attachAttributionToLead,
   getOrCreateVisitorId,
   type PublicBot as PublicBotType,
 } from "@/lib/public-runtime";
+import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/tracking";
 import type { Flow } from "@/types";
+
 
 type LoadState =
   | { kind: "loading" }

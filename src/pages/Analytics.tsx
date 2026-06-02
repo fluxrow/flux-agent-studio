@@ -1,4 +1,5 @@
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
+// Analytics — KPIs reais + zero state. Funil/charts mockados removidos
+// (Phase 20). Voltarão alimentados por agregações reais em fase futura.
 import { Link } from "react-router-dom";
 import { Bot, MessageSquare, Target, Users, Plus } from "lucide-react";
 import { useBasicStats } from "@/lib/analytics-basic";

@@ -32,5 +32,30 @@ const sdrConnections: Connection[] = [
 ];
 
 export const mockFlows: Record<string, Flow> = {
-  "sdr-imob": { botId: "sdr-imob", blocks: sdrBlocks, connections: sdrConnections },
+  "sdr-imob": {
+    botId: "sdr-imob",
+    blocks: sdrBlocks,
+    connections: sdrConnections,
+    variables: [
+      { name: "lead_name", type: "string" },
+      { name: "intent", type: "string" },
+      { name: "region", type: "string" },
+      { name: "budget", type: "string" },
+      { name: "phone", type: "string" },
+    ],
+    metadata: {
+      name: "SDR Imobiliária Premium",
+      description: "Qualificação de leads para imóveis de alto padrão.",
+      version: 3,
+      primaryChannel: "whatsapp",
+      status: "published",
+      lastEditedAt: fixedIso(1),
+    },
+    publishedVersion: 3,
+    versions: [
+      { version: 1, status: "archived",  createdAt: fixedIso(20) },
+      { version: 2, status: "archived",  createdAt: fixedIso(10) },
+      { version: 3, status: "published", createdAt: fixedIso(1)  },
+    ],
+  },
 };

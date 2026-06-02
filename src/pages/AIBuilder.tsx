@@ -44,7 +44,7 @@ export default function AIBuilder() {
 
   const handleGenerate = async () => {
     if (!description.trim()) {
-      toast({ title: "Descreva o objetivo", description: "Conte em uma frase o que o bot precisa fazer." });
+      toast.message("Descreva o objetivo", { description: "Conte em uma frase o que o bot precisa fazer." });
       return;
     }
     setLoading(true);
@@ -59,9 +59,9 @@ export default function AIBuilder() {
       setBlueprint(bp);
       aiBuilderCost.record(aiBuilderCost.fromBlueprint(description, bp));
       setRuns(aiBuilderCost.list());
-      toast({ title: "Blueprint gerado", description: `${bp.bot.name} • ${bp.flow.steps.length} blocos` });
+      toast.success("Blueprint gerado", { description: `${bp.bot.name} • ${bp.flow.steps.length} blocos` });
     } catch (err: any) {
-      toast({ title: "Falha ao gerar", description: err?.message ?? "Erro desconhecido", variant: "destructive" });
+      toast.error("Falha ao gerar", { description: err?.message ?? "Erro desconhecido" });
     } finally {
       setLoading(false);
     }
@@ -74,10 +74,10 @@ export default function AIBuilder() {
       const { botId } = await materializeBlueprint(blueprint);
       const last = aiBuilderCost.list()[0];
       if (last) aiBuilderCost.attachBotId(last.id, botId);
-      toast({ title: "Bot criado", description: "Abrindo no Builder…" });
+      toast.success("Bot criado", { description: "Abrindo no Builder…" });
       navigate(`/builder/${botId}`);
     } catch (err: any) {
-      toast({ title: "Erro ao criar bot", description: err?.message ?? "", variant: "destructive" });
+      toast.error("Erro ao criar bot", { description: err?.message ?? "" });
     } finally {
       setCreating(false);
     }

@@ -15,7 +15,7 @@ import {
   type PublicBot as PublicBotType,
 } from "@/lib/public-runtime";
 import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/tracking";
-import { webChannel, webChannelHelpers, sessionRouter } from "@/channels";
+import { webChannel, webChannelHelpers } from "@/channels";
 import type { Flow } from "@/types";
 import { getRenderer, listRenderers, resolveVariant, type RendererId } from "@/renderers";
 

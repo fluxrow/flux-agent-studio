@@ -889,3 +889,27 @@ e QA Dashboard.
 - Nenhuma engine existente (Runtime, CRM, Tracking, AI, Knowledge,
   Connectors, Intelligence) foi modificada — observabilidade é puramente
   aditiva via `recordError()` / `reportHealth()` / `incrementUsage()`.
+
+
+## Phase 18.6 — Stabilization Sprint
+
+Pré-requisito do beta fechado. Foco em segurança, persistência real e gating
+de rotas internas — sem novas funcionalidades.
+
+### Segurança
+- **Secret Vault em memória** (`src/security/secretVault.ts`) — tokens OAuth,
+  refresh tokens, client secrets e API keys ficam apenas em RAM e somem ao
+  fechar a aba. `localStorage` só guarda metadados públicos + preview
+  ofuscado.
+- **AdminRoute** protege `/qa`, `/system-health`, `/errors`,
+  `/debug/repositories` e `/channels/debug` (owner/admin do workspace).
+- **Meta CAPI**: `access_token` movido do query-string para o body do POST.
+
+### Persistência
+- Adapters Supabase reais para flows, conversations, versions e variables.
+  Apenas `templates` permanece como stub até a fase do marketplace.
+
+### Beta readiness
+- Feature flags com default-off para Knowledge Base, Omnichannel e
+  Marketplace — beta só vê o que realmente persiste.
+

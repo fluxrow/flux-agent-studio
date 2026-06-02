@@ -17,7 +17,7 @@ export function TrackingAnalyticsWidget() {
 
   useEffect(() => {
     let cancelled = false;
-    persistence.leads.list({ limit: 500 })
+    persistence.leads.list({ pageSize: 500 })
       .then((res) => { if (!cancelled) { setLeads(res.items); setLoading(false); } })
       .catch((e) => { if (!cancelled) { setErr(e?.message ?? "Falha ao carregar"); setLoading(false); } });
     return () => { cancelled = true; };

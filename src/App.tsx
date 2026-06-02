@@ -43,6 +43,7 @@ import Beta from "./pages/Beta";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
+import { AdminRoute } from "@/auth/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -91,29 +92,29 @@ const App = () => (
                 <Route path="/ai-builder" element={<AIBuilder />} />
                 <Route path="/connectors" element={<Connectors />} />
                 <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/beta" element={<Beta />} />
+              </Route>
+              {/* Internal/admin-only diagnostic routes. */}
+              <Route
+                element={
+                  <AdminRoute>
+                    <AppLayout />
+                  </AdminRoute>
+                }
+              >
                 <Route path="/system-health" element={<SystemHealth />} />
                 <Route path="/errors" element={<Errors />} />
                 <Route path="/qa" element={<QA />} />
-                <Route path="/beta" element={<Beta />} />
+                <Route path="/channels/debug" element={<ChannelsDebug />} />
               </Route>
               <Route
                 path="/debug/repositories"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <DebugRepositories />
-                  </ProtectedRoute>
+                  </AdminRoute>
                 }
               />
-              <Route
-                path="/channels/debug"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<ChannelsDebug />} />
-              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </WorkspaceProvider>

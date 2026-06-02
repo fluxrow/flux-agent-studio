@@ -5,6 +5,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AppLayout from "./components/AppLayout";
+import Dashboard from "./pages/Dashboard";
+import Bots from "./pages/Bots";
+import Builder from "./pages/Builder";
+import Leads from "./pages/Leads";
+import Conversations from "./pages/Conversations";
+import Analytics from "./pages/Analytics";
+import Templates from "./pages/Templates";
+import Variables from "./pages/Variables";
+import PublicBot from "./pages/PublicBot";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +26,17 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/bot/:slug" element={<PublicBot />} />
+          <Route path="/app" element={<AppLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="bots" element={<Bots />} />
+            <Route path="builder/:id" element={<Builder />} />
+            <Route path="leads" element={<Leads />} />
+            <Route path="conversations" element={<Conversations />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="templates" element={<Templates />} />
+            <Route path="variables" element={<Variables />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

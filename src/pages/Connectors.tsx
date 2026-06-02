@@ -37,10 +37,10 @@ const lifecycleMeta: Record<ConnectorLifecycle, { label: string; tone: string; i
 export default function Connectors() {
   const { workspace } = useWorkspace();
   const workspaceId = workspace?.id ?? "ws_local_demo";
-  bootstrapConnectors();
 
   const [tick, setTick] = useState(0);
   useEffect(() => {
+    bootstrapConnectors();
     const a = connectorStore.subscribe(() => setTick((t) => t + 1));
     const b = connectorRegistry.subscribe(() => setTick((t) => t + 1));
     return () => { a(); b(); };

@@ -1,15 +1,27 @@
 /**
  * Local persistence for ConnectedAccounts + ChannelBindings.
  *
- * Phase 11 is architectural foundation only — no real OAuth handshake and
- * no Supabase tables yet. We keep the data in localStorage so the UI feels
- * real and survives reloads. Swapping this for a Supabase-backed repository
- * later only requires implementing the same surface.
+ * Public metadata (provider, account name, status) is kept in localStorage
+ * so the UI rehydrates across reloads. Any sensitive value carried in
+ * `account.meta` — access/refresh tokens, client secrets, API keys — is
+ * stripped before disk write and routed to the in-memory Secret Vault
+ * (Phase 18.6 / BUG-01).
+ *
+ * On module load we also purge legacy KEY_CREDENTIAL_VALUES entries that
+ * earlier phases wrote to localStorage, so upgrading users no longer carry
+ * raw tokens around the browser.
  */
 import type { ConnectedAccount, ChannelBinding, OAuthProviderId } from "@/types/connectedAccount";
+import { extractSecrets, putSecrets, getSecrets, clearSecrets } from "@/security/secretVault";
 
 const ACCOUNTS_KEY = "fluxbot.oauth.accounts.v1";
 const BINDINGS_KEY = "fluxbot.oauth.bindings.v1";
+const LEGACY_CREDENTIAL_VALUES_KEY = "fluxbot.connector_credential_values.v1";
+
+// One-time cleanup for sensitive data persisted by earlier phases.
+if (typeof localStorage !== "undefined") {
+  try { localStorage.removeItem(LEGACY_CREDENTIAL_VALUES_KEY); } catch { /* noop */ }
+}
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
@@ -29,6 +41,16 @@ function uid(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
+/** Returns `account` with sensitive meta fields removed; pushes them to vault. */
+function vaultAndStrip(account: ConnectedAccount): ConnectedAccount {
+  if (!account.meta) return account;
+  const { publicMeta, secrets } = extractSecrets(account.meta);
+  if (Object.keys(secrets).length > 0) {
+    putSecrets("oauth", account.id, secrets);
+  }
+  return { ...account, meta: publicMeta as Record<string, unknown> };
+}
+
 export const oauthStore = {
   /* ---------- accounts ---------- */
   listAccounts(): ConnectedAccount[] { return read<ConnectedAccount>(ACCOUNTS_KEY); },
@@ -38,7 +60,7 @@ export const oauthStore = {
   upsertAccount(account: Omit<ConnectedAccount, "id"> & { id?: string }): ConnectedAccount {
     const all = this.listAccounts();
     const id = account.id ?? uid("acc");
-    const next: ConnectedAccount = { ...account, id };
+    const next = vaultAndStrip({ ...account, id });
     const idx = all.findIndex((a) => a.id === id);
     if (idx >= 0) all[idx] = next; else all.push(next);
     write(ACCOUNTS_KEY, all);
@@ -49,15 +71,22 @@ export const oauthStore = {
     const all = this.listAccounts();
     const idx = all.findIndex((a) => a.id === id);
     if (idx < 0) return undefined;
-    all[idx] = { ...all[idx], ...patch };
+    const merged = vaultAndStrip({ ...all[idx], ...patch, id });
+    all[idx] = merged;
     write(ACCOUNTS_KEY, all);
     notify();
-    return all[idx];
+    return merged;
   },
   removeAccount(id: string) {
     write(ACCOUNTS_KEY, this.listAccounts().filter((a) => a.id !== id));
     write(BINDINGS_KEY, this.listBindings().filter((b) => b.accountId !== id));
+    clearSecrets("oauth", id);
     notify();
+  },
+
+  /** Returns the in-vault secrets for an account (empty if not unlocked this tab). */
+  getAccountSecrets(id: string): Record<string, string> {
+    return getSecrets("oauth", id);
   },
 
   /* ---------- bindings ---------- */

@@ -19,6 +19,9 @@ import Tracking from "./pages/Tracking";
 import Attribution from "./pages/Attribution";
 import Revenue from "./pages/Revenue";
 import Alerts from "./pages/Alerts";
+import Channels from "./pages/Channels";
+import Forms from "./pages/Forms";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +47,9 @@ const App = () => (
             <Route path="alerts" element={<Alerts />} />
             <Route path="templates" element={<Templates />} />
             <Route path="variables" element={<Variables />} />
+            <Route path="channels" element={<Channels />} />
+            <Route path="forms" element={<Forms />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

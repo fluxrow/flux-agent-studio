@@ -1,8 +1,21 @@
 import { kpis, conversionsChart, channelChart, recentActivity, bots } from "@/lib/mock";
-import { TrendingUp, TrendingDown, ArrowUpRight, Bot, Activity, Zap, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowUpRight, Bot, Activity, Zap, Sparkles, AlertTriangle, Flame, DollarSign } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+
+const smartAlerts = [
+  { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/app/leads" },
+  { id: 2, icon: AlertTriangle, tone: "warning",     title: "Queda de 22% na qualificação IA",   desc: "Bloco 'Qualifica com IA' perdeu performance nas últimas 24h.",   cta: "Investigar",  to: "/app/analytics" },
+  { id: 3, icon: DollarSign,    tone: "success",     title: "ROAS Instagram subiu 1.4x",          desc: "Campanha Reels VSL gerou R$ 14.8k em pipeline hoje.",            cta: "Ver receita", to: "/app/revenue" },
+];
+
+const alertTone: Record<string,string> = {
+  destructive: "border-destructive/40 bg-destructive/5 text-destructive",
+  warning:     "border-warning/40 bg-warning/5 text-warning",
+  success:     "border-success/40 bg-success/5 text-success",
+};
+
 
 const channelColors = ["hsl(265 89% 66%)", "hsl(190 95% 55%)", "hsl(220 95% 60%)", "hsl(270 95% 75%)"];
 
@@ -33,6 +46,33 @@ export default function Dashboard() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Smart alerts */}
+      <div className="rounded-2xl border border-border bg-card/60 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-semibold flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary-glow" /> Alertas inteligentes</h3>
+            <p className="text-xs text-muted-foreground">A IA monitorou 2.847 eventos nas últimas 24h</p>
+          </div>
+          <Link to="/app/alerts" className="text-xs text-primary-glow flex items-center gap-1">Ver todos <ArrowUpRight className="h-3 w-3" /></Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {smartAlerts.map((a) => (
+            <div key={a.id} className={`rounded-xl border p-4 ${alertTone[a.tone]}`}>
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-background/50 border border-current/20 flex items-center justify-center flex-shrink-0">
+                  <a.icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-foreground">{a.title}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{a.desc}</div>
+                  <Link to={a.to} className="text-[11px] mt-2 inline-flex items-center gap-1 hover:underline">{a.cta} <ArrowUpRight className="h-3 w-3" /></Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

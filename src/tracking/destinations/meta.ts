@@ -60,10 +60,13 @@ export const metaAdapter: DestinationAdapter = {
       // Pixel-only browser mode would happen client-side via fbq(); not in scope here.
       return;
     }
-    const res = await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`, {
+    // BUG-02: never put `access_token` on the URL — it leaks into Referer,
+    // browser history, proxy logs, and the Network panel. Meta CAPI accepts
+    // the token inside the JSON body, which keeps it scoped to the request.
+    const res = await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: [mapped.payload] }),
+      body: JSON.stringify({ access_token: accessToken, data: [mapped.payload] }),
     });
     if (!res.ok) {
       const text = await res.text().catch(() => res.statusText);

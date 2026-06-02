@@ -6,13 +6,16 @@ import type { FeatureFlag, FeatureKey } from "./types";
 
 const flags = new Map<string, FeatureFlag>(); // key: `${workspaceId}:${key}`
 
+// Phase 18.6: stabilization defaults. Only features with a real persistence
+// path are on by default. Mock-only subsystems stay dark until their
+// Supabase backend lands so beta testers do not see fake data.
 const DEFAULTS: Record<FeatureKey, { enabled: boolean; rollout: number }> = {
   ai_builder:        { enabled: true,  rollout: 100 },
-  knowledge_base:    { enabled: true,  rollout: 100 },
+  knowledge_base:    { enabled: false, rollout: 0   }, // mock pipeline only
   connectors:        { enabled: true,  rollout: 100 },
   lead_intelligence: { enabled: true,  rollout: 100 },
-  omnichannel:       { enabled: false, rollout: 25 },
-  marketplace:       { enabled: false, rollout: 0 },
+  omnichannel:       { enabled: false, rollout: 0   }, // requires Phase 19 channels
+  marketplace:       { enabled: false, rollout: 0   }, // not started
 };
 
 const k = (ws: string, key: FeatureKey) => `${ws}:${key}`;

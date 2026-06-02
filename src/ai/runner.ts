@@ -12,6 +12,8 @@
 import { runtimeEventBus } from "@/runtime/events/bus";
 import { getAIProvider, DEFAULT_PROVIDER } from "./registry";
 import { aiInspector } from "./inspector";
+import { retrieveKnowledge, formatContext } from "@/knowledge/retriever";
+import { emitKnowledgeEvent } from "@/knowledge/events";
 import type {
   AIBlockConfig, AIResponse, AIRunRecord, AIProviderId,
 } from "./types";
@@ -30,6 +32,8 @@ export interface RunAiBlockOutput {
   /** Variables to merge back into the flow context. */
   variableUpdates: Record<string, unknown>;
   error?: string;
+  /** Knowledge chunks retrieved (when knowledge is enabled). */
+  knowledgeResults?: Array<{ documentTitle: string; score: number; text: string }>;
 }
 
 function makeId() {
@@ -40,13 +44,51 @@ export async function runAiBlock(input: RunAiBlockInput): Promise<RunAiBlockOutp
   const cfg = input.config ?? {};
   const providerId: AIProviderId = cfg.provider ?? DEFAULT_PROVIDER;
   const provider = getAIProvider(providerId);
-  const prompt = String(cfg.prompt ?? "");
+  let prompt = String(cfg.prompt ?? "");
 
   if (!prompt) {
     return { ok: false, variableUpdates: {}, error: "AI block sem prompt." };
   }
 
   const variableUpdates: Record<string, unknown> = {};
+  let knowledgeResults: RunAiBlockOutput["knowledgeResults"] = undefined;
+
+  // ---- Knowledge retrieval (Phase 13) ----
+  if (cfg.knowledge?.baseId) {
+    try {
+      const results = await retrieveKnowledge({
+        baseId: cfg.knowledge.baseId,
+        query: prompt,
+        topK: cfg.knowledge.topK ?? 4,
+        minScore: cfg.knowledge.minScore,
+        sessionId: input.sessionId,
+        flowId: input.flowId,
+        blockId: input.blockId,
+      });
+      knowledgeResults = results.map((r) => ({
+        documentTitle: r.document.title, score: r.score, text: r.chunk.text,
+      }));
+
+      if (cfg.knowledge.injectAsContext !== false && results.length) {
+        const ctx = formatContext(results);
+        prompt = `CONTEXTO DA BASE DE CONHECIMENTO:\n${ctx}\n\nPERGUNTA:\n${prompt}`;
+      }
+      if (cfg.knowledge.outputVariable) {
+        variableUpdates[cfg.knowledge.outputVariable] = knowledgeResults;
+      }
+      emitKnowledgeEvent({
+        type: "knowledge_used",
+        baseId: cfg.knowledge.baseId,
+        sessionId: input.sessionId,
+        flowId: input.flowId,
+        blockId: input.blockId,
+        payload: { results: results.length },
+      });
+    } catch (err: any) {
+      // Knowledge retrieval failures should not block the AI call.
+      console.warn("[runAiBlock] knowledge retrieval failed", err);
+    }
+  }
 
   try {
     let response: AIResponse<unknown>;
@@ -119,7 +161,7 @@ export async function runAiBlock(input: RunAiBlockInput): Promise<RunAiBlockOutp
       },
     });
 
-    return { ok: true, response, variableUpdates };
+    return { ok: true, response, variableUpdates, knowledgeResults };
   } catch (err: any) {
     const message = err?.message ?? "Falha ao executar bloco IA.";
     aiInspector.record({

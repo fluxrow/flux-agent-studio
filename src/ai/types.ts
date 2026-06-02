@@ -94,6 +94,16 @@ export interface AIBlockVariableMapping {
   to: string;
 }
 
+export interface AIBlockKnowledgeConfig {
+  baseId: string;
+  topK?: number;
+  minScore?: number;
+  /** When true (default), prepend retrieved chunks as a CONTEXT block. */
+  injectAsContext?: boolean;
+  /** Optional flow variable to store retrieved chunks for later use. */
+  outputVariable?: string;
+}
+
 export interface AIBlockConfig {
   prompt?: string;
   provider?: AIProviderId;
@@ -106,6 +116,8 @@ export interface AIBlockConfig {
   mappings?: AIBlockVariableMapping[];
   /** When extract() is not used, store the raw answer in this variable. */
   outputVariable?: string;
+  /** Optional Knowledge Base retrieval (Phase 13). */
+  knowledge?: AIBlockKnowledgeConfig;
 }
 
 /* ---------------- Inspector records ---------------- */

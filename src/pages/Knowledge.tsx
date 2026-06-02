@@ -42,6 +42,21 @@ export default function Knowledge() {
   const docs: KnowledgeDocument[] = activeBase ? knowledgeStore.listDocuments(activeBase.id) : [];
   const stats = knowledgeCost.stats(workspaceId);
 
+  const [confirmAction, setConfirmAction] = useState<Confirm>(null);
+  const runConfirm = () => {
+    if (!confirmAction) return;
+    if (confirmAction.kind === "base") {
+      knowledgeStore.deleteBase(confirmAction.id);
+      setActiveBaseId(null);
+      toast.success("Base removida");
+    } else {
+      knowledgeStore.deleteDocument(confirmAction.id);
+      toast.success("Documento removido");
+    }
+    setConfirmAction(null);
+  };
+
+
   // ---- create base ----
   const [newBaseName, setNewBaseName] = useState("");
   const onCreateBase = () => {

@@ -85,4 +85,23 @@ export const supabaseBotRepository: BotRepository = {
     const { error } = await supabase.from("bots").delete().eq("id", id);
     if (error) throw error;
   },
+  async publish(id: ID, snapshot: Flow, slug?: string, note?: string) {
+    const { data, error } = await supabase.rpc("publish_bot" as any, {
+      _bot_id: id,
+      _snapshot: snapshot as any,
+      _slug: slug ?? null,
+      _note: note ?? null,
+    });
+    if (error) throw error;
+    return mapRow(Array.isArray(data) ? data[0] : data);
+  },
+  async getBySlug(slug: string) {
+    const { data, error } = await supabase
+      .from("bots")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    return data ? mapRow(data) : null;
+  },
 };

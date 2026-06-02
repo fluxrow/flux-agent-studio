@@ -23,6 +23,7 @@ const main = [
 
 const intel = [
   { title: "Simulator",     url: "/simulator",     icon: PlayCircle },
+  { title: "AI Builder",    url: "/ai-builder",    icon: Wand2 },
   { title: "AI Playground", url: "/ai/playground", icon: Sparkles },
   { title: "Knowledge",     url: "/knowledge",     icon: BookOpen },
   { title: "Tracking",      url: "/tracking",      icon: Activity },

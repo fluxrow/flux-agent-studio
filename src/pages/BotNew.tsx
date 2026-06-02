@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SectionCard } from "@/components/shared/SectionCard";
 import { cn } from "@/lib/utils";
+import { useCreateBot } from "@/domain/hooks";
+import { toast } from "sonner";
 
 const presets = [
   { id: "blank",   icon: Sparkles,      title: "Em branco",       desc: "Comece do zero com um canvas vazio." },
@@ -25,6 +27,8 @@ export default function BotNew() {
   const [preset, setPreset] = useState("sdr");
   const [channel, setChannel] = useState("WhatsApp");
   const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const createBot = useCreateBot();
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-5xl mx-auto">
@@ -100,6 +104,8 @@ export default function BotNew() {
             <Label htmlFor="bot-desc">Descrição (opcional)</Label>
             <Textarea
               id="bot-desc"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
               placeholder="Para que serve esse agente?"
               className="bg-background/60 min-h-[90px]"
             />
@@ -111,9 +117,23 @@ export default function BotNew() {
         <Button variant="ghost" onClick={() => navigate("/bots")}>Cancelar</Button>
         <Button
           className="gradient-primary text-primary-foreground border-0 shadow-elegant"
-          onClick={() => navigate("/builder/sdr-imob")}
+          disabled={createBot.isPending}
+          onClick={async () => {
+            const botName = name.trim() || presets.find((p) => p.id === preset)?.title || "Novo bot";
+            try {
+              const bot = await createBot.mutateAsync({
+                name: botName,
+                description: desc.trim() || undefined,
+                channel,
+                preset,
+              });
+              navigate(`/builder/${bot.id}`);
+            } catch {
+              toast.error("Não foi possível criar o bot. Tente novamente.");
+            }
+          }}
         >
-          Criar e abrir builder
+          {createBot.isPending ? "Criando…" : "Criar e abrir builder"}
         </Button>
       </div>
     </div>

@@ -157,7 +157,7 @@ export const supabaseFlowRepository: FlowRepository = {
     }));
     const upsert = await supabase
       .from("flow_blocks")
-      .upsert(rows, { onConflict: "flow_id,block_key" });
+      .upsert(rows as any, { onConflict: "flow_id,block_key" });
     if (upsert.error) throw upsert.error;
   },
 

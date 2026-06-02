@@ -161,7 +161,7 @@ export async function runAiBlock(input: RunAiBlockInput): Promise<RunAiBlockOutp
       },
     });
 
-    return { ok: true, response, variableUpdates };
+    return { ok: true, response, variableUpdates, knowledgeResults };
   } catch (err: any) {
     const message = err?.message ?? "Falha ao executar bloco IA.";
     aiInspector.record({

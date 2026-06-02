@@ -59,6 +59,7 @@ export default function Settings() {
           <TabsTrigger value="billing"><CreditCard className="h-3.5 w-3.5 mr-1.5" />Plano</TabsTrigger>
           <TabsTrigger value="api"><KeyRound className="h-3.5 w-3.5 mr-1.5" />API & Webhooks</TabsTrigger>
           <TabsTrigger value="notify"><Bell className="h-3.5 w-3.5 mr-1.5" />Notificações</TabsTrigger>
+          <TabsTrigger value="system"><Database className="h-3.5 w-3.5 mr-1.5" />Sistema</TabsTrigger>
         </TabsList>
 
         {/* Perfil */}

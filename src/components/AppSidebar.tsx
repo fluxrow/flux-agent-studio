@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Bot, Users, MessageSquare,
   BarChart3, LayoutTemplate, Settings, Sparkles,
   Activity, Target, DollarSign, Bell, Plug, PlayCircle, BookOpen, Wand2,
-  Rocket, HeartPulse, AlertOctagon, ClipboardCheck, FlaskConical, LifeBuoy,
+  Rocket, HeartPulse, AlertOctagon, ClipboardCheck, FlaskConical, LifeBuoy, Sparkle,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -31,6 +31,7 @@ const main: NavItem[] = [
   { title: "Canais",        url: "/channels",      icon: Plug },
   { title: "Conectores",    url: "/connectors",    icon: Plug, flag: "connectors" },
   { title: "Documentação",  url: "/docs",          icon: LifeBuoy },
+  { title: "Novidades",     url: "/updates",       icon: Sparkle },
   { title: "Configurações", url: "/settings",      icon: Settings },
 ];
 

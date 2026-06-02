@@ -12,6 +12,7 @@
 import { runtimeEventBus } from "@/runtime/events";
 import { persistence } from "@/domain/persistence";
 import { tryGetCurrentWorkspaceId } from "@/domain/persistence/workspaceContext";
+import { recordActivation } from "@/beta/activation";
 import type { LeadCreateInput } from "@/types";
 
 interface Draft {
@@ -50,6 +51,8 @@ export function startCrmBridge() {
             started: event.at,
           });
         }
+        const wsForConv = tryGetCurrentWorkspaceId();
+        if (wsForConv) recordActivation(wsForConv, "first_conversation");
         return;
       }
 

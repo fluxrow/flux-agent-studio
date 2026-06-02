@@ -84,6 +84,7 @@ const App = () => (
                 <Route path="/ai/playground" element={<AIPlayground />} />
                 <Route path="/knowledge" element={<Knowledge />} />
                 <Route path="/ai-builder" element={<AIBuilder />} />
+                <Route path="/connectors" element={<Connectors />} />
               </Route>
               <Route
                 path="/debug/repositories"

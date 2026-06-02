@@ -630,3 +630,38 @@ optional `config.knowledge` block.
 - **Playground (`src/pages/Knowledge.tsx`, route `/knowledge`)** — create
   bases, upload/index content, inspect documents and chunks, run live
   retrieval queries and watch cost stats update.
+
+## Phase 14 — AI Builder Engine
+
+Generate complete bots from a natural-language description without
+touching the Runtime, Builder, CRM, AI Block or Knowledge layers.
+
+- **Domain (`src/ai-builder/types.ts`)** — `BotBlueprint`, `FlowBlueprint`,
+  `LeadModelBlueprint`, `KnowledgeBlueprint`, `ConversationBlueprint`.
+  Blueprints are intermediate; nothing in the Runtime knows about them.
+- **Generator (`src/ai-builder/generator.ts`)**
+    - Heuristic detection of objective and segment from the prompt.
+    - Calls the existing `AIProvider.extract()` so token usage, latency
+      and cost flow through the same surfaces as a normal AI Block.
+    - Produces a multi-step flow with `start`, `message`, `input`,
+      `choice`, `condition`, `ai` and `end` blocks plus a populated CRM
+      seed (fields, tags, initial score, pipeline) and Knowledge hints.
+    - `blueprintToFlow()` converts a blueprint into a real `Flow`
+      (`Block[]` + `Connection[]`) compatible with the Runtime Engine.
+    - `materializeBlueprint()` creates the bot via the bot repository,
+      persists the flow via the flow repository, and returns the new
+      `botId`. Builder, Runtime, CRM, Tracking and Knowledge consume it
+      with zero changes.
+- **Cost tracking (`src/ai-builder/cost.ts`)** — ring buffer of the last
+  50 generations: provider, model, tokens, duration, USD cost and the
+  materialized `botId` once published.
+- **Events (`src/ai-builder/events.ts`)** — `ai_blueprint_generated`,
+  `ai_flow_generated`, `ai_crm_generated`, `ai_knowledge_suggested`,
+  `ai_bot_materialized` are emitted into the shared `runtimeEventBus`
+  so the Event Inspector and Tracking destinations pick them up.
+- **UI (`src/pages/AIBuilder.tsx`, route `/ai-builder`)** — prompt input,
+  optional segment/product/process/objective hints, blueprint preview
+  with Flow / CRM / Knowledge / Conversation tabs, cost panel, and
+  "Abrir no Builder" which materializes and navigates to `/builder/:id`.
+- **Bots page CTA (`src/pages/Bots.tsx`)** — new "Gerar com IA" action
+  next to "Criar bot" routes to `/ai-builder`.

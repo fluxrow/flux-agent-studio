@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Bot, Users, MessageSquare,
   BarChart3, LayoutTemplate, Settings, Sparkles,
-  Activity, Target, DollarSign, Bell, Plug, PlayCircle, BookOpen,
+  Activity, Target, DollarSign, Bell, Plug, PlayCircle, BookOpen, Wand2,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -23,6 +23,7 @@ const main = [
 
 const intel = [
   { title: "Simulator",     url: "/simulator",     icon: PlayCircle },
+  { title: "AI Builder",    url: "/ai-builder",    icon: Wand2 },
   { title: "AI Playground", url: "/ai/playground", icon: Sparkles },
   { title: "Knowledge",     url: "/knowledge",     icon: BookOpen },
   { title: "Tracking",      url: "/tracking",      icon: Activity },

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Bot, BotCreateInput, ID, ListParams } from "@/types";
+import type { Bot, BotCreateInput, Flow, ID, ListParams } from "@/types";
 import type { BotRepository } from "../contracts";
 import { getCurrentWorkspaceId } from "../workspaceContext";
 

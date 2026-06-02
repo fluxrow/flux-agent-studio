@@ -158,6 +158,31 @@ export function SystemHealthPanel() {
         ? `${eventTelemetry.calls} eventos · ${eventTelemetry.errors} erros`
         : `Aguardando primeiro evento da Runtime.`,
     },
+    {
+      label: "Bot publicado",
+      status: publishedBots == null ? "pending" : publishedBots.count > 0 ? "ok" : "warn",
+      detail: publishedBots == null
+        ? "Verificando…"
+        : publishedBots.count > 0
+        ? `${publishedBots.count} bot(s) com link público.`
+        : "Nenhum bot publicado ainda. Use o botão Publicar no Builder.",
+    },
+    {
+      label: "Link público gerado",
+      status: publishedBots?.firstSlug ? "ok" : "warn",
+      detail: publishedBots?.firstSlug
+        ? `${window.location.origin}/bot/${publishedBots.firstSlug}`
+        : "Será preenchido ao publicar o primeiro bot.",
+    },
+    {
+      label: "Lead criado via bot público",
+      status: publicLeads == null ? "pending" : publicLeads > 0 ? "ok" : "warn",
+      detail: publicLeads == null
+        ? "Verificando…"
+        : publicLeads > 0
+        ? `${publicLeads} lead(s) com origem public-bot.`
+        : "Abra o link público e conclua um fluxo para gerar um lead real.",
+    },
   ];
 
   return (

@@ -6,9 +6,14 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   User, Building2, CreditCard, KeyRound, Bell, Users2, Sparkles, Copy,
-  Database, LogOut, Loader2, Wand2, Plug, Link2,
+  Database, LogOut, Loader2, Wand2, Plug, Link2, ShieldCheck, ScrollText, Shield, Cookie,
 } from "lucide-react";
 import { ConnectedAccountsPanel } from "@/components/settings/ConnectedAccountsPanel";
+import { CompliancePanel } from "@/components/settings/CompliancePanel";
+import { CredentialsPanel } from "@/components/settings/CredentialsPanel";
+import { ReadinessPanel } from "@/components/settings/ReadinessPanel";
+import { AuditLogsPanel } from "@/components/settings/AuditLogsPanel";
+import { ConsentPanel } from "@/components/settings/ConsentPanel";
 import { toast } from "sonner";
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
@@ -42,6 +47,8 @@ export default function Settings() {
   };
 
   const handleLogout = async () => {
+    const { recordAudit } = await import("@/compliance");
+    recordAudit({ action: "logout", actor: user?.email ?? "anonymous" });
     await signOut();
     navigate("/auth", { replace: true });
   };
@@ -64,6 +71,11 @@ export default function Settings() {
           <TabsTrigger value="notify"><Bell className="h-3.5 w-3.5 mr-1.5" />Notificações</TabsTrigger>
           <TabsTrigger value="accounts"><Link2 className="h-3.5 w-3.5 mr-1.5" />Contas conectadas</TabsTrigger>
           <TabsTrigger value="destinations"><Plug className="h-3.5 w-3.5 mr-1.5" />Destinations</TabsTrigger>
+          <TabsTrigger value="compliance"><ShieldCheck className="h-3.5 w-3.5 mr-1.5" />Compliance</TabsTrigger>
+          <TabsTrigger value="credentials"><KeyRound className="h-3.5 w-3.5 mr-1.5" />Credenciais</TabsTrigger>
+          <TabsTrigger value="consent"><Cookie className="h-3.5 w-3.5 mr-1.5" />Consent</TabsTrigger>
+          <TabsTrigger value="audit"><ScrollText className="h-3.5 w-3.5 mr-1.5" />Auditoria</TabsTrigger>
+          <TabsTrigger value="readiness"><Shield className="h-3.5 w-3.5 mr-1.5" />Readiness</TabsTrigger>
           <TabsTrigger value="system"><Database className="h-3.5 w-3.5 mr-1.5" />Sistema</TabsTrigger>
         </TabsList>
 
@@ -314,6 +326,31 @@ export default function Settings() {
         {/* Tracking destinations */}
         <TabsContent value="destinations" className="mt-6">
           <TrackingDestinationsPanel />
+        </TabsContent>
+
+        {/* Compliance */}
+        <TabsContent value="compliance" className="mt-6">
+          <CompliancePanel />
+        </TabsContent>
+
+        {/* Credentials */}
+        <TabsContent value="credentials" className="mt-6">
+          <CredentialsPanel />
+        </TabsContent>
+
+        {/* Consent */}
+        <TabsContent value="consent" className="mt-6">
+          <ConsentPanel />
+        </TabsContent>
+
+        {/* Audit logs */}
+        <TabsContent value="audit" className="mt-6">
+          <AuditLogsPanel />
+        </TabsContent>
+
+        {/* Readiness */}
+        <TabsContent value="readiness" className="mt-6">
+          <ReadinessPanel />
         </TabsContent>
 
         {/* System Health */}

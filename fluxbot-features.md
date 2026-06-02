@@ -665,3 +665,35 @@ touching the Runtime, Builder, CRM, AI Block or Knowledge layers.
   "Abrir no Builder" which materializes and navigates to `/builder/:id`.
 - **Bots page CTA (`src/pages/Bots.tsx`)** — new "Gerar com IA" action
   next to "Criar bot" routes to `/ai-builder`.
+
+## Phase 15 — Integration Readiness Layer
+- **Compliance domain (`src/compliance/`)** — typed entities for
+  `ComplianceDocument`, `ConsentRecord`, `AuditLogEntry`, `CredentialRecord`
+  and `ReadinessCheck`. Workspace-scoped localStorage adapters ready to
+  swap for Supabase tables without touching pages.
+- **Public compliance pages** — `/privacy`, `/terms`, `/data-deletion`
+  rendered through `CompliancePublicLayout` with a minimal markdown
+  renderer. Required by Meta / Google review and linked from the public
+  footer.
+- **Compliance Center (`Settings → Compliance`)** — edit Privacy / Terms /
+  Data Deletion documents, bump version, open the public page; updates
+  emit `privacy_updated` / `terms_updated` and an audit entry.
+- **Credentials Manager (`Settings → Credenciais`)** — register OpenAI,
+  Anthropic, Gemini, Meta, Google and Webhook secrets. Only masked
+  previews live in the UI; full values are slated for Supabase Secrets
+  when real integrations land. Validate / rotate / remove flows emit
+  `credential_*` events into the shared `runtimeEventBus`.
+- **Consent Tracking (`Settings → Consent`)** — LGPD / GDPR / cookies /
+  communication consent records per visitor. `recordConsent()` is the
+  single entry point used by future public-bot consent UIs.
+- **Audit Logs (`Settings → Auditoria`)** — `recordAudit()` captures
+  `login`, `logout`, `oauth_connect/disconnect`, `publish_bot`,
+  `delete_bot`, `change_workspace`, `knowledge_upload`, plus credential
+  and compliance lifecycle events. Ring buffer of the last 1000 entries.
+- **Integration Readiness (`Settings → Readiness`)** — live checklist
+  scoring Privacy Policy, Terms, Data Deletion URL, Audit Logs, Consent
+  Tracking, Meta Review, Google OAuth, Custom Domain and HTTPS. Drives
+  the percentage shown at the top of the dashboard.
+- **Event Bus integration** — every Phase 15 action funnels through
+  `emitComplianceEvent()` so the Event Inspector, Tracking destinations
+  and any future Supabase realtime subscriber receive the same payloads.

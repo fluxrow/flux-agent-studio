@@ -31,6 +31,9 @@ import ChannelsDebug from "./pages/ChannelsDebug";
 import AIPlayground from "./pages/AIPlayground";
 import Knowledge from "./pages/Knowledge";
 import AIBuilder from "./pages/AIBuilder";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import DataDeletion from "./pages/DataDeletion";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
@@ -49,6 +52,9 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/bot/:slug" element={<PublicBot />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/data-deletion" element={<DataDeletion />} />
               <Route
                 element={
                   <ProtectedRoute>

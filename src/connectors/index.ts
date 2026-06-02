@@ -19,12 +19,13 @@ export { builtInConnectors } from "./builtins";
 export { bootstrapAdapters, adapterRegistry } from "./adapters";
 export * from "./runtime";
 
-/** Idempotent bootstrap — seeds built-in manifests once per process. */
+/** Idempotent bootstrap — seeds built-in manifests + adapters once per process. */
 let booted = false;
 export function bootstrapConnectors() {
   if (booted) return;
   booted = true;
   for (const m of builtInConnectors) connectorRegistry.register(m);
+  bootstrapAdapters();
 }
 
 /* ------------ Lifecycle helpers (emit events automatically) ------------ */

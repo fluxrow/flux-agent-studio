@@ -76,6 +76,7 @@ const App = () => (
                 <Route path="/simulator" element={<Simulator />} />
                 <Route path="/ai/playground" element={<AIPlayground />} />
                 <Route path="/knowledge" element={<Knowledge />} />
+                <Route path="/ai-builder" element={<AIBuilder />} />
               </Route>
               <Route
                 path="/debug/repositories"

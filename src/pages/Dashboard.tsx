@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
 import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
+import { LeadIntelligenceWidget } from "@/components/dashboard/LeadIntelligenceWidget";
 
 const smartAlerts = [
   { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/leads" },
@@ -177,6 +178,8 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <LeadIntelligenceWidget />
     </div>
   );
 }

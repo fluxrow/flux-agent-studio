@@ -789,3 +789,45 @@ response payload and resolved variables.
 New `ConnectorEventType` values are emitted through `runtimeEventBus`, so the
 Event Inspector, Tracking destinations and any future Supabase realtime
 listener already see the new stream.
+
+## Phase 18 — Lead Intelligence Engine
+
+Adds an intelligence layer that runs *after* lead capture, without touching
+Runtime, CRM, Tracking, AI providers or Knowledge Base.
+
+### Domain (`src/intelligence/`)
+- **`types.ts`** — `LeadScore`, `LeadSummary`, `LeadInsight`,
+  `LeadRecommendation`, `LeadForecast`, `RevenueAttributionRow`,
+  `LeadIntelligence` bundle.
+- **`scorer.ts`** — Configurable score engine with 7 weighted factors
+  (completeness, source, campaign, interaction, answers, AI classification,
+  recency). Returns a 0–100 score with a reasoning trace and derived
+  temperature (`frio | morno | quente`).
+- **`summary.ts`** — Deterministic narrative generator with
+  `buildSummaryPrompt()` ready to be consumed by any AIProvider
+  (Phase 12) — interest, goal, budget, timeframe, objections, urgency.
+- **`insights.ts`** — Channel/campaign efficiency, likely next stage,
+  abandon risk, engagement trend.
+- **`recommendations.ts`** — Next action, best time, best channel,
+  suggested message draft, rationale.
+- **`forecast.ts`** — Conversion probability, expected revenue and
+  expected close date.
+- **`attribution.ts`** — `buildAttributionRow()` + `summarizeAttribution()`
+  using Tracking + CRM data to relate Source / Campaign / Lead / Revenue.
+- **`engine.ts`** — `computeLeadIntelligence(lead, ctx)` aggregator that
+  returns the full bundle ready for the UI.
+- **`events.ts`** — Bridges `lead_scored`, `lead_summary_generated`,
+  `lead_insight_generated`, `lead_recommendation_generated`,
+  `lead_forecast_generated` onto the shared `runtimeEventBus`.
+
+### UI
+- **Lead Detail → Intelligence tab** (`LeadIntelligencePanel`) — Renders
+  score breakdown, narrative summary, recommendation, insights and
+  forecast for any lead.
+- **Dashboard → Lead Intelligence widget** — Hot/cold leads count,
+  average score, attributed revenue and top campaigns.
+
+### AI Integration
+`generateSummary()` accepts a `provider` id and `buildSummaryPrompt()`
+emits a structured prompt so any registered AIProvider can replace the
+mock summarizer without changes to the engine signature or events.

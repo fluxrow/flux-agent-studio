@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Loader2, Mail, Phone, Building2, Tag as TagIcon, Plus,
-  Trash2, Flame, Snowflake, Thermometer, MessageSquare, Clock,
+  Trash2, Flame, Snowflake, Thermometer, MessageSquare, Clock, Brain,
 } from "lucide-react";
+import { LeadIntelligencePanel } from "@/components/intelligence/LeadIntelligencePanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -220,9 +221,14 @@ export default function LeadDetail() {
           <Tabs defaultValue="timeline">
             <TabsList className="bg-card/60 border border-border h-auto p-1">
               <TabsTrigger value="timeline"><Clock className="h-3.5 w-3.5 mr-1.5" />Timeline</TabsTrigger>
+              <TabsTrigger value="intelligence"><Brain className="h-3.5 w-3.5 mr-1.5" />Intelligence</TabsTrigger>
               <TabsTrigger value="conversations"><MessageSquare className="h-3.5 w-3.5 mr-1.5" />Conversas</TabsTrigger>
               <TabsTrigger value="notes">Notas</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="intelligence" className="mt-4">
+              <LeadIntelligencePanel lead={lead} eventCount={timeline.length} />
+            </TabsContent>
 
             <TabsContent value="timeline" className="mt-4">
               <div className="rounded-2xl border border-border bg-card/60 p-5">

@@ -697,3 +697,49 @@ touching the Runtime, Builder, CRM, AI Block or Knowledge layers.
 - **Event Bus integration** — every Phase 15 action funnels through
   `emitComplianceEvent()` so the Event Inspector, Tracking destinations
   and any future Supabase realtime subscriber receive the same payloads.
+
+## Phase 16 — Connector Hub Foundation
+
+Single architectural layer for every external integration. The Runtime, CRM,
+Tracking, AI and Knowledge engines never reference a specific vendor — they
+only see the **Connector** abstraction.
+
+### Connector Domain (`src/connectors/`)
+- **`types.ts`** — `Connector`, `ConnectorManifest`, `ConnectorCredential`,
+  `ConnectorAction`, `ConnectorTrigger`, `ConnectorPermission`,
+  `ConnectorEvent`, plus the `ConnectorKind` (`app | mcp | api | webhook |
+  internal`) and `ConnectorCategory` taxonomy.
+- **`registry.ts`** — `connectorRegistry` registers, discovers, lists and
+  validates manifests. Marketplace-ready: every manifest carries name,
+  description, category, version, author, permissions, actions and triggers.
+- **`store.ts`** — workspace-scoped persistence for installations and
+  credentials. Credentials are stored with **masked previews** only; real
+  secret material is delegated to the Credentials Manager (Phase 15).
+- **`events.ts`** — bridges connector lifecycle into `runtimeEventBus`:
+  `connector_installed`, `connector_configured`, `connector_connected`,
+  `connector_disconnected`, `connector_disabled`, `connector_error`,
+  `connector_action_executed`, `connector_trigger_received`.
+- **`builtins.ts`** — mocked first-party manifests: Google Sheets, Slack,
+  Webhook, Telegram, Stripe, Google Analytics 4.
+
+### Lifecycle
+`installed → configured → connected → disconnected | error | disabled` —
+exposed through the helpers `installConnector`, `configureConnector`,
+`connectConnector`, `disconnectConnector`, `disableConnector`, and
+`recordActionExecution`.
+
+### Connector Center (`/connectors`)
+New page listing every manifest with status badges, install/configure/connect
+controls, a credentials dialog driven by the manifest's `CredentialField[]`
+spec, and an expandable view of each connector's actions & triggers.
+
+### Builder Integration
+`src/components/builder/ConnectorBlockEditor.tsx` is the future Connector
+block editor. It already lets users select **manifest → action → parameters**
+visually; runtime execution will plug in when adapters land (per spec the
+block has no real execution yet).
+
+### Marketplace Compatibility
+Every manifest contains `id`, `name`, `description`, `category`, `version`,
+`author`, `permissions`, `actions`, `triggers`, and optional `tags` — making
+the same shape valid for a future Lovable marketplace import/export.

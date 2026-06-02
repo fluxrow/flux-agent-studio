@@ -18,6 +18,7 @@ const main = [
   { title: "Analytics",     url: "/analytics",     icon: BarChart3 },
   { title: "Templates",     url: "/templates",     icon: LayoutTemplate },
   { title: "Canais",        url: "/channels",      icon: Plug },
+  { title: "Conectores",    url: "/connectors",    icon: Plug },
   { title: "Configurações", url: "/settings",      icon: Settings },
 ];
 

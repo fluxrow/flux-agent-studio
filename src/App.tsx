@@ -31,6 +31,7 @@ import ChannelsDebug from "./pages/ChannelsDebug";
 import AIPlayground from "./pages/AIPlayground";
 import Knowledge from "./pages/Knowledge";
 import AIBuilder from "./pages/AIBuilder";
+import Connectors from "./pages/Connectors";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import DataDeletion from "./pages/DataDeletion";
@@ -83,6 +84,7 @@ const App = () => (
                 <Route path="/ai/playground" element={<AIPlayground />} />
                 <Route path="/knowledge" element={<Knowledge />} />
                 <Route path="/ai-builder" element={<AIBuilder />} />
+                <Route path="/connectors" element={<Connectors />} />
               </Route>
               <Route
                 path="/debug/repositories"

@@ -33,7 +33,7 @@ export const supabaseSessionRepository: SessionRepository = {
         status: input.status,
         started_at: input.startedAt,
         ended_at: input.endedAt ?? null,
-        variables: input.variables ?? {},
+        variables: (input.variables ?? {}) as any,
         current_block_key: input.currentBlockId ?? null,
       })
       .select("*")
@@ -64,7 +64,7 @@ export const supabaseSessionRepository: SessionRepository = {
     if (patch.leadId !== undefined) row.lead_id = patch.leadId;
     const { data, error } = await supabase
       .from("sessions")
-      .update(row)
+      .update(row as any)
       .eq("id", id)
       .select("*")
       .single();
@@ -80,7 +80,7 @@ export const supabaseSessionRepository: SessionRepository = {
       bot_id: event.botId ?? null,
       block_key: event.blockId ?? null,
       type: event.type,
-      payload: event.payload ?? {},
+      payload: (event.payload ?? {}) as any,
       occurred_at: event.at,
     });
     if (error) console.error("[appendHistory]", error);

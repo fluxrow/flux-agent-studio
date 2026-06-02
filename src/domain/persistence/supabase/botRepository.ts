@@ -71,7 +71,7 @@ export const supabaseBotRepository: BotRepository = {
     }
     const { data, error } = await supabase
       .from("bots")
-      .update(row)
+      .update(row as any)
       .eq("id", id)
       .select("*")
       .single();

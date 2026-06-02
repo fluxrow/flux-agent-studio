@@ -26,7 +26,7 @@ export const supabaseEventRepository: EventRepository = {
       bot_id: event.botId ?? null,
       block_key: event.blockId ?? null,
       type: event.type,
-      payload: event.payload ?? {},
+      payload: (event.payload ?? {}) as any,
       occurred_at: event.at,
     });
     if (error) console.error("[supabaseEventRepository.record]", error);

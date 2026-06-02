@@ -32,7 +32,7 @@ export const supabaseWorkspaceRepository: WorkspaceRepository = {
     if (patch.plan) row.plan = patch.plan;
     const { data, error } = await supabase
       .from("workspaces")
-      .update(row)
+      .update(row as any)
       .eq("id", id)
       .select("*")
       .single();

@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Bot, Users, MessageSquare,
   BarChart3, LayoutTemplate, Settings, Sparkles,
   Activity, Target, DollarSign, Bell, Plug, PlayCircle, BookOpen, Wand2,
+  Rocket, HeartPulse, AlertOctagon, ClipboardCheck, FlaskConical,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -31,6 +32,14 @@ const intel = [
   { title: "Attribution",   url: "/attribution",   icon: Target },
   { title: "Revenue",       url: "/revenue",       icon: DollarSign },
   { title: "Alertas",       url: "/alerts",        icon: Bell },
+];
+
+const beta = [
+  { title: "Onboarding",    url: "/onboarding",    icon: Rocket },
+  { title: "Beta Program",  url: "/beta",          icon: FlaskConical },
+  { title: "System Health", url: "/system-health", icon: HeartPulse },
+  { title: "Errors",        url: "/errors",        icon: AlertOctagon },
+  { title: "QA Dashboard",  url: "/qa",            icon: ClipboardCheck },
 ];
 
 export function AppSidebar() {
@@ -86,6 +95,7 @@ export function AppSidebar() {
       <SidebarContent className="px-2 py-3">
         {renderGroup("Principal", main)}
         {renderGroup("Intelligence", intel)}
+        {renderGroup("Beta", beta)}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-2">

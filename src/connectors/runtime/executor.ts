@@ -99,11 +99,11 @@ export async function executeConnectorAction(opts: ExecuteOptions): Promise<Exec
   const backoffMs = Math.max(0, opts.retry?.backoffMs ?? 500);
   const policy: ErrorPolicy = opts.errorPolicy ?? "stop_on_error";
 
-  emitConnectorEvent("connector_action_executed", {
+  emitConnectorEvent("connector_action_started", {
     connectorId: installation.id,
     manifestId: manifest.id,
     workspaceId: opts.workspaceId,
-    payload: { action: action.key, phase: "started", parameters },
+    payload: { action: action.key, parameters },
   });
 
   const t0 = Date.now();

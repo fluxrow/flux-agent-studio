@@ -118,6 +118,10 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         const sid = await startPublicSession(bot.slug, bot.id, bot.workspaceId, visitorId);
         if (cancelled) return;
         sessionIdRef.current = sid;
+        const channelSession = await webChannelHelpers.openWebSession({
+          visitorId, runtimeSessionId: sid, botId: bot.id, workspaceId: bot.workspaceId,
+        });
+        channelSessionIdRef.current = channelSession.id;
         if (attribution) {
           recordPublicAttribution(bot.slug, visitorId, sid, attribution).catch(() => undefined);
         }

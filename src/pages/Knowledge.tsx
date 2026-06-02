@@ -192,7 +192,7 @@ export default function Knowledge() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => knowledgeStore.deleteDocument(d.id)}
+                      onClick={() => setConfirmAction({ kind: "doc", id: d.id, title: d.title })}
                       className="text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-3.5 w-3.5" />

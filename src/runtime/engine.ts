@@ -142,9 +142,11 @@ export class RuntimeEngine {
     if (!this.context.visitedBlocks.includes(block.id)) {
       this.context.visitedBlocks.push(block.id);
     }
+    this.emitExecution("block_entered", { blockId: block.id, blockType: block.type }, block.id);
 
     switch (block.type) {
       case "start":
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         this.advanceFrom(block.id);
         return;
 
@@ -152,6 +154,7 @@ export class RuntimeEngine {
         const text = interpolate(String(block.config.text ?? ""), this.context.variables);
         this.transcript.push({ kind: "bot", blockId: block.id, text, at: now() });
         this.emit({ type: "message", blockId: block.id, text });
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         this.advanceFrom(block.id);
         return;
       }
@@ -190,10 +193,16 @@ export class RuntimeEngine {
           value: (block.config.value as string | number) ?? "",
         };
         const result = evaluateCondition(cfg, this.context.variables);
+        this.emitExecution(
+          "condition_evaluated",
+          { variable: cfg.variable, operator: cfg.operator, value: cfg.value, result },
+          block.id,
+        );
         const label = result ? "true" : "false";
         const next = this.outgoing(block.id).find(
           (c) => (c.condition ?? "").toLowerCase() === label,
         );
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         if (next) this.process(next.toBlockId);
         else this.advanceFrom(block.id);
         return;
@@ -208,12 +217,15 @@ export class RuntimeEngine {
         this.context.status = "ended";
         this.context.endedAt = now();
         this.emit({ type: "ended", context: this.context });
+        this.emitExecution("flow_completed", { endBlockId: block.id }, block.id);
+        this.emitExecution("conversation_completed", {}, block.id);
         this.emitState();
         return;
       }
 
       // Unsupported types (ai, webhook, delay) auto-advance for now.
       default:
+        this.emitExecution("block_exited", { blockId: block.id }, block.id);
         this.advanceFrom(block.id);
     }
   }

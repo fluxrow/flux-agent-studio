@@ -1,8 +1,8 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Bot, GitBranch, Variable, Users, MessageSquare,
-  BarChart3, LayoutTemplate, Settings, Sparkles, Activity, Target, DollarSign, Bell,
-  Plug, FileInput,
+  LayoutDashboard, Bot, Users, MessageSquare,
+  BarChart3, LayoutTemplate, Settings, Sparkles,
+  Activity, Target, DollarSign, Bell, Plug,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -11,27 +11,21 @@ import {
 } from "@/components/ui/sidebar";
 
 const main = [
-  { title: "Dashboard",    url: "/app",                    icon: LayoutDashboard },
-  { title: "Bots",         url: "/app/bots",               icon: Bot },
-  { title: "Builder",      url: "/app/builder/sdr-imob",   icon: GitBranch },
-  { title: "Leads",        url: "/app/leads",              icon: Users },
-  { title: "Conversas",    url: "/app/conversations",      icon: MessageSquare },
+  { title: "Dashboard",     url: "/dashboard",     icon: LayoutDashboard },
+  { title: "Bots",          url: "/bots",          icon: Bot },
+  { title: "Leads",         url: "/leads",         icon: Users },
+  { title: "Conversas",     url: "/conversations", icon: MessageSquare },
+  { title: "Analytics",     url: "/analytics",     icon: BarChart3 },
+  { title: "Templates",     url: "/templates",     icon: LayoutTemplate },
+  { title: "Canais",        url: "/channels",      icon: Plug },
+  { title: "Configurações", url: "/settings",      icon: Settings },
 ];
 
 const intel = [
-  { title: "Analytics",   url: "/app/analytics",   icon: BarChart3 },
-  { title: "Tracking",    url: "/app/tracking",    icon: Activity },
-  { title: "Attribution", url: "/app/attribution", icon: Target },
-  { title: "Revenue",     url: "/app/revenue",     icon: DollarSign },
-  { title: "Alertas",     url: "/app/alerts",      icon: Bell },
-];
-
-const build = [
-  { title: "Templates",     url: "/app/templates", icon: LayoutTemplate },
-  { title: "Canais",        url: "/app/channels",  icon: Plug },
-  { title: "Formulários",   url: "/app/forms",     icon: FileInput },
-  { title: "Variáveis",     url: "/app/variables", icon: Variable },
-  { title: "Configurações", url: "/app/settings",  icon: Settings },
+  { title: "Tracking",    url: "/tracking",    icon: Activity },
+  { title: "Attribution", url: "/attribution", icon: Target },
+  { title: "Revenue",     url: "/revenue",     icon: DollarSign },
+  { title: "Alertas",     url: "/alerts",      icon: Bell },
 ];
 
 export function AppSidebar() {
@@ -39,7 +33,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const { pathname } = useLocation();
   const isActive = (url: string) =>
-    url === "/app" ? pathname === "/app" : pathname.startsWith(url.split("/").slice(0,3).join("/"));
+    url === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(url);
 
   const renderGroup = (label: string, items: typeof main) => (
     <SidebarGroup className="mt-4 first:mt-0">
@@ -87,7 +81,6 @@ export function AppSidebar() {
       <SidebarContent className="px-2 py-3">
         {renderGroup("Principal", main)}
         {renderGroup("Intelligence", intel)}
-        {renderGroup("Construção", build)}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-2">

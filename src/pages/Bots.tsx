@@ -23,9 +23,11 @@ export default function Bots() {
           <h1 className="font-display text-3xl font-bold">Bots</h1>
           <p className="text-muted-foreground text-sm mt-1">{bots.length} agentes no workspace</p>
         </div>
-        <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
-          <Plus className="h-4 w-4 mr-1.5" /> Criar bot
-        </Button>
+        <Link to="/bots/new">
+          <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
+            <Plus className="h-4 w-4 mr-1.5" /> Criar bot
+          </Button>
+        </Link>
       </div>
 
       <div className="flex gap-3">
@@ -80,7 +82,7 @@ export default function Bots() {
               </div>
 
               <div className="mt-4 flex gap-2">
-                <Link to={`/app/builder/${b.id}`} className="flex-1">
+                <Link to={`/builder/${b.id}`} className="flex-1">
                   <Button variant="outline" size="sm" className="w-full bg-secondary/40">Abrir builder</Button>
                 </Link>
                 <Link to={`/bot/${b.id}`} target="_blank">

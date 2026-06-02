@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const smartAlerts = [
-  { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/app/leads" },
-  { id: 2, icon: AlertTriangle, tone: "warning",     title: "Queda de 22% na qualificação IA",   desc: "Bloco 'Qualifica com IA' perdeu performance nas últimas 24h.",   cta: "Investigar",  to: "/app/analytics" },
-  { id: 3, icon: DollarSign,    tone: "success",     title: "ROAS Instagram subiu 1.4x",          desc: "Campanha Reels VSL gerou R$ 14.8k em pipeline hoje.",            cta: "Ver receita", to: "/app/revenue" },
+  { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/leads" },
+  { id: 2, icon: AlertTriangle, tone: "warning",     title: "Queda de 22% na qualificação IA",   desc: "Bloco 'Qualifica com IA' perdeu performance nas últimas 24h.",   cta: "Investigar",  to: "/analytics" },
+  { id: 3, icon: DollarSign,    tone: "success",     title: "ROAS Instagram subiu 1.4x",          desc: "Campanha Reels VSL gerou R$ 14.8k em pipeline hoje.",            cta: "Ver receita", to: "/revenue" },
 ];
 
 const alertTone: Record<string,string> = {
@@ -55,7 +55,7 @@ export default function Dashboard() {
             <h3 className="font-semibold flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary-glow" /> Alertas inteligentes</h3>
             <p className="text-xs text-muted-foreground">A IA monitorou 2.847 eventos nas últimas 24h</p>
           </div>
-          <Link to="/app/alerts" className="text-xs text-primary-glow flex items-center gap-1">Ver todos <ArrowUpRight className="h-3 w-3" /></Link>
+          <Link to="/alerts" className="text-xs text-primary-glow flex items-center gap-1">Ver todos <ArrowUpRight className="h-3 w-3" /></Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {smartAlerts.map((a) => (
@@ -153,7 +153,7 @@ export default function Dashboard() {
         <div className="rounded-2xl border border-border bg-card/60 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold flex items-center gap-2"><Bot className="h-4 w-4 text-primary-glow" /> Top bots</h3>
-            <Link to="/app/bots" className="text-xs text-primary-glow flex items-center gap-1">Ver todos <ArrowUpRight className="h-3 w-3" /></Link>
+            <Link to="/bots" className="text-xs text-primary-glow flex items-center gap-1">Ver todos <ArrowUpRight className="h-3 w-3" /></Link>
           </div>
           <div className="space-y-3">
             {bots.filter(b=>b.status==="ativo").slice(0,4).map((b) => (

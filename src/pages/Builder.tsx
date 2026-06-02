@@ -81,7 +81,7 @@ export default function Builder() {
       {/* toolbar */}
       <div className="flex items-center justify-between border-b border-border bg-card/60 px-4 py-2.5">
         <div className="flex items-center gap-3">
-          <Link to="/app/bots"><Button size="sm" variant="ghost"><ChevronLeft className="h-4 w-4" /></Button></Link>
+          <Link to="/bots"><Button size="sm" variant="ghost"><ChevronLeft className="h-4 w-4" /></Button></Link>
           <div>
             <div className="text-xs text-muted-foreground">Builder</div>
             <div className="text-sm font-semibold">SDR Imobiliária Premium <span className="text-muted-foreground font-normal">/ {id}</span></div>

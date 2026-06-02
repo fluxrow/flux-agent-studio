@@ -85,8 +85,13 @@ export class RuntimeEngine {
     }
     const block = this.awaiting;
     const variable = String(block.config.variable ?? "");
-    if (variable) this.context.variables[variable] = value;
+    if (variable) {
+      this.context.variables[variable] = value;
+      this.emitExecution("variable_updated", { variable, value }, block.id);
+    }
     this.transcript.push({ kind: "user", text: value, at: now() });
+    this.emitExecution("input_received", { variable, value }, block.id);
+    this.emitExecution("block_exited", { blockId: block.id }, block.id);
     this.awaiting = null;
     this.advanceFrom(block.id);
   }
@@ -99,8 +104,13 @@ export class RuntimeEngine {
     }
     const block = this.awaiting;
     const variable = String(block.config.variable ?? "");
-    if (variable) this.context.variables[variable] = option;
+    if (variable) {
+      this.context.variables[variable] = option;
+      this.emitExecution("variable_updated", { variable, value: option }, block.id);
+    }
     this.transcript.push({ kind: "user", text: option, at: now() });
+    this.emitExecution("choice_selected", { variable, option }, block.id);
+    this.emitExecution("block_exited", { blockId: block.id }, block.id);
     this.awaiting = null;
     // Follow a connection whose `condition` label matches the option, if any.
     const labeled = this.outgoing(block.id).find(
@@ -112,10 +122,13 @@ export class RuntimeEngine {
 
   /** Force end the session. */
   end(systemNote = "Sessão encerrada"): void {
+    const wasRunning = this.context.status === "running" || this.context.status === "awaiting_input" || this.context.status === "awaiting_choice";
     this.context.status = "ended";
     this.context.endedAt = now();
     this.transcript.push({ kind: "system", text: systemNote, at: now() });
     this.emit({ type: "ended", context: this.context });
+    this.emitExecution(wasRunning ? "flow_abandoned" : "flow_completed", { note: systemNote });
+    this.emitExecution("conversation_completed", {});
     this.emitState();
   }
 

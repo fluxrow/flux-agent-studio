@@ -193,16 +193,18 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
   const submitInput = (value: string) => {
     if (!engine) return;
     const sid = sessionIdRef.current;
-    if (sid) recordPublicMessage(sid, "user", value);
+    const csid = channelSessionIdRef.current;
+    if (csid) webChannelHelpers.receiveText(csid, value);
+    else if (sid) recordPublicMessage(sid, "user", value);
     engine.submitInput(value);
   };
   const submitChoice = (opt: string) => {
     if (!engine) return;
     const sid = sessionIdRef.current;
-    if (sid) {
-      recordPublicMessage(sid, "user", opt);
-      recordPublicEvent(sid, "choice_selected", { option: opt });
-    }
+    const csid = channelSessionIdRef.current;
+    if (csid) webChannelHelpers.receiveText(csid, opt);
+    else if (sid) recordPublicMessage(sid, "user", opt);
+    if (sid) recordPublicEvent(sid, "choice_selected", { option: opt });
     engine.submitChoice(opt);
   };
 

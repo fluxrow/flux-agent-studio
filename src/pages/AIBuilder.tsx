@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   generateBlueprint, materializeBlueprint, aiBuilderCost,
   type BotBlueprint, type AIBuilderObjective,

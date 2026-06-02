@@ -7,3 +7,5 @@ export * from "./lead";
 export * from "./template";
 export * from "./channel";
 export * from "./conversation";
+export * from "./workspace";
+export * from "./event";

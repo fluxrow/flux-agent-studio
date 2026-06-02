@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { persistence } from "@/domain/persistence";
 import { connectorStore } from "@/connectors/store";
 import { knowledgeStore } from "@/knowledge/store";
+import { useWorkspace } from "@/auth/WorkspaceProvider";
 
 export type HealthCriterionKey =
   | "has_bot"

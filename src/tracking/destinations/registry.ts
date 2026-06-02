@@ -187,7 +187,13 @@ class DestinationRegistry {
       const parsed = JSON.parse(raw) as { configs?: Record<string, DestinationConfig> };
       if (parsed.configs) {
         for (const [id, cfg] of Object.entries(parsed.configs)) {
-          this.state.configs[id] = { ...DEFAULT_CONFIG, ...cfg, credentials: cfg.credentials ?? {} };
+          // Defensive: even if a previous (pre-18.7) build persisted secrets,
+          // strip them on read so we never reload tokens from disk.
+          const { publicMeta, secrets } = splitCredentials(cfg.credentials ?? {});
+          if (Object.keys(secrets).length > 0) {
+            console.warn(`[destinations] purged ${Object.keys(secrets).length} legacy secret(s) for ${id}`);
+          }
+          this.state.configs[id] = { ...DEFAULT_CONFIG, ...cfg, credentials: publicMeta };
         }
       }
     } catch (e) {
@@ -198,7 +204,13 @@ class DestinationRegistry {
   private saveToStorage() {
     if (typeof localStorage === "undefined") return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ configs: this.state.configs }));
+      // Only public metadata is serialized — sensitive keys live in the vault.
+      const safeConfigs: Record<string, DestinationConfig> = {};
+      for (const [id, cfg] of Object.entries(this.state.configs)) {
+        const { publicMeta } = splitCredentials(cfg.credentials ?? {});
+        safeConfigs[id] = { ...cfg, credentials: publicMeta };
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ configs: safeConfigs }));
     } catch (e) {
       console.warn("[destinations] failed to persist config", e);
     }

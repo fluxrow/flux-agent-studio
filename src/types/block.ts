@@ -1,4 +1,4 @@
-import type { ID, Timestamps } from "./common";
+import type { ID, ISODate, Timestamps } from "./common";
 
 export type BlockType =
   | "start"
@@ -24,6 +24,8 @@ export interface BlockConfig {
   options?: string[];
   url?: string;
   delayMs?: number;
+  operator?: "equals" | "contains" | "greater_than" | "less_than";
+  value?: string | number;
   [key: string]: unknown;
 }
 
@@ -41,12 +43,45 @@ export interface Connection extends Timestamps {
   botId: ID;
   fromBlockId: ID;
   toBlockId: ID;
-  /** Optional condition label, e.g. "sim" / "não" for choice branches. */
+  /** Optional condition label, e.g. "sim" / "não" / "true" / "false". */
   condition?: string;
+}
+
+/* ---------------- Flow envelope ---------------- */
+
+export type FlowStatus = "draft" | "published" | "archived";
+
+export type FlowVariableType = "string" | "number" | "boolean";
+
+export interface FlowVariableDecl {
+  name: string;
+  type?: FlowVariableType;
+  defaultValue?: string | number | boolean | null;
+  description?: string;
+}
+
+export interface FlowMetadata {
+  name: string;
+  description?: string;
+  version: number;
+  primaryChannel?: string;
+  status: FlowStatus;
+  lastEditedAt: ISODate;
+}
+
+export interface FlowVersionRef {
+  version: number;
+  status: FlowStatus;
+  createdAt: ISODate;
+  note?: string;
 }
 
 export interface Flow {
   botId: ID;
   blocks: Block[];
   connections: Connection[];
+  variables?: FlowVariableDecl[];
+  metadata?: FlowMetadata;
+  publishedVersion?: number;
+  versions?: FlowVersionRef[];
 }

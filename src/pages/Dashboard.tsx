@@ -76,6 +76,10 @@ export default function Dashboard() {
         </div>
       </div>
 
+      <CrmDashboardWidget />
+
+
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* chart */}
         <div className="lg:col-span-2 rounded-2xl border border-border bg-card/60 p-6">

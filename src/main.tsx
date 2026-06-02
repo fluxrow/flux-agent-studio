@@ -6,9 +6,10 @@ import "./lib/analytics/adapter";
 // Bridge runtime events → CRM (auto-creates leads from completed flows).
 import { startCrmBridge } from "./lib/crm-bridge";
 // Tracking core — visitor profile, attribution, session events.
-import { trackingEngine } from "./tracking";
+import { trackingEngine, destinations } from "./tracking";
 
 startCrmBridge();
 trackingEngine.start();
+destinations.start();
 
 createRoot(document.getElementById("root")!).render(<App />);

@@ -20,7 +20,7 @@ import { useWorkspace } from "./WorkspaceProvider";
 import { USE_SUPABASE } from "@/lib/runtime-config";
 
 export function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { session, user, loading: authLoading } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const { workspace, loading: wsLoading } = useWorkspace();
   const location = useLocation();
 
@@ -38,8 +38,11 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/auth" replace state={{ from: location }} />;
   }
 
-  const isOwner = workspace && user && workspace.ownerId === user.id;
-  if (!isOwner) {
+  // Workspace-role based admin gate. A formal app_role table will replace
+  // this heuristic in Phase 19; for now only owners/admins reach internal tooling.
+  const role = workspace?.role;
+  const isAdmin = role === "owner" || role === "admin";
+  if (!isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 

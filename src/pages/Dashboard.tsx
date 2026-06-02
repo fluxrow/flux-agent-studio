@@ -6,6 +6,16 @@ import { Button } from "@/components/ui/button";
 import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
 import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
 import { LeadIntelligenceWidget } from "@/components/dashboard/LeadIntelligenceWidget";
+import { useAuth } from "@/auth/AuthProvider";
+import { useWorkspace } from "@/auth/WorkspaceProvider";
+
+function greetingFor(date: Date): string {
+  const h = date.getHours();
+  if (h < 5) return "Boa madrugada";
+  if (h < 12) return "Bom dia";
+  if (h < 18) return "Boa tarde";
+  return "Boa noite";
+}
 
 const smartAlerts = [
   { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/leads" },

@@ -12,6 +12,14 @@ const blockPerf = [
 ];
 
 export default function Analytics() {
+  const { data: stats, isLoading } = useBasicStats();
+  const kpis = [
+    { icon: Bot,           label: "Bots",       value: stats?.bots ?? 0 },
+    { icon: Users,         label: "Leads",      value: stats?.leads ?? 0 },
+    { icon: MessageSquare, label: "Conversas",  value: stats?.conversations ?? 0 },
+    { icon: Target,        label: "Conversões", value: stats?.conversions ?? 0 },
+  ];
+
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
       <div>
@@ -26,7 +34,9 @@ export default function Analytics() {
               <div className="text-xs text-muted-foreground">{k.label}</div>
               <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center"><k.icon className="h-4 w-4 text-primary-foreground" /></div>
             </div>
-            <div className="font-display text-2xl font-bold mt-3">{k.value}</div>
+            <div className="font-display text-2xl font-bold mt-3 tabular-nums">
+              {isLoading ? "—" : k.value.toLocaleString()}
+            </div>
           </div>
         ))}
       </div>

@@ -1,106 +1,139 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import {
-  MessageSquare, Image as ImageIcon, Video, Mic, FileText, Layers, Type, Mail, Phone, Hash,
-  CalendarDays, MousePointerClick, List, ToggleLeft, Star, GitFork, Variable, Timer, Shuffle,
-  Webhook, Database, Sparkles, ChevronLeft, Save, Play, ZoomIn, ZoomOut, Search, Map,
+  ChevronLeft, Save, Play, ZoomIn, ZoomOut, Search, Map,
+  AlertTriangle, CheckCircle2, Sparkles, Database, Settings as SettingsIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { sampleChat } from "@/lib/mock";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useFlow } from "@/domain/hooks";
+import { BuilderProvider, useBuilder } from "@/builder/BuilderContext";
+import { blockRegistry, toneClass } from "@/builder/blockRegistry";
+import { ValidationPanel } from "@/components/builder/ValidationPanel";
+import { PreviewPanel } from "@/components/builder/PreviewPanel";
+import type { Block, FlowMetadata } from "@/types";
 
-const groups = [
-  { label: "Comunicação", items: [
-    { id: "msg", icon: MessageSquare, name: "Mensagem", color: "primary" },
-    { id: "img", icon: ImageIcon, name: "Imagem", color: "accent" },
-    { id: "vid", icon: Video, name: "Vídeo", color: "accent" },
-    { id: "aud", icon: Mic, name: "Áudio", color: "accent" },
-    { id: "file", icon: FileText, name: "Arquivo", color: "accent" },
-    { id: "car", icon: Layers, name: "Carrossel", color: "accent" },
-  ]},
-  { label: "Entrada", items: [
-    { id: "txt", icon: Type, name: "Texto", color: "warning" },
-    { id: "eml", icon: Mail, name: "Email", color: "warning" },
-    { id: "phn", icon: Phone, name: "Telefone", color: "warning" },
-    { id: "num", icon: Hash, name: "Número", color: "warning" },
-    { id: "dt", icon: CalendarDays, name: "Data", color: "warning" },
-  ]},
-  { label: "Escolhas", items: [
-    { id: "btn", icon: MousePointerClick, name: "Botão", color: "success" },
-    { id: "ms", icon: List, name: "Múltipla", color: "success" },
-    { id: "yn", icon: ToggleLeft, name: "Sim / Não", color: "success" },
-    { id: "rate", icon: Star, name: "Avaliação", color: "success" },
-  ]},
-  { label: "Lógica", items: [
-    { id: "cond", icon: GitFork, name: "Condição", color: "destructive" },
-    { id: "var", icon: Variable, name: "Variável", color: "destructive" },
-    { id: "delay", icon: Timer, name: "Delay", color: "destructive" },
-    { id: "rnd", icon: Shuffle, name: "Randomizador", color: "destructive" },
-  ]},
-  { label: "Integrações & IA", items: [
-    { id: "hook", icon: Webhook, name: "Webhook", color: "primary" },
-    { id: "db", icon: Database, name: "Supabase", color: "primary" },
-    { id: "ai", icon: Sparkles, name: "Bloco IA", color: "primary" },
-  ]},
+const paletteGroups = [
+  { label: "Comunicação", types: ["message"] as const },
+  { label: "Entrada",     types: ["input"] as const },
+  { label: "Escolhas",    types: ["choice"] as const },
+  { label: "Lógica",      types: ["condition", "delay"] as const },
+  { label: "Integrações", types: ["webhook", "ai"] as const },
+  { label: "Fluxo",       types: ["start", "end"] as const },
 ];
 
-type Node = { id: string; x: number; y: number; type: string; title: string; subtitle: string; icon: any; tone: string };
-
-const initialNodes: Node[] = [
-  { id: "n1", x: 80, y: 60, type: "start", title: "Início", subtitle: "Saudação inicial", icon: Play, tone: "primary" },
-  { id: "n2", x: 80, y: 200, type: "msg", title: "Mensagem", subtitle: "Olá! Sou o assistente da FluxBot. Como posso ajudar?", icon: MessageSquare, tone: "primary" },
-  { id: "n3", x: 80, y: 360, type: "input", title: "Captura nome", subtitle: "{{nome}}", icon: Type, tone: "warning" },
-  { id: "n4", x: 80, y: 510, type: "ai", title: "Qualifica com IA", subtitle: "GPT-5 · Lead scoring", icon: Sparkles, tone: "primary" },
-  { id: "n5", x: 430, y: 360, type: "cond", title: "Condição", subtitle: "score > 70?", icon: GitFork, tone: "destructive" },
-  { id: "n6", x: 780, y: 280, type: "hook", title: "Webhook → CRM", subtitle: "POST /leads", icon: Webhook, tone: "primary" },
-  { id: "n7", x: 780, y: 440, type: "msg", title: "Follow-up", subtitle: "Te mando conteúdo por email", icon: Mail, tone: "primary" },
-];
-
-const edges = [
-  { from: "n1", to: "n2" }, { from: "n2", to: "n3" }, { from: "n3", to: "n4" },
-  { from: "n4", to: "n5" }, { from: "n5", to: "n6", label: "sim" }, { from: "n5", to: "n7", label: "não" },
-];
-
-const toneClass: Record<string,string> = {
-  primary: "border-primary/50 bg-primary/10 text-primary-glow",
-  accent: "border-accent/50 bg-accent/10 text-accent",
-  warning: "border-warning/50 bg-warning/10 text-warning",
-  success: "border-success/50 bg-success/10 text-success",
-  destructive: "border-destructive/50 bg-destructive/10 text-destructive",
+const statusTone: Record<FlowMetadata["status"], string> = {
+  draft:     "bg-warning/15 text-warning border-warning/30",
+  published: "bg-success/15 text-success border-success/30",
+  archived:  "bg-muted text-muted-foreground border-border",
 };
 
 export default function Builder() {
   const { id } = useParams();
-  const [selected, setSelected] = useState<Node>(initialNodes[3]);
-  const nodes = initialNodes;
-  const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const { data: flow, isLoading } = useFlow(id);
+
+  if (isLoading || !flow) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-3.5rem)] text-muted-foreground text-sm">
+        Carregando flow…
+      </div>
+    );
+  }
+
+  return (
+    <BuilderProvider flow={flow}>
+      <BuilderInner />
+    </BuilderProvider>
+  );
+}
+
+function BuilderInner() {
+  const { id } = useParams();
+  const {
+    flow, selectedBlock, validation,
+    selectBlock, updateBlock, updateConfig, updateMetadata,
+    publish, state,
+  } = useBuilder();
+
+  const [showPreview, setShowPreview] = useState(false);
+  const metadata = flow.metadata as FlowMetadata;
+  const nodeMap = Object.fromEntries(flow.blocks.map((n) => [n.id, n]));
+
+  const handlePublish = () => {
+    if (!validation.valid) return;
+    publish();
+  };
 
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)]">
       {/* toolbar */}
-      <div className="flex items-center justify-between border-b border-border bg-card/60 px-4 py-2.5">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between border-b border-border bg-card/60 px-4 py-2.5 gap-4">
+        <div className="flex items-center gap-3 min-w-0">
           <Link to="/bots"><Button size="sm" variant="ghost"><ChevronLeft className="h-4 w-4" /></Button></Link>
-          <div>
-            <div className="text-xs text-muted-foreground">Builder</div>
-            <div className="text-sm font-semibold">SDR Imobiliária Premium <span className="text-muted-foreground font-normal">/ {id}</span></div>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Builder · {id}</div>
+            <div className="flex items-center gap-2">
+              <input
+                value={metadata.name}
+                onChange={(e) => updateMetadata({ name: e.target.value })}
+                className="text-sm font-semibold bg-transparent border-0 outline-none focus:bg-background rounded px-1 -ml-1 min-w-0"
+              />
+              <Badge variant="outline" className={statusTone[metadata.status]}>
+                {metadata.status}
+              </Badge>
+              <span className="text-[10px] text-muted-foreground">v{metadata.version}</span>
+              {state.dirty && <span className="text-[10px] text-warning">• alterado</span>}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-1.5 text-[11px] mr-3">
+            {validation.valid ? (
+              <span className="flex items-center gap-1 text-success">
+                <CheckCircle2 className="h-3.5 w-3.5" /> Flow válido
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-destructive">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                {validation.errors.length} erro(s)
+              </span>
+            )}
+            {validation.warnings.length > 0 && (
+              <span className="flex items-center gap-1 text-warning">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                {validation.warnings.length} aviso(s)
+              </span>
+            )}
+          </div>
           <div className="hidden md:flex items-center gap-1 mr-3 text-muted-foreground">
             <Button size="icon" variant="ghost" className="h-8 w-8"><ZoomOut className="h-4 w-4" /></Button>
             <span className="text-xs">100%</span>
             <Button size="icon" variant="ghost" className="h-8 w-8"><ZoomIn className="h-4 w-4" /></Button>
             <Button size="icon" variant="ghost" className="h-8 w-8"><Map className="h-4 w-4" /></Button>
           </div>
-          <Button size="sm" variant="outline" className="bg-secondary/40"><Save className="h-4 w-4 mr-1.5" /> Salvar</Button>
-          <Button size="sm" className="gradient-primary text-primary-foreground border-0 shadow-elegant"><Play className="h-4 w-4 mr-1.5" /> Publicar</Button>
+          <Button size="sm" variant="outline" className="bg-secondary/40" onClick={() => setShowPreview(true)}>
+            <Play className="h-4 w-4 mr-1.5" /> Preview
+          </Button>
+          <Button size="sm" variant="outline" className="bg-secondary/40">
+            <Save className="h-4 w-4 mr-1.5" /> Salvar rascunho
+          </Button>
+          <Button
+            size="sm"
+            disabled={!validation.valid}
+            onClick={handlePublish}
+            className="gradient-primary text-primary-foreground border-0 shadow-elegant disabled:opacity-50"
+          >
+            Publicar
+          </Button>
         </div>
       </div>
 
       <div className="flex flex-1 min-h-0">
-        {/* blocks panel */}
+        {/* blocks palette */}
         <aside className="w-64 border-r border-border bg-card/40 overflow-y-auto">
           <div className="p-3">
             <div className="relative">
@@ -109,16 +142,22 @@ export default function Builder() {
             </div>
           </div>
           <div className="px-3 pb-6 space-y-5">
-            {groups.map((g) => (
+            {paletteGroups.map((g) => (
               <div key={g.label}>
                 <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{g.label}</div>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {g.items.map((it) => (
-                    <div key={it.id} className={`flex flex-col items-center gap-1 rounded-lg border border-border bg-background/60 p-2.5 cursor-grab hover:border-primary/40 hover:bg-card transition text-[10px]`}>
-                      <it.icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-center">{it.name}</span>
-                    </div>
-                  ))}
+                  {g.types.map((t) => {
+                    const meta = blockRegistry[t];
+                    return (
+                      <div
+                        key={t}
+                        className="flex flex-col items-center gap-1 rounded-lg border border-border bg-background/60 p-2.5 cursor-grab hover:border-primary/40 hover:bg-card transition text-[10px]"
+                      >
+                        <meta.icon className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-center">{meta.label}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -127,18 +166,22 @@ export default function Builder() {
 
         {/* canvas */}
         <div className="flex-1 relative overflow-auto grid-bg">
-          <div className="relative" style={{ width: 1400, height: 800 }}>
-            <svg className="absolute inset-0 pointer-events-none" width={1400} height={800}>
-              {edges.map((e, i) => {
-                const a = nodeMap[e.from], b = nodeMap[e.to];
-                const x1 = a.x + 130, y1 = a.y + 40, x2 = b.x + 10, y2 = b.y + 40;
+          <div className="relative" style={{ width: 2000, height: 800 }}>
+            <svg className="absolute inset-0 pointer-events-none" width={2000} height={800}>
+              {flow.connections.map((e) => {
+                const a = nodeMap[e.fromBlockId], b = nodeMap[e.toBlockId];
+                if (!a || !b) return null;
+                const x1 = a.position.x + 260, y1 = a.position.y + 40;
+                const x2 = b.position.x, y2 = b.position.y + 40;
                 const c = `M ${x1} ${y1} C ${x1+80} ${y1}, ${x2-80} ${y2}, ${x2} ${y2}`;
                 return (
-                  <g key={i}>
+                  <g key={e.id}>
                     <path d={c} stroke="hsl(var(--primary) / 0.5)" strokeWidth={2} fill="none" />
-                    {e.label && (
-                      <foreignObject x={(x1+x2)/2-18} y={(y1+y2)/2-10} width={36} height={20}>
-                        <div className="text-[10px] text-center rounded bg-background border border-border px-1.5 py-0.5">{e.label}</div>
+                    {e.condition && (
+                      <foreignObject x={(x1+x2)/2-22} y={(y1+y2)/2-10} width={44} height={20}>
+                        <div className="text-[10px] text-center rounded bg-background border border-border px-1.5 py-0.5">
+                          {e.condition}
+                        </div>
                       </foreignObject>
                     )}
                   </g>
@@ -146,109 +189,301 @@ export default function Builder() {
               })}
             </svg>
 
-            {nodes.map((n) => {
-              const isSel = selected.id === n.id;
+            {flow.blocks.map((n) => {
+              const meta = blockRegistry[n.type];
+              const isSel = selectedBlock?.id === n.id;
+              const hasError = validation.errors.some((i) => i.blockId === n.id);
               return (
-                <button key={n.id} onClick={() => setSelected(n)}
-                  style={{ left: n.x, top: n.y }}
-                  className={`absolute w-[260px] text-left rounded-xl border bg-card p-3 shadow-card transition hover:shadow-elegant ${isSel ? "border-primary shadow-glow ring-2 ring-primary/30" : "border-border"}`}>
+                <button
+                  key={n.id}
+                  onClick={() => selectBlock(n.id)}
+                  style={{ left: n.position.x, top: n.position.y }}
+                  className={`absolute w-[260px] text-left rounded-xl border bg-card p-3 shadow-card transition hover:shadow-elegant ${
+                    isSel ? "border-primary shadow-glow ring-2 ring-primary/30" : hasError ? "border-destructive/60" : "border-border"
+                  }`}
+                >
                   <div className="flex items-center gap-2">
-                    <div className={`h-7 w-7 rounded-md flex items-center justify-center border ${toneClass[n.tone]}`}>
-                      <n.icon className="h-3.5 w-3.5" />
+                    <div className={`h-7 w-7 rounded-md flex items-center justify-center border ${toneClass[meta.tone]}`}>
+                      <meta.icon className="h-3.5 w-3.5" />
                     </div>
                     <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{n.type}</div>
+                    {hasError && <AlertTriangle className="h-3 w-3 text-destructive ml-auto" />}
                   </div>
-                  <div className="text-sm font-semibold mt-2">{n.title}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.subtitle}</div>
+                  <div className="text-sm font-semibold mt-2">{n.label}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                    {String(n.config.text ?? n.config.variable ?? "—")}
+                  </div>
                   <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-primary bg-background" />
                   <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-primary bg-background" />
                 </button>
               );
             })}
-
-            {/* mini map */}
-            <div className="sticky bottom-4 ml-4 inline-block">
-              <div className="glass rounded-lg p-2 w-40 h-24 relative">
-                <div className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Mini-mapa</div>
-                {nodes.map((n) => (
-                  <div key={n.id} className="absolute h-1.5 w-3 rounded-sm bg-primary/60" style={{ left: 8 + n.x/30, top: 18 + n.y/25 }} />
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* properties */}
-        <aside className="w-80 border-l border-border bg-card/60 overflow-y-auto">
-          <div className="p-5 border-b border-border">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Propriedades do bloco</div>
-            <div className="mt-2 flex items-center gap-2">
-              <div className={`h-8 w-8 rounded-md flex items-center justify-center border ${toneClass[selected.tone]}`}><selected.icon className="h-4 w-4" /></div>
-              <div>
-                <div className="font-semibold">{selected.title}</div>
-                <div className="text-xs text-muted-foreground">#{selected.id}</div>
-              </div>
-            </div>
-          </div>
-          <div className="p-5 space-y-4">
-            <div>
-              <label className="text-xs text-muted-foreground">Nome do bloco</label>
-              <Input defaultValue={selected.title} className="mt-1 bg-background border-border" />
-            </div>
-            {selected.type === "ai" ? (
-              <>
-                <div>
-                  <label className="text-xs text-muted-foreground">Modelo</label>
-                  <div className="mt-1 rounded-lg border border-border bg-background px-3 py-2 text-sm">GPT-5.2 · OpenAI</div>
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground">Prompt</label>
-                  <Textarea rows={5} defaultValue="Você é um SDR especialista em imóveis de alto padrão. Qualifique o lead com perguntas sobre orçamento, região e prazo. Retorne um score de 0-100." className="mt-1 bg-background border-border text-sm" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-muted-foreground">Temperatura</label>
-                    <Input defaultValue="0.6" className="mt-1 bg-background border-border" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">Máx. tokens</label>
-                    <Input defaultValue="500" className="mt-1 bg-background border-border" />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground">Base de conhecimento</label>
-                  <div className="mt-1 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm flex items-center gap-2">
-                    <Database className="h-4 w-4 text-primary-glow" /> Catálogo Imóveis Q1 2026
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <label className="text-xs text-muted-foreground">Conteúdo</label>
-                  <Textarea rows={4} defaultValue={selected.subtitle} className="mt-1 bg-background border-border text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground">Variável de saída</label>
-                  <Input defaultValue="{{resposta}}" className="mt-1 bg-background border-border font-mono text-xs" />
-                </div>
-              </>
-            )}
-          </div>
+        {/* right sidebar — tabs: properties / validation / metadata */}
+        <aside className="w-80 border-l border-border bg-card/60 overflow-hidden flex flex-col">
+          <Tabs defaultValue="props" className="flex flex-col flex-1 min-h-0">
+            <TabsList className="m-3 grid grid-cols-3 bg-background/60">
+              <TabsTrigger value="props" className="text-xs">Propriedades</TabsTrigger>
+              <TabsTrigger value="validation" className="text-xs gap-1">
+                Validação
+                {!validation.valid && <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-destructive" />}
+              </TabsTrigger>
+              <TabsTrigger value="meta" className="text-xs">Flow</TabsTrigger>
+            </TabsList>
 
-          {/* live preview */}
-          <div className="border-t border-border p-5">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Preview da conversa</div>
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              {sampleChat.map((m, i) => (
-                <div key={i} className={`text-xs px-3 py-2 rounded-2xl max-w-[85%] ${m.from === "bot" ? "bg-secondary rounded-tl-sm" : "gradient-primary text-primary-foreground ml-auto rounded-tr-sm"}`}>
-                  {m.text}
-                </div>
-              ))}
-            </div>
-          </div>
+            <TabsContent value="props" className="flex-1 overflow-y-auto m-0 px-5 pb-5">
+              {selectedBlock ? <PropertiesEditor block={selectedBlock} onChange={(p) => updateConfig(selectedBlock.id, p)} onLabel={(l) => updateBlock(selectedBlock.id, { label: l })} /> : null}
+            </TabsContent>
+
+            <TabsContent value="validation" className="flex-1 overflow-y-auto m-0 px-3 pb-5">
+              <ValidationPanel report={validation} onSelectBlock={selectBlock} />
+            </TabsContent>
+
+            <TabsContent value="meta" className="flex-1 overflow-y-auto m-0 px-5 pb-5 space-y-4">
+              <FlowMetadataEditor />
+            </TabsContent>
+          </Tabs>
         </aside>
       </div>
+
+      {showPreview && <PreviewPanel onClose={() => setShowPreview(false)} />}
     </div>
+  );
+}
+
+/* ---------- Properties editor ---------- */
+
+function PropertiesEditor({
+  block,
+  onChange,
+  onLabel,
+}: {
+  block: Block;
+  onChange: (config: Partial<Block["config"]>) => void;
+  onLabel: (label: string) => void;
+}) {
+  const meta = blockRegistry[block.type];
+  return (
+    <div className="space-y-4">
+      <div className="border-b border-border pb-4 -mx-5 px-5">
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Bloco selecionado</div>
+        <div className="mt-2 flex items-center gap-2">
+          <div className={`h-8 w-8 rounded-md flex items-center justify-center border ${toneClass[meta.tone]}`}>
+            <meta.icon className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="font-semibold truncate">{block.label}</div>
+            <div className="text-xs text-muted-foreground font-mono truncate">#{block.id}</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground">Nome do bloco</label>
+        <Input value={block.label} onChange={(e) => onLabel(e.target.value)} className="mt-1 bg-background border-border" />
+      </div>
+
+      {(block.type === "message" || block.type === "input" || block.type === "end") && (
+        <div>
+          <label className="text-xs text-muted-foreground">
+            {block.type === "input" ? "Pergunta" : "Conteúdo"}
+          </label>
+          <Textarea
+            rows={4}
+            value={String(block.config.text ?? "")}
+            onChange={(e) => onChange({ text: e.target.value })}
+            className="mt-1 bg-background border-border text-sm"
+            placeholder="Use {{variavel}} para interpolar."
+          />
+        </div>
+      )}
+
+      {(block.type === "input" || block.type === "choice") && (
+        <div>
+          <label className="text-xs text-muted-foreground">Variável de saída</label>
+          <Input
+            value={String(block.config.variable ?? "")}
+            onChange={(e) => onChange({ variable: e.target.value })}
+            className="mt-1 bg-background border-border font-mono text-xs"
+            placeholder="ex: lead_name"
+          />
+        </div>
+      )}
+
+      {block.type === "choice" && (
+        <div>
+          <label className="text-xs text-muted-foreground">Opções (uma por linha)</label>
+          <Textarea
+            rows={4}
+            value={((block.config.options as string[] | undefined) ?? []).join("\n")}
+            onChange={(e) => onChange({ options: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
+            className="mt-1 bg-background border-border text-sm font-mono"
+          />
+        </div>
+      )}
+
+      {block.type === "condition" && (
+        <>
+          <div>
+            <label className="text-xs text-muted-foreground">Variável</label>
+            <Input
+              value={String(block.config.variable ?? "")}
+              onChange={(e) => onChange({ variable: e.target.value })}
+              className="mt-1 bg-background border-border font-mono text-xs"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs text-muted-foreground">Operador</label>
+              <Select
+                value={String(block.config.operator ?? "equals")}
+                onValueChange={(v) => onChange({ operator: v as Block["config"]["operator"] })}
+              >
+                <SelectTrigger className="mt-1 bg-background border-border text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="equals">equals</SelectItem>
+                  <SelectItem value="contains">contains</SelectItem>
+                  <SelectItem value="greater_than">greater_than</SelectItem>
+                  <SelectItem value="less_than">less_than</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Valor</label>
+              <Input
+                value={String(block.config.value ?? "")}
+                onChange={(e) => onChange({ value: e.target.value })}
+                className="mt-1 bg-background border-border text-xs"
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {block.type === "ai" && (
+        <>
+          <div>
+            <label className="text-xs text-muted-foreground">Modelo</label>
+            <div className="mt-1 rounded-lg border border-border bg-background px-3 py-2 text-sm flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary-glow" /> GPT-5.2 · OpenAI
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">Prompt</label>
+            <Textarea
+              rows={5}
+              value={String(block.config.prompt ?? "")}
+              onChange={(e) => onChange({ prompt: e.target.value })}
+              className="mt-1 bg-background border-border text-sm"
+            />
+          </div>
+        </>
+      )}
+
+      {block.type === "webhook" && (
+        <div>
+          <label className="text-xs text-muted-foreground">URL</label>
+          <Input
+            value={String(block.config.url ?? "")}
+            onChange={(e) => onChange({ url: e.target.value })}
+            className="mt-1 bg-background border-border font-mono text-xs"
+            placeholder="https://api.exemplo.com/hook"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Flow metadata editor ---------- */
+
+function FlowMetadataEditor() {
+  const { flow, updateMetadata, setStatus } = useBuilder();
+  const md = flow.metadata as FlowMetadata;
+
+  return (
+    <>
+      <div className="border-b border-border pb-4 -mx-5 px-5">
+        <div className="flex items-center gap-2">
+          <SettingsIcon className="h-3.5 w-3.5 text-primary-glow" />
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+            Metadata do flow
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground">Nome</label>
+        <Input value={md.name} onChange={(e) => updateMetadata({ name: e.target.value })} className="mt-1 bg-background border-border" />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground">Descrição</label>
+        <Textarea
+          rows={3}
+          value={md.description ?? ""}
+          onChange={(e) => updateMetadata({ description: e.target.value })}
+          className="mt-1 bg-background border-border text-sm"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground">Canal principal</label>
+          <Select value={md.primaryChannel ?? ""} onValueChange={(v) => updateMetadata({ primaryChannel: v })}>
+            <SelectTrigger className="mt-1 bg-background border-border text-xs">
+              <SelectValue placeholder="Escolha…" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="whatsapp">WhatsApp</SelectItem>
+              <SelectItem value="instagram">Instagram</SelectItem>
+              <SelectItem value="telegram">Telegram</SelectItem>
+              <SelectItem value="webchat">Webchat</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Status</label>
+          <Select value={md.status} onValueChange={(v) => setStatus(v as FlowMetadata["status"])}>
+            <SelectTrigger className="mt-1 bg-background border-border text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="text-xs text-muted-foreground flex items-center justify-between border-t border-border pt-3">
+        <span>Versão atual</span>
+        <span className="font-mono">v{md.version}</span>
+      </div>
+      <div className="text-xs text-muted-foreground flex items-center justify-between">
+        <span>Última edição</span>
+        <span>{new Date(md.lastEditedAt).toLocaleString()}</span>
+      </div>
+
+      {flow.versions && flow.versions.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card/60 p-3 space-y-2 mt-2">
+          <div className="flex items-center gap-2">
+            <Database className="h-3.5 w-3.5 text-primary-glow" />
+            <span className="text-[11px] uppercase tracking-widest text-muted-foreground">Histórico de versões</span>
+          </div>
+          <ul className="space-y-1.5">
+            {[...flow.versions].reverse().map((v) => (
+              <li key={v.version} className="flex items-center justify-between text-xs rounded-lg border border-border bg-background/60 px-2.5 py-1.5">
+                <span className="font-mono">v{v.version}</span>
+                <Badge variant="outline" className={statusTone[v.status]}>{v.status}</Badge>
+                <span className="text-muted-foreground text-[10px]">{new Date(v.createdAt).toLocaleDateString()}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
   );
 }

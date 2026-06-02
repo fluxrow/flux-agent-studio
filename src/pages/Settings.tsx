@@ -195,13 +195,7 @@ export default function Settings() {
             </div>
           </div>
         </TabsContent>
-            <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
-              <div className="text-sm font-semibold text-destructive">Zona de risco</div>
-              <div className="text-xs text-muted-foreground mt-1">Excluir o workspace remove todos os bots, leads e dados associados.</div>
-              <Button size="sm" variant="outline" className="mt-3 border-destructive/40 text-destructive hover:bg-destructive/10">Excluir workspace</Button>
-            </div>
-          </div>
-        </TabsContent>
+
 
         {/* Equipe */}
         <TabsContent value="team" className="mt-6">

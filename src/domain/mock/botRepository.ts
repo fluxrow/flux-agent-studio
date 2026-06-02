@@ -1,11 +1,13 @@
 import type { Bot, BotCreateInput, Flow, ID, ListParams } from "@/types";
 import type { BotRepository } from "../repositories";
-import { mockFlows } from "@/mocks";
-import { mockBots } from "@/mocks";
+import { mockBots, mockFlows } from "@/mocks";
 import { MOCK_WORKSPACE_ID, nowIso } from "@/mocks/_shared";
 import { delay, filterBySearch, paginate } from "./_helpers";
 
 const store: Bot[] = [...mockBots];
+
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "bot";
 
 export const mockBotRepository: BotRepository = {
   async list(params: ListParams = {}) {
@@ -45,10 +47,7 @@ export const mockBotRepository: BotRepository = {
   async publish(id: ID, snapshot: Flow, slug?: string, _note?: string) {
     const idx = store.findIndex((b) => b.id === id);
     if (idx === -1) throw new Error(`Bot ${id} not found`);
-    const base = (slug?.trim() || store[idx].name || "bot")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "") || "bot";
+    const base = slugify(slug?.trim() || store[idx].name || "bot");
     let final = base;
     let i = 0;
     while (store.some((b) => b.slug === final && b.id !== id)) {
@@ -69,4 +68,4 @@ export const mockBotRepository: BotRepository = {
   async getBySlug(slug: string) {
     return delay(store.find((b) => b.slug === slug) ?? null);
   },
-
+};

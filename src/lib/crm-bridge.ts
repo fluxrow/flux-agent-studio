@@ -95,6 +95,7 @@ export function startCrmBridge() {
             tags: draft.data.tags,
             score: draft.data.score,
           });
+          if (wsId) recordActivation(wsId, "first_lead_captured");
           // Best-effort: link the runtime session to the new lead so the
           // detail page can list its conversations.
           if (wsId) {

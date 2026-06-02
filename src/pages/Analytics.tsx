@@ -1,6 +1,7 @@
 import { funnelSteps, conversionsChart } from "@/lib/mock";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
-import { TrendingUp, Clock, Target, Users } from "lucide-react";
+import { Bot, MessageSquare, Target, Users } from "lucide-react";
+import { useBasicStats } from "@/lib/analytics-basic";
 
 const blockPerf = [
   { name: "Saudação", value: 98 },
@@ -8,13 +9,6 @@ const blockPerf = [
   { name: "Coleta email", value: 78 },
   { name: "Qualificação IA", value: 64 },
   { name: "Agendamento", value: 41 },
-];
-
-const kpis = [
-  { icon: Users, label: "Início do fluxo", value: "4.820" },
-  { icon: Target, label: "Conversão final", value: "12.7%" },
-  { icon: Clock, label: "Tempo médio", value: "1m 42s" },
-  { icon: TrendingUp, label: "Crescimento", value: "+24%" },
 ];
 
 export default function Analytics() {

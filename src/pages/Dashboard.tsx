@@ -70,12 +70,31 @@ export default function Dashboard() {
           </h1>
           <p className="text-muted-foreground text-sm mt-1">Veja o desempenho dos seus agentes hoje.</p>
         </div>
-        <Link to="/docs">
-          <Button variant="outline" className="bg-card/60">
-            <Sparkles className="h-4 w-4 mr-1.5" /> Guia rápido
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="bg-card/60"
+            onClick={() => {
+              const on = !isDemoMode();
+              setDemoMode(on);
+              toast.success(on ? "Modo demonstração ativado" : "Modo demonstração desativado", {
+                description: on
+                  ? "Explore o produto com dados de exemplo (workspace real não é afetado)."
+                  : "Voltando ao seu workspace.",
+              });
+            }}
+          >
+            <PlayCircle className="h-4 w-4 mr-1.5" /> Explorar workspace demo
           </Button>
-        </Link>
+          <Link to="/docs">
+            <Button variant="outline" className="bg-card/60">
+              <Sparkles className="h-4 w-4 mr-1.5" /> Guia rápido
+            </Button>
+          </Link>
+        </div>
       </div>
+
+      <OnboardingChecklist />
 
       {/* KPIs — agregações reais com tooltips explicativos */}
       <div data-tour="dashboard-kpis" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -122,8 +141,15 @@ export default function Dashboard() {
         />
       ) : (
         <>
-          <CrmDashboardWidget />
-          <OmnichannelWidget />
+          <div className="grid lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 space-y-4">
+              <CrmDashboardWidget />
+              <OmnichannelWidget />
+            </div>
+            <div className="space-y-4">
+              <WorkspaceHealthCard />
+            </div>
+          </div>
 
           {/* Top bots (reais) */}
           <div className="rounded-2xl border border-border bg-card/60 p-6">

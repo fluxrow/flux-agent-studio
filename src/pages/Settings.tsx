@@ -300,6 +300,11 @@ export default function Settings() {
             ))}
           </div>
         </TabsContent>
+
+        {/* System Health */}
+        <TabsContent value="system" className="mt-6">
+          <SystemHealthPanel />
+        </TabsContent>
       </Tabs>
     </div>
   );

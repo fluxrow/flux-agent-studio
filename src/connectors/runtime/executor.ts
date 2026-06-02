@@ -90,7 +90,10 @@ export async function executeConnectorAction(opts: ExecuteOptions): Promise<Exec
   const adapter = adapterRegistry.get(manifest.id);
   if (!adapter) throw new Error(`No adapter implemented for connector '${manifest.id}'`);
 
-  const credentials = opts.credentialsOverride ?? {};
+  const credentials = opts.credentialsOverride
+    ?? (installation.credentialId
+      ? connectorStore.resolveCredentialValues(opts.workspaceId, installation.credentialId)
+      : {});
   const parameters = opts.parameters ?? {};
   const attempts = Math.max(1, opts.retry?.attempts ?? 1);
   const backoffMs = Math.max(0, opts.retry?.backoffMs ?? 500);

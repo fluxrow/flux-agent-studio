@@ -66,13 +66,11 @@ const supabasePersistence: Persistence = {
 };
 
 /**
- * Some Supabase repos are placeholder stubs (Phase 6 work). They satisfy
- * the contract but return empty data. We tag them so the debug UI can
- * show "stub" instead of misleading "supabase".
+ * Phase 18.6 collapsed the previous stub list: flows, conversations,
+ * versions and variables now have real Supabase adapters. `templates`
+ * remains a stub until the marketplace schema lands.
  */
-const STUB_DOMAINS: DomainKey[] = USE_SUPABASE
-  ? ["flows", "conversations", "templates", "variables", "versions"]
-  : [];
+const STUB_DOMAINS: DomainKey[] = USE_SUPABASE ? ["templates"] : [];
 
 const chosen: Persistence = USE_SUPABASE ? supabasePersistence : mockPersistence;
 

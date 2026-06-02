@@ -27,17 +27,29 @@ export const builtInConnectors: ConnectorManifest[] = [
       ],
     },
     actions: [
+      { key: "append_row", name: "Append linha", parameters: [
+        { key: "spreadsheet_id", label: "Spreadsheet ID", type: "string", required: true },
+        { key: "sheet", label: "Aba", type: "string", required: true, defaultValue: "Sheet1" },
+        { key: "values", label: "Valores (JSON array)", type: "json", required: true },
+      ]},
       { key: "create_row", name: "Criar linha", parameters: [
+        { key: "spreadsheet_id", label: "Spreadsheet ID", type: "string", required: true },
         { key: "sheet", label: "Aba", type: "string", required: true },
         { key: "values", label: "Valores (JSON)", type: "json", required: true },
       ]},
       { key: "update_row", name: "Atualizar linha", parameters: [
+        { key: "spreadsheet_id", label: "Spreadsheet ID", type: "string", required: true },
         { key: "sheet", label: "Aba", type: "string", required: true },
         { key: "row", label: "Linha", type: "number", required: true },
         { key: "values", label: "Valores (JSON)", type: "json", required: true },
       ]},
+      { key: "list_rows", name: "Listar linhas", parameters: [
+        { key: "spreadsheet_id", label: "Spreadsheet ID", type: "string", required: true },
+        { key: "range", label: "Range A1", type: "string", required: true },
+      ]},
       { key: "lookup_row", name: "Buscar linha", parameters: [
-        { key: "sheet", label: "Aba", type: "string", required: true },
+        { key: "spreadsheet_id", label: "Spreadsheet ID", type: "string", required: true },
+        { key: "range", label: "Range A1", type: "string", required: true },
         { key: "query", label: "Busca", type: "string", required: true },
       ]},
     ],

@@ -18,7 +18,7 @@ const KINDS: { key: FeedbackKind; label: string; icon: typeof Bug }[] = [
 
 export function FeedbackWidget() {
   const { workspace } = useWorkspace();
-  const { toast } = useToast();
+  // toast imported from sonner
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<FeedbackKind>("bug");

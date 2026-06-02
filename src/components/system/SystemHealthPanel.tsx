@@ -9,7 +9,7 @@ import {
   persistenceTelemetry,
   type DomainTelemetry,
 } from "@/lib/persistence-telemetry";
-import { runtimeEventBus } from "@/runtime/events";
+
 
 type CheckStatus = "ok" | "warn" | "fail" | "pending";
 

@@ -74,7 +74,10 @@ export type Database = {
           description: string
           id: string
           name: string
+          published_at: string | null
+          published_snapshot: Json | null
           published_version_id: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["bot_status"]
           updated_at: string
           workspace_id: string
@@ -87,7 +90,10 @@ export type Database = {
           description?: string
           id?: string
           name: string
+          published_at?: string | null
+          published_snapshot?: Json | null
           published_version_id?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["bot_status"]
           updated_at?: string
           workspace_id: string
@@ -100,7 +106,10 @@ export type Database = {
           description?: string
           id?: string
           name?: string
+          published_at?: string | null
+          published_snapshot?: Json | null
           published_version_id?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["bot_status"]
           updated_at?: string
           workspace_id?: string
@@ -737,6 +746,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_bot: { Args: { _slug: string }; Returns: Json }
       has_workspace_role: {
         Args: {
           _roles: Database["public"]["Enums"]["workspace_role"][]
@@ -749,6 +759,71 @@ export type Database = {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
       }
+      publish_bot: {
+        Args: {
+          _bot_id: string
+          _note?: string
+          _slug?: string
+          _snapshot: Json
+        }
+        Returns: {
+          channel: string
+          conversations_count: number
+          conversions_count: number
+          created_at: string
+          description: string
+          id: string
+          name: string
+          published_at: string | null
+          published_snapshot: Json | null
+          published_version_id: string | null
+          slug: string | null
+          status: Database["public"]["Enums"]["bot_status"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bots"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_public_event: {
+        Args: {
+          _block_key?: string
+          _payload?: Json
+          _session_id: string
+          _type: string
+        }
+        Returns: undefined
+      }
+      record_public_lead: {
+        Args: {
+          _company?: string
+          _email?: string
+          _name: string
+          _phone?: string
+          _score?: number
+          _session_id: string
+          _tags?: string[]
+        }
+        Returns: string
+      }
+      record_public_message: {
+        Args: {
+          _block_key?: string
+          _role: string
+          _session_id: string
+          _text: string
+        }
+        Returns: undefined
+      }
+      record_public_session: {
+        Args: { _slug: string; _variables?: Json; _visitor_id: string }
+        Returns: string
+      }
+      slugify: { Args: { _input: string }; Returns: string }
     }
     Enums: {
       bot_status: "ativo" | "rascunho" | "arquivado"

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Bot, BotCreateInput, ID, ListParams } from "@/types";
+import type { Bot, BotCreateInput, Flow, ID, ListParams } from "@/types";
 import type { BotRepository } from "../contracts";
 import { getCurrentWorkspaceId } from "../workspaceContext";
 
@@ -10,6 +10,9 @@ const mapRow = (r: any): Bot => ({
   description: r.description ?? "",
   status: r.status,
   channel: r.channel,
+  slug: r.slug ?? null,
+  publishedSnapshot: r.published_snapshot ?? null,
+  publishedAt: r.published_at ?? null,
   metrics: {
     conversations: r.conversations_count ?? 0,
     conversions: r.conversions_count ?? 0,
@@ -81,5 +84,24 @@ export const supabaseBotRepository: BotRepository = {
   async remove(id: ID) {
     const { error } = await supabase.from("bots").delete().eq("id", id);
     if (error) throw error;
+  },
+  async publish(id: ID, snapshot: Flow, slug?: string, note?: string) {
+    const { data, error } = await supabase.rpc("publish_bot" as any, {
+      _bot_id: id,
+      _snapshot: snapshot as any,
+      _slug: slug ?? null,
+      _note: note ?? null,
+    });
+    if (error) throw error;
+    return mapRow(Array.isArray(data) ? data[0] : data);
+  },
+  async getBySlug(slug: string) {
+    const { data, error } = await supabase
+      .from("bots")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    return data ? mapRow(data) : null;
   },
 };

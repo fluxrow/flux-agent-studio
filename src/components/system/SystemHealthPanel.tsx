@@ -45,6 +45,8 @@ export function SystemHealthPanel() {
   );
   const [rlsCheck, setRlsCheck] = useState<CheckStatus>("pending");
   const [rlsDetail, setRlsDetail] = useState<string>();
+  const [publishedBots, setPublishedBots] = useState<{ count: number; firstSlug: string | null } | null>(null);
+  const [publicLeads, setPublicLeads] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -58,9 +60,20 @@ export function SystemHealthPanel() {
     setRefreshing(true);
     setRlsCheck("pending");
     try {
-      await persistence.bots.list();
+      const list = await persistence.bots.list();
       setRlsCheck("ok");
       setRlsDetail("Consulta passou pelo filtro de workspace.");
+      const published = list.items.filter((b: any) => b.publishedAt && b.slug);
+      setPublishedBots({
+        count: published.length,
+        firstSlug: published[0]?.slug ?? null,
+      });
+      try {
+        const leads = await persistence.leads.list({ pageSize: 100 });
+        setPublicLeads(leads.items.filter((l: any) => l.source === "public-bot").length);
+      } catch {
+        setPublicLeads(null);
+      }
     } catch (err: any) {
       setRlsCheck("fail");
       setRlsDetail(err?.message ?? String(err));
@@ -144,6 +157,31 @@ export function SystemHealthPanel() {
       detail: eventTelemetry
         ? `${eventTelemetry.calls} eventos · ${eventTelemetry.errors} erros`
         : `Aguardando primeiro evento da Runtime.`,
+    },
+    {
+      label: "Bot publicado",
+      status: publishedBots == null ? "pending" : publishedBots.count > 0 ? "ok" : "warn",
+      detail: publishedBots == null
+        ? "Verificando…"
+        : publishedBots.count > 0
+        ? `${publishedBots.count} bot(s) com link público.`
+        : "Nenhum bot publicado ainda. Use o botão Publicar no Builder.",
+    },
+    {
+      label: "Link público gerado",
+      status: publishedBots?.firstSlug ? "ok" : "warn",
+      detail: publishedBots?.firstSlug
+        ? `${window.location.origin}/bot/${publishedBots.firstSlug}`
+        : "Será preenchido ao publicar o primeiro bot.",
+    },
+    {
+      label: "Lead criado via bot público",
+      status: publicLeads == null ? "pending" : publicLeads > 0 ? "ok" : "warn",
+      detail: publicLeads == null
+        ? "Verificando…"
+        : publicLeads > 0
+        ? `${publicLeads} lead(s) com origem public-bot.`
+        : "Abra o link público e conclua um fluxo para gerar um lead real.",
     },
   ];
 

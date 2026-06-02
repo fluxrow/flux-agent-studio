@@ -27,6 +27,8 @@ export interface BotRepository {
   create(input: BotCreateInput): Promise<Bot>;
   update(id: ID, patch: Partial<Bot>): Promise<Bot>;
   remove(id: ID): Promise<void>;
+  publish(id: ID, snapshot: Flow, slug?: string, note?: string): Promise<Bot>;
+  getBySlug?(slug: string): Promise<Bot | null>;
 }
 
 export interface FlowRepository {

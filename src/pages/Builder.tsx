@@ -15,6 +15,7 @@ import { BuilderProvider, useBuilder } from "@/builder/BuilderContext";
 import { blockRegistry, toneClass } from "@/builder/blockRegistry";
 import { ValidationPanel } from "@/components/builder/ValidationPanel";
 import { PreviewPanel } from "@/components/builder/PreviewPanel";
+import { PublishDialog } from "@/components/builder/PublishDialog";
 import type { Block, FlowMetadata } from "@/types";
 
 const paletteGroups = [
@@ -72,12 +73,14 @@ function BuilderInner() {
   } = useBuilder();
 
   const [showPreview, setShowPreview] = useState(false);
+  const [showPublish, setShowPublish] = useState(false);
   const metadata = flow.metadata as FlowMetadata;
   const nodeMap = Object.fromEntries(flow.blocks.map((n) => [n.id, n]));
 
   const handlePublish = () => {
     if (!validation.valid) return;
     publish();
+    setShowPublish(true);
   };
 
   return (
@@ -261,6 +264,7 @@ function BuilderInner() {
       </div>
 
       {showPreview && <PreviewPanel onClose={() => setShowPreview(false)} />}
+      <PublishDialog open={showPublish} onOpenChange={setShowPublish} />
     </div>
   );
 }

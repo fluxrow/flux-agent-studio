@@ -11,6 +11,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { USE_SUPABASE } from "@/lib/runtime-config";
 import { FeedbackWidget } from "@/components/beta/FeedbackWidget";
+import { BetaBanner } from "@/components/beta/BetaBanner";
 
 export default function AppLayout() {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export default function AppLayout() {
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
         <div className="flex flex-1 flex-col min-w-0">
+          <BetaBanner />
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/70 px-4 backdrop-blur-xl">
             <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
             <div className="hidden md:flex items-center gap-2 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-sm text-muted-foreground w-72">

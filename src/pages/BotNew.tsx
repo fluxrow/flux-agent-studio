@@ -10,6 +10,8 @@ import { SectionCard } from "@/components/shared/SectionCard";
 import { cn } from "@/lib/utils";
 import { useCreateBot } from "@/domain/hooks";
 import { toast } from "sonner";
+import { recordActivation } from "@/beta/activation";
+import { useWorkspace } from "@/auth/WorkspaceProvider";
 
 const presets = [
   { id: "blank",   icon: Sparkles,      title: "Em branco",       desc: "Comece do zero com um canvas vazio." },
@@ -30,6 +32,7 @@ const channels = [
 export default function BotNew() {
   const navigate = useNavigate();
   const createBot = useCreateBot();
+  const { workspace } = useWorkspace();
   const [preset, setPreset] = useState("sdr");
   const [channel, setChannel] = useState("whatsapp");
   const [name, setName] = useState("");
@@ -50,6 +53,7 @@ export default function BotNew() {
         channel,
       });
       toast.success(`Bot "${bot.name}" criado.`);
+      recordActivation(workspace?.id ?? "ws_local_demo", "first_bot_created");
       navigate(`/builder/${bot.id}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Falha ao criar bot.";

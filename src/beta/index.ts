@@ -12,3 +12,8 @@ export * from "./feedback";
 export * from "./analytics";
 export * from "./qa";
 export * from "./smokeTemplates";
+export * from "./activation";
+export * from "./healthScore";
+export * from "./contextualFeedback";
+export * from "./updates";
+export * from "./demoMode";

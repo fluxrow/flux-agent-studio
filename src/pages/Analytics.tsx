@@ -6,6 +6,7 @@ import { useBasicStats } from "@/lib/analytics-basic";
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
+import { ContextualFeedback } from "@/components/beta/ContextualFeedback";
 
 const KPI_HELP: Record<string, string> = {
   Bots:       "Quantidade de agentes (ativos + rascunhos) neste workspace.",
@@ -68,6 +69,10 @@ export default function Analytics() {
           disponíveis em breve — agregações reais já alimentam os KPIs acima.
         </div>
       )}
+
+      <div className="flex justify-end">
+        <ContextualFeedback surface="analytics" />
+      </div>
     </div>
   );
 }

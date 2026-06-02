@@ -33,13 +33,22 @@ const alertTone: Record<string,string> = {
 const channelColors = ["hsl(265 89% 66%)", "hsl(190 95% 55%)", "hsl(220 95% 60%)", "hsl(270 95% 75%)"];
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const { workspace } = useWorkspace();
+  const firstName = ((user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "").split(" ")[0];
+  const greeting = greetingFor(new Date());
+
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
       {/* header */}
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-xs uppercase tracking-widest text-primary-glow font-medium">Workspace · FluxBot Premium</div>
-          <h1 className="font-display text-3xl font-bold mt-1.5">Bom dia, Cauã 👋</h1>
+          <div className="text-xs uppercase tracking-widest text-primary-glow font-medium">
+            {workspace?.name ? `Workspace · ${workspace.name}` : "Workspace"}
+          </div>
+          <h1 className="font-display text-3xl font-bold mt-1.5">
+            {greeting}{firstName ? `, ${firstName}` : ""} 👋
+          </h1>
           <p className="text-muted-foreground text-sm mt-1">Veja o desempenho dos seus agentes hoje.</p>
         </div>
         <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">

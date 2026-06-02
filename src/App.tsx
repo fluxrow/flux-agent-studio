@@ -12,6 +12,7 @@ import Bots from "./pages/Bots";
 import BotNew from "./pages/BotNew";
 import Builder from "./pages/Builder";
 import Leads from "./pages/Leads";
+import LeadDetail from "./pages/LeadDetail";
 import Conversations from "./pages/Conversations";
 import Analytics from "./pages/Analytics";
 import Templates from "./pages/Templates";

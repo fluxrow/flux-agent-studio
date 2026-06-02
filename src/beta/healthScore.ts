@@ -6,7 +6,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { persistence } from "@/domain/persistence";
-import { listConnectorInstallations } from "@/connectors/store";
+import { connectorStore } from "@/connectors/store";
 import { knowledgeStore } from "@/knowledge/store";
 
 export type HealthCriterionKey =
@@ -45,12 +45,12 @@ export function tierFor(score: number): HealthTier {
   return HEALTH_TIERS.find((t) => score >= t.min && score <= t.max) ?? HEALTH_TIERS[0];
 }
 
-async function compute(): Promise<{ score: number; criteria: HealthCriterion[]; tier: HealthTier }> {
+async function compute(workspaceId: string): Promise<{ score: number; criteria: HealthCriterion[]; tier: HealthTier }> {
   const [bots, leads, convs, channels] = await Promise.all([
     persistence.bots.list({ page: 1, pageSize: 50 }),
     persistence.leads.list({ page: 1, pageSize: 1 }),
     persistence.conversations.list({ page: 1, pageSize: 1 }),
-    persistence.channels.list({ page: 1, pageSize: 50 }).catch(() => ({ items: [], total: 0 })),
+    persistence.channels.list().catch(() => [] as Array<{ status?: string }>),
   ]);
 
   const hasBot = bots.total > 0 || bots.items.length > 0;
@@ -59,7 +59,7 @@ async function compute(): Promise<{ score: number; criteria: HealthCriterion[]; 
   );
   const hasLead = leads.total > 0;
   const hasConversation = convs.total > 0;
-  const hasChannel = (channels.items ?? []).some(
+  const hasChannel = (channels ?? []).some(
     (c) => c.status === "conectado" || c.status === "ativo",
   );
   const hasTracking = (() => {
@@ -72,7 +72,8 @@ async function compute(): Promise<{ score: number; criteria: HealthCriterion[]; 
       return Boolean(localStorage.getItem("ai_credentials") || localStorage.getItem("fluxbot.ai.providers"));
     } catch { return false; }
   })();
-  const hasKnowledge = knowledgeStore.listSources().length > 0;
+  const hasKnowledge = knowledgeStore.listBases(workspaceId).length > 0;
+  const hasConnector = connectorStore.list(workspaceId).length > 0;
 
   const criteria: HealthCriterion[] = [
     { key: "has_bot",            label: "Possui bot",               ok: hasBot,
@@ -89,7 +90,7 @@ async function compute(): Promise<{ score: number; criteria: HealthCriterion[]; 
       recommendation: "Adicione um provedor de IA para qualificar leads.", ctaHref: "/settings", ctaLabel: "Adicionar provedor" },
     { key: "has_knowledge",      label: "Knowledge base",           ok: hasKnowledge,
       recommendation: "Suba documentos para alimentar respostas.",  ctaHref: "/knowledge",  ctaLabel: "Abrir Knowledge" },
-    { key: "has_channel",        label: "Canal conectado",          ok: hasChannel || listConnectorInstallations().length > 0,
+    { key: "has_channel",        label: "Canal conectado",          ok: hasChannel || hasConnector,
       recommendation: "Conecte um canal (WhatsApp, Web, Telegram).", ctaHref: "/channels",   ctaLabel: "Conectar canal" },
   ];
 
@@ -98,10 +99,14 @@ async function compute(): Promise<{ score: number; criteria: HealthCriterion[]; 
   return { score, criteria, tier: tierFor(score) };
 }
 
+import { useWorkspace } from "@/auth/WorkspaceProvider";
+
 export function useWorkspaceHealth() {
+  const { workspace } = useWorkspace();
+  const wsId = workspace?.id ?? "ws_local_demo";
   return useQuery({
-    queryKey: ["workspace", "health"],
-    queryFn: compute,
+    queryKey: ["workspace", "health", wsId],
+    queryFn: () => compute(wsId),
     staleTime: 30_000,
   });
 }

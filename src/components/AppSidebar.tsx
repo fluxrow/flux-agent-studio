@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Bot, Users, MessageSquare,
   BarChart3, LayoutTemplate, Settings, Sparkles,
-  Activity, Target, DollarSign, Bell, Plug, PlayCircle, BookOpen,
+  Activity, Target, DollarSign, Bell, Plug, PlayCircle, BookOpen, Wand2,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,

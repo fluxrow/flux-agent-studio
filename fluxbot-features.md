@@ -110,3 +110,69 @@ Run after every Supabase-touching change.
 
 If any step fails, open `/debug/repositories` and check the
 "Último erro" column — that's the first place to look.
+
+---
+
+## Phase 6.5 — Public Bot Runtime + CRM QA
+- **Public route `/bot/:slug`** — engine-driven chat with bubbles,
+  free-text input, choice buttons, loading + error + ended states.
+  No sidebar, no auth, no internal workspace data exposed.
+- **Bots schema**: new columns `slug`, `published_snapshot`,
+  `published_at`; auto-slug trigger.
+- **Publish RPC `publish_bot(bot_id, snapshot, slug, note)`**
+  (SECURITY DEFINER, editor+). Updates the bot, stores the snapshot
+  and creates a new `bot_versions` row.
+- **Public RPCs (anon-safe)**: `get_public_bot`, `record_public_session`,
+  `record_public_event`, `record_public_message`, `record_public_lead`.
+  All scoped to bots where `status='ativo'` AND `published_snapshot IS NOT NULL`.
+- **Persistence**: `BotRepository.publish()` + `getBySlug()` for mock
+  and Supabase modes; mock writes to `mockFlows` and the in-memory bot
+  store; Supabase calls `publish_bot` RPC.
+- **Builder**: new **PublishDialog** opens after clicking *Publicar*.
+  Lets the user edit the slug, see the public URL preview, copy the
+  generated link and open it in a new tab.
+- **Public runtime façade** (`src/lib/public-runtime.ts`): mock or
+  Supabase mode picked by `VITE_USE_SUPABASE`; the page goes through
+  this module, never the persistence facade.
+- **CRM bridge in public**: variables `name/email/phone/company` (and
+  their `lead.*` aliases) are accumulated client-side and persisted via
+  `record_public_lead` once `flow_completed` fires. Lead surfaces in
+  CRM with source `public-bot`.
+- **SystemHealthPanel** new checks:
+  - Bot publicado — counts bots with `slug` + `publishedAt`
+  - Link público gerado — shows first public URL
+  - Lead criado via bot público — counts leads with `source='public-bot'`
+
+### How to publish a bot
+1. Open Builder → `/builder/:id`.
+2. Click **Publicar** (top right). If the flow is invalid, fix the
+   errors first.
+3. In the dialog, choose a slug (auto-suggested from the bot name).
+4. Click **Publicar** again. A toast confirms; the public URL appears
+   with copy and open-in-new-tab buttons.
+
+### How to test `/bot/:slug`
+1. Open the link from the PublishDialog (or `/bot/<slug>`).
+2. Conversation auto-starts. Type input for `input` blocks or pick
+   options for `choice` blocks.
+3. When the flow reaches an `end` block, the chat shows the ended
+   banner and posts `flow_completed`.
+
+### How to validate the lead landed in the CRM
+1. Make sure the flow captures a `name` (or `lead.name`) variable —
+   without a name the bridge skips lead creation by design.
+2. Open `/leads` after completing the public conversation. The new
+   lead appears in the **Novo** stage with source `public-bot`.
+3. Open the lead detail page — the linked session is listed under
+   **Conversas** and `flow_completed` shows up in **Timeline**.
+
+### Simulator vs Public Runtime
+| | Simulator (`/simulator`) | Public Runtime (`/bot/:slug`) |
+|---|---|---|
+| Audience | Authenticated operator | Anonymous visitor |
+| Source | Latest draft flow | Published snapshot only |
+| Auth | Required (ProtectedRoute) | None — anon RPCs |
+| Sidebar / chrome | Full app shell | Standalone chat surface |
+| Persistence | Direct via `persistence` facade | Via `public-runtime` RPCs |
+| Lead creation | `crmBridge` listens to bus | Page captures vars + `record_public_lead` |
+

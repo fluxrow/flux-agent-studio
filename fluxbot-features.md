@@ -276,3 +276,62 @@ shows hints (e.g. "adicione `?utm_source=meta` para validar").
 
 Mock mode: steps 1–5 still work; visitor + attribution stay client-side
 (localStorage + tracking engine ring buffer) since the RPCs are skipped.
+
+---
+
+## Phase 8 — Meta + Google Connectors
+
+The Tracking Core now ships a decoupled **Destinations** layer. The Runtime keeps emitting only
+internal events; mapping + dispatch happens entirely outside the engine.
+
+```
+Runtime  →  Event Bus  →  Tracking Engine  →  Destinations Registry
+                                                  ├── Meta Adapter   (Pixel + CAPI)
+                                                  ├── Google Adapter (GA4 MP)
+                                                  └── n8n / Webhook / LinkedIn / TikTok (stubs)
+```
+
+### Event Mapping (`src/tracking/mappings`)
+Pure lookup table from `TrackedEventType` → external event names:
+
+| Internal            | Meta                    | Google           |
+| ------------------- | ----------------------- | ---------------- |
+| `page_view`         | PageView                | page_view        |
+| `bot_loaded`        | ViewContent             | page_view        |
+| `session_started`   | ViewContent             | session_start    |
+| `flow_started`      | InitiateCheckout        | begin_checkout   |
+| `flow_completed`    | Lead                    | generate_lead    |
+| `lead_created`      | CompleteRegistration    | generate_lead    |
+
+### Adapters
+- **MetaAdapter** — payload shaped for the Pixel/CAPI `events` array. Mock mode by default; provide
+  `Pixel ID` + `CAPI Access Token` in Settings → Destinations to enable real dispatch.
+- **GoogleAnalyticsAdapter** — Measurement Protocol body. Provide `Measurement ID` + `API Secret`
+  to enable real dispatch.
+- **Stubs** — `n8nAdapter`, `webhookAdapter`, `linkedinAdapter`, `tiktokAdapter` are registered but
+  inert, ready for future implementation.
+
+### Destinations Panel
+`Settings → Destinations` exposes per-adapter cards with:
+- Status chip: `Connected | Mock | Disconnected`
+- Toggle ativo + toggle mock mode
+- Credential inputs (Meta/Google)
+- Counters: Sucessos, Mock, Falhas
+
+### Dispatch Inspector
+`/tracking` now shows the full pipeline per dispatch:
+`internal type → destination → external name → outcome` with the exact payload sent.
+
+### Analytics Validation
+Aggregated counters at the top of the Destinations panel:
+- Fila (in-flight)
+- Sucessos
+- Mock (skipped — mock mode)
+- Falhas
+
+### Smoke test
+1. Settings → Destinations: confirm Meta + Google show "Mock".
+2. Open `/simulator` or `/bot/:slug` and complete a flow.
+3. Open `/tracking` → "Destination Dispatch": you should see
+   `flow_completed → meta → Lead (skipped)` and `flow_completed → google → generate_lead (skipped)`.
+4. Add Pixel ID / Measurement ID, disable mock — outcomes flip to `success` (or `failure` with error message).

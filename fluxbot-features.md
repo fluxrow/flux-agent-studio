@@ -831,3 +831,61 @@ Runtime, CRM, Tracking, AI providers or Knowledge Base.
 `generateSummary()` accepts a `provider` id and `buildSummaryPrompt()`
 emits a structured prompt so any registered AIProvider can replace the
 mock summarizer without changes to the engine signature or events.
+
+## Phase 18.5 — Beta Readiness Program
+Foco em estabilidade, onboarding, QA e observabilidade. Sem novas
+fundações arquiteturais — apenas o suficiente para receber os primeiros
+usuários reais com segurança.
+
+### Domínio `src/beta/`
+- `featureFlags` — flags por workspace (`ai_builder`, `knowledge_base`,
+  `connectors`, `lead_intelligence`, `omnichannel`, `marketplace`) com
+  rollout 0–100% preparado para rollout gradual.
+- `betaUsers` — convites + status (`invited` / `active` / `paused` /
+  `removed`).
+- `onboarding` — 6 passos guiados (criar bot → publicar → testar link
+  público → primeiro lead → CRM → Intelligence) com progresso persistido.
+- `health` — snapshot de subsistemas (runtime, repositories, connectors,
+  ai_providers, tracking, crm, knowledge, channels) com status
+  `healthy` / `warning` / `error` e agregação `overallHealth()`.
+- `errors` — Error Center workspace-scoped, filtrável por tipo/data,
+  alimentado por `recordError()` a partir de qualquer subsistema.
+- `feedback` — coleta tipada (`bug` / `suggestion` / `question` /
+  `feature`) com página de origem capturada automaticamente.
+- `analytics` — contadores de uso (`bots_created`, `bots_published`,
+  `leads_generated`, `flows_executed`, `ai_builder_used`, `knowledge_used`,
+  `connector_used`).
+- `qa` — checklist interno (Pass/Fail/Pending) com 10 itens cobrindo
+  auth, builder, runtime público, CRM, Intelligence, Knowledge,
+  Connectors, Tracking e AI Builder.
+- `smokeTemplates` — 4 blueprints rápidos (SDR, Atendimento, Suporte,
+  Captura) para QA manual.
+
+### UI
+- **`/onboarding`** — passos guiados com progresso e CTAs diretos.
+- **`/beta`** — hub com tabs: Feature Flags · Beta Users · Usage ·
+  Smoke Tests · Feedback.
+- **`/system-health`** — visão consolidada com badge geral + cards por
+  subsistema.
+- **`/errors`** — Error Center com filtros (tipo/data) e ação de simular
+  erros para validar o pipeline.
+- **`/qa`** — QA Dashboard com cards agregados (Pass/Fail/Pending) por
+  grupo (Auth, Core, CRM, Intelligence, AI, Integrations, Analytics).
+- **FeedbackWidget global** — botão flutuante presente em todo o
+  `AppLayout`, registra `page` e `workspaceId` automaticamente.
+
+### Sidebar
+Novo grupo **Beta** com Onboarding, Beta Program, System Health, Errors
+e QA Dashboard.
+
+### Eventos (preparados em `BetaEventType`)
+`feature_flag_toggled`, `beta_user_invited`, `beta_user_status_changed`,
+`onboarding_step_completed`, `health_check_failed`, `error_recorded`,
+`feedback_submitted`, `usage_metric_incremented`, `qa_item_updated`.
+
+### Princípios
+- Stores em memória, prontos para migrar para Supabase sem alterar a
+  superfície pública.
+- Nenhuma engine existente (Runtime, CRM, Tracking, AI, Knowledge,
+  Connectors, Intelligence) foi modificada — observabilidade é puramente
+  aditiva via `recordError()` / `reportHealth()` / `incrementUsage()`.

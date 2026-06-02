@@ -9,6 +9,9 @@ export interface Bot extends Timestamps {
   description: string;
   status: BotStatus;
   channel: string;
+  slug?: string | null;
+  publishedSnapshot?: unknown;
+  publishedAt?: string | null;
   metrics: {
     conversations: number;
     conversions: number;

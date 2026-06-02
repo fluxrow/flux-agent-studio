@@ -176,3 +176,103 @@ If any step fails, open `/debug/repositories` and check the
 | Persistence | Direct via `persistence` facade | Via `public-runtime` RPCs |
 | Lead creation | `crmBridge` listens to bus | Page captures vars + `record_public_lead` |
 
+
+---
+
+## Phase 7 — Tracking Core
+
+End-to-end tracking layer that turns every visitor of a public bot into a
+persistent profile + attribution + session, ready to be forwarded to Meta,
+Google or n8n in a later phase.
+
+### Architecture
+
+```
+Runtime Engine  →  runtimeEventBus  →  TrackingEngine  →  Persistence (visitor_profiles, lead_attribution, events)
+                                            ↓
+                                    in-memory ring buffer (Inspector)
+```
+
+The TrackingEngine lives in `src/tracking/` and is completely decoupled
+from the Runtime. It subscribes once at boot (`main.tsx`) and emits a
+parallel stream of `TrackedEvent`s — never touching the runtime
+internals.
+
+### New tables
+
+- `visitor_profiles` — one row per `(workspace_id, visitor_id)`. Stores
+  browser, OS, device, language, timezone, referrer, landing page, UA.
+- `lead_attribution` — every UTM hit / click-id captured from the URL.
+  `lead_id` is null until the conversation completes and is then linked
+  via the `attach_public_attribution_to_lead` RPC.
+
+Both tables: RLS scoped to workspace members; admins+ can delete.
+
+### Anon-callable RPCs (extend Phase 6.5)
+
+- `record_public_visitor_profile(slug, visitor_id, browser, os, …)`
+- `record_public_attribution(slug, visitor_id, session_id, utm_*, *clid, …)`
+- `attach_public_attribution_to_lead(session_id, lead_id, visitor_id)`
+
+All SECURITY DEFINER, gated by `bots.status='ativo' AND published_snapshot IS NOT NULL`.
+
+### Visitor identity
+
+- Stored in `localStorage` under `fluxbot:visitor_id`.
+- `getOrCreateVisitorId()` returns a stable `v_xxx_yyy` id.
+- `detectBrowser()` snapshots browser/OS/device/language/timezone/referrer.
+- `captureAttributionFromUrl()` reads `utm_source`, `utm_medium`,
+  `utm_campaign`, `utm_content`, `utm_term`, `fbclid`, `gclid`,
+  `ttclid`, `msclkid` from the current URL and persists them under
+  `fluxbot:attribution` for the session.
+- `resetVisitor()` wipes the three localStorage keys (used by the
+  Tracking page's "Reset visitor" button).
+
+### Tracked events
+
+`page_view`, `bot_loaded`, `session_started`, `session_ended`,
+`flow_started`, `flow_completed`, `flow_abandoned`, `block_entered`,
+`block_exited`, `input_received`, `choice_selected`,
+`condition_evaluated`, `variable_updated`, `lead_created`,
+`lead_updated`.
+
+Session lifecycle (`session_started` / `session_ended` + `durationMs`)
+is computed from `flow_started` / `flow_completed|abandoned` events
+emitted by the Runtime.
+
+### Tracking Inspector (`Settings → Tracking`)
+
+Visual panel at `/tracking` showing in real time:
+
+- Visitor profile (id, browser, OS, device, timezone, referrer, …)
+- Current session (id, started_at, duration)
+- Attribution (UTMs + click ids + capture timestamp)
+- Ring buffer of last 200 events (badge color per type, payload preview)
+- Aggregations: leads by source, leads by bot, top tags/campaigns
+
+Empty/loading states are explicit — opening Tracking with no activity
+shows hints (e.g. "adicione `?utm_source=meta` para validar").
+
+### Public Bot integration
+
+`/bot/:slug` now:
+
+1. Detects browser + captures URL attribution before starting the session.
+2. Calls `record_public_visitor_profile` (Supabase mode) — no-op in mock.
+3. Calls `record_public_attribution` once the session id exists.
+4. Emits a `bot_loaded` event.
+5. When a lead is persisted (`recordPublicLead`), it calls
+   `attach_public_attribution_to_lead` so the UTM row is linked.
+
+### Smoke test
+
+1. Publish a bot in the Builder (Phase 6.5).
+2. Open `/bot/<slug>?utm_source=meta&utm_campaign=teste-fase-7&fbclid=abc`.
+3. Complete the flow providing a name / email.
+4. In the workspace, open `/tracking` — visitor + attribution + events visible.
+5. Open `/leads` — the new lead has `source=public-bot`.
+6. In Supabase: `lead_attribution.lead_id` is set; `visitor_profiles`
+   has a row with the captured browser/OS.
+
+Mock mode: steps 1–5 still work; visitor + attribution stay client-side
+(localStorage + tracking engine ring buffer) since the RPCs are skipped.

@@ -45,7 +45,7 @@ export function useBasicStats() {
       return {
         bots: botsPage.total ?? botsPage.items.length,
         leads: leadsPage.total ?? leadsPage.items.length,
-        conversations: convs.length,
+        conversations: convsPage.total ?? convsPage.items.length,
         conversions,
       };
     },

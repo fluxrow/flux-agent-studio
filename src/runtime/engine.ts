@@ -262,6 +262,24 @@ export class RuntimeEngine {
   private emitState(): void {
     this.emit({ type: "state", state: this.getState() });
   }
+
+  private emitExecution(
+    type: ExecutionEventType,
+    payload: Record<string, unknown>,
+    blockId?: ID,
+  ): void {
+    runtimeEventBus.emit(
+      makeEvent(
+        type,
+        {
+          sessionId: this.context.sessionId,
+          flowId: this.context.flowId,
+          blockId: blockId ?? this.context.currentBlockId ?? undefined,
+        },
+        payload,
+      ),
+    );
+  }
 }
 
 /** Convenience factory. */

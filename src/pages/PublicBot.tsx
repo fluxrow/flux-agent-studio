@@ -1,8 +1,6 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Send, Sparkles, Bot, Loader2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
 import { useEngine } from "@/hooks/useEngine";
 import {
   loadPublicBot,
@@ -18,6 +16,7 @@ import {
 } from "@/lib/public-runtime";
 import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/tracking";
 import type { Flow } from "@/types";
+import { getRenderer, listRenderers, resolveVariant, type RendererId } from "@/renderers";
 
 
 type LoadState =
@@ -81,14 +80,18 @@ export default function PublicBot() {
 
 /* ------------------ Chat ------------------ */
 
+const VALID_MODES: RendererId[] = ["whatsapp", "instagram", "messenger", "chatgpt", "form"];
+
 function PublicChat({ bot }: { bot: PublicBotType }) {
   const flow = bot.snapshot as Flow;
   const { engine, state } = useEngine(flow);
   const sessionIdRef = useRef<string | null>(null);
   const draftLeadRef = useRef<Record<string, string>>({});
   const leadCreatedRef = useRef(false);
-  const [draft, setDraft] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
+
+  const [params, setParams] = useSearchParams();
+  const requested = (params.get("mode") ?? "whatsapp") as RendererId;
+  const mode: RendererId = VALID_MODES.includes(requested) ? requested : "whatsapp";
 
   // Bootstrap session + start engine once
   useEffect(() => {
@@ -99,7 +102,6 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         const visitorId = getOrCreateVisitorId(bot.slug);
         const profile = detectBrowser();
         const attribution = captureAttributionFromUrl();
-        // Best-effort visitor capture (Supabase mode only — no-op in mock).
         recordPublicVisitorProfile(bot.slug, visitorId, {
           browser: profile.browser,
           os: profile.os,
@@ -117,19 +119,19 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         if (attribution) {
           recordPublicAttribution(bot.slug, visitorId, sid, attribution).catch(() => undefined);
         }
-        trackingEngine.recordCustom("bot_loaded", { slug: bot.slug }, {
+        trackingEngine.recordCustom("bot_loaded", { slug: bot.slug, mode }, {
           sessionId: sid, botId: bot.id, workspaceId: bot.workspaceId,
         });
-        recordPublicEvent(sid, "bot_loaded", { slug: bot.slug });
+        recordPublicEvent(sid, "bot_loaded", { slug: bot.slug, mode });
         engine.start();
       } catch (err) {
         console.error("[publicBot] failed to start session", err);
       }
     })();
     return () => { cancelled = true; };
-  }, [engine, bot.id, bot.slug, bot.workspaceId]);
+  }, [engine, bot.id, bot.slug, bot.workspaceId, mode]);
 
-  // Mirror engine events to backend (Supabase mode) + accumulate lead.* vars
+  // Mirror engine events to backend + accumulate lead.* vars
   useEffect(() => {
     if (!engine) return;
     return engine.on(async (ev) => {
@@ -140,7 +142,6 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         recordPublicEvent(sid, "block_exited", { text: ev.text }, ev.blockId);
       }
       if (ev.type === "ended") {
-        // Persist lead if we collected something
         const d = draftLeadRef.current;
         const candidate = d.name || d["lead.name"];
         if (candidate && !leadCreatedRef.current) {
@@ -156,14 +157,13 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
             attachAttributionToLead(sid, leadId, visitorId).catch(() => undefined);
           }
         }
-
-        recordPublicEvent(sid, "flow_completed", {});
+        recordPublicEvent(sid, "flow_completed", { mode });
         recordPublicEvent(sid, "conversation_completed", {});
       }
     });
-  }, [engine, bot.id, bot.workspaceId]);
+  }, [engine, bot.id, bot.workspaceId, mode]);
 
-  // Capture lead-flavoured variables as they update
+  // Capture lead-flavoured variables
   useEffect(() => {
     if (!state) return;
     const vars = state.context.variables;
@@ -171,39 +171,23 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
       if (v == null) return;
       const lower = k.toLowerCase();
       const stripped = lower.startsWith("lead.") ? lower.slice(5) : lower;
-      if (LEAD_FIELDS.includes(stripped as any) || lower === "name") {
-        draftLeadRef.current[stripped] = String(v);
-      }
+      draftLeadRef.current[stripped] = String(v);
       draftLeadRef.current[lower] = String(v);
     });
   }, [state?.context.variables]);
 
-  // Scroll to bottom
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [state?.transcript.length, state?.awaiting]);
+  const variant = useMemo(() => resolveVariant(mode, getOrCreateVisitorId(bot.slug)), [mode, bot.slug]);
+  const renderer = getRenderer(mode, variant);
+  const Renderer = renderer.Component;
 
-  const status = state?.context.status ?? "idle";
-  const awaiting = state?.awaiting;
-  const isChoice = status === "awaiting_choice";
-  const isInput = status === "awaiting_input";
-  const ended = status === "ended" || status === "error";
-
-  const choiceOptions = useMemo<string[]>(() => {
-    if (!awaiting || !isChoice) return [];
-    return (awaiting.config?.options as string[] | undefined) ?? [];
-  }, [awaiting, isChoice]);
-
-  const submit = () => {
-    if (!engine || !draft.trim() || !isInput) return;
+  const submitInput = (value: string) => {
+    if (!engine) return;
     const sid = sessionIdRef.current;
-    if (sid) recordPublicMessage(sid, "user", draft.trim());
-    engine.submitInput(draft.trim());
-    setDraft("");
+    if (sid) recordPublicMessage(sid, "user", value);
+    engine.submitInput(value);
   };
-
-  const pick = (opt: string) => {
-    if (!engine || !isChoice) return;
+  const submitChoice = (opt: string) => {
+    if (!engine) return;
     const sid = sessionIdRef.current;
     if (sid) {
       recordPublicMessage(sid, "user", opt);
@@ -213,87 +197,56 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
   };
 
   return (
-    <PublicShell slug={bot.slug} title={bot.name}>
-      {/* chat */}
-      <div className="h-[440px] overflow-y-auto p-4 space-y-3 bg-background/40">
-        {state?.transcript.map((m, i) => {
-          if (m.kind === "system") {
-            return (
-              <div key={i} className="text-center text-[10px] uppercase tracking-widest text-muted-foreground py-1">
-                {m.text}
-              </div>
-            );
-          }
-          const isUser = m.kind === "user";
-          return (
-            <div key={i} className={`animate-fade-in flex ${isUser ? "justify-end" : "justify-start"}`}>
-              <div className={`px-4 py-2.5 max-w-[85%] text-sm rounded-2xl whitespace-pre-wrap break-words ${
-                isUser
-                  ? "gradient-primary text-primary-foreground rounded-tr-sm shadow-glow"
-                  : "bg-secondary rounded-tl-sm"
-              }`}>
-                {m.text}
-              </div>
-            </div>
-          );
-        })}
-
-        {isChoice && choiceOptions.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-1 animate-fade-in">
-            {choiceOptions.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => pick(opt)}
-                className="text-xs px-3 py-1.5 rounded-full border border-primary/40 bg-primary/5 text-primary-glow hover:bg-primary/15 transition"
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {ended && (
-          <div className="text-center pt-4">
-            <div className="inline-block px-4 py-3 rounded-2xl bg-success/10 border border-success/30 text-success text-xs">
-              Conversa encerrada · obrigado!
-            </div>
-          </div>
-        )}
-
-        <div ref={endRef} />
-      </div>
-
-      {/* composer */}
-      <div className="flex items-center gap-2 p-3 border-t border-border bg-card/80">
-        <Input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
-          disabled={!isInput}
-          className="flex-1 rounded-full bg-background border-border text-sm disabled:opacity-50"
-          placeholder={
-            isInput ? "Digite sua resposta..."
-            : isChoice ? "Escolha uma opção acima"
-            : ended ? "Conversa encerrada"
-            : "Aguarde…"
-          }
+    <PublicShell slug={bot.slug}>
+      <ModeSelector
+        current={mode}
+        onChange={(m) => { params.set("mode", m); setParams(params, { replace: true }); }}
+      />
+      <div className="rounded-3xl overflow-hidden shadow-elegant border border-border h-[560px]">
+        <Renderer
+          engine={engine}
+          state={state}
+          theme={renderer.defaultTheme}
+          typing={{ mode: "realistic", msPerChar: 26, minDelayMs: 500, maxDelayMs: 2800 }}
+          delay={{ mode: "random", randomMinMs: 200, randomMaxMs: 700 }}
+          title={bot.name}
+          onSubmitInput={submitInput}
+          onSubmitChoice={submitChoice}
         />
-        <Button
-          size="icon"
-          onClick={submit}
-          disabled={!isInput || !draft.trim()}
-          className="rounded-full gradient-primary text-primary-foreground border-0"
-        >
-          <Send className="h-4 w-4" />
-        </Button>
       </div>
     </PublicShell>
   );
 }
 
+/* ------------------ Mode Selector ------------------ */
+
+function ModeSelector({ current, onChange }: { current: RendererId; onChange: (m: RendererId) => void }) {
+  const all = listRenderers();
+  return (
+    <div className="flex items-center gap-1.5 mb-3 overflow-x-auto pb-1">
+      {all.map((r) => {
+        const active = r.id === current;
+        return (
+          <button
+            key={r.id}
+            onClick={() => onChange(r.id as RendererId)}
+            className={`text-[11px] px-2.5 py-1 rounded-full border whitespace-nowrap transition ${
+              active
+                ? "bg-primary/20 border-primary/40 text-primary-glow"
+                : "bg-background/40 border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {r.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ------------------ Shell ------------------ */
 
-function PublicShell({ slug, title, children }: { slug?: string; title?: string; children: React.ReactNode }) {
+function PublicShell({ slug, children }: { slug?: string; children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background relative overflow-hidden">
       <div className="absolute inset-0 grid-bg opacity-20" />
@@ -305,29 +258,11 @@ function PublicShell({ slug, title, children }: { slug?: string; title?: string;
             <div className="h-5 w-5 rounded-md gradient-primary flex items-center justify-center">
               <Sparkles className="h-3 w-3 text-primary-foreground" />
             </div>
-            powered by FluxBot
+            powered by FluxBot {slug && <span className="font-mono opacity-60">· /bot/{slug}</span>}
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-border bg-card/80 backdrop-blur-xl shadow-elegant overflow-hidden">
-          <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-primary/20 to-accent/10">
-            <div className="relative">
-              <div className="h-11 w-11 rounded-full gradient-primary flex items-center justify-center shadow-glow">
-                <Bot className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-success border-2 border-card animate-pulse" />
-            </div>
-            <div className="min-w-0">
-              <div className="font-semibold truncate">{title ?? "FluxBot"}</div>
-              <div className="text-[10px] text-muted-foreground">Online · responde em segundos</div>
-            </div>
-            {slug && (
-              <div className="ml-auto text-[10px] font-mono text-muted-foreground truncate">/bot/{slug}</div>
-            )}
-          </div>
-
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   );

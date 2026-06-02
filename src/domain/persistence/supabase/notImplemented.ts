@@ -53,7 +53,7 @@ async function ensureFlowRow(botId: ID): Promise<{ id: string; workspaceId: stri
       id: existing.data.id,
       workspaceId: existing.data.workspace_id,
       name: existing.data.name,
-      variables: (existing.data.variables as FlowVariableDecl[]) ?? [],
+      variables: (existing.data.variables as unknown as FlowVariableDecl[]) ?? [],
     };
   }
   const inserted = await supabase
@@ -66,7 +66,7 @@ async function ensureFlowRow(botId: ID): Promise<{ id: string; workspaceId: stri
     id: inserted.data.id,
     workspaceId: inserted.data.workspace_id,
     name: inserted.data.name,
-    variables: (inserted.data.variables as FlowVariableDecl[]) ?? [],
+    variables: (inserted.data.variables as unknown as FlowVariableDecl[]) ?? [],
   };
 }
 
@@ -123,7 +123,7 @@ export const supabaseFlowRepository: FlowRepository = {
       botId,
       blocks: (blocksRes.data ?? []).map((r) => mapBlock(botId, r)),
       connections: (connsRes.data ?? []).map((r) => mapConnection(botId, r)),
-      variables: (flowRes.data.variables as FlowVariableDecl[]) ?? [],
+      variables: (flowRes.data.variables as unknown as FlowVariableDecl[]) ?? [],
       metadata: {
         name: botRes.data?.name ?? flowRes.data.name,
         version: 1,
@@ -347,7 +347,7 @@ export const supabaseVariableRepository: VariableRepository = {
       .eq("workspace_id", wsId)
       .maybeSingle();
     if (error) throw error;
-    const decls = ((data?.variables as FlowVariableDecl[]) ?? []);
+    const decls = ((data?.variables as unknown as FlowVariableDecl[]) ?? []);
     const now = nowIso();
     return decls.map<Variable>((d, idx) => ({
       id: `${botId}:${d.name}:${idx}`,

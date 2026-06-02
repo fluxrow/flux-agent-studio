@@ -30,7 +30,7 @@ const examples = [
 
 export default function AIBuilder() {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  // toast from sonner
 
   const [description, setDescription] = useState("");
   const [segment, setSegment] = useState("");

@@ -18,10 +18,6 @@ export { emitConnectorEvent } from "./events";
 export { builtInConnectors } from "./builtins";
 export { bootstrapAdapters, adapterRegistry } from "./adapters";
 export * from "./runtime";
-export { connectorRegistry } from "./registry";
-export { connectorStore } from "./store";
-export { emitConnectorEvent } from "./events";
-export { builtInConnectors } from "./builtins";
 
 /** Idempotent bootstrap — seeds built-in manifests once per process. */
 let booted = false;

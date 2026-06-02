@@ -9,6 +9,7 @@ import {
   Rocket, Bot, Users, BarChart3, Activity, Sparkles, BookOpen, Plug, ArrowUpRight,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { ContextualFeedback } from "@/components/beta/ContextualFeedback";
 
 type DocSection = {
   icon: typeof Rocket;
@@ -132,11 +133,14 @@ export default function Docs() {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-dashed border-border bg-card/30 p-6 text-center">
+      <div className="rounded-2xl border border-dashed border-border bg-card/30 p-6 text-center space-y-3">
         <p className="text-sm text-muted-foreground">
           Não encontrou o que procura? Use o widget de feedback no canto da tela —
           ele chega direto para o time.
         </p>
+        <div className="flex justify-center">
+          <ContextualFeedback surface="docs" />
+        </div>
       </div>
     </div>
   );

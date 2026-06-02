@@ -65,15 +65,21 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs — agregações reais do workspace */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.map((k) => (
+        {kpiCards.map((k) => (
           <div key={k.label} className="rounded-2xl border border-border bg-card/60 p-5 hover:border-primary/40 transition">
-            <div className="text-xs text-muted-foreground">{k.label}</div>
-            <div className="font-display text-3xl font-bold mt-2">{k.value}</div>
-            <div className={`mt-2 inline-flex items-center gap-1 text-xs ${k.trend === "up" ? "text-success" : "text-accent"}`}>
-              {k.trend === "up" ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-              {k.delta} <span className="text-muted-foreground">vs semana passada</span>
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-muted-foreground">{k.label}</div>
+              <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
+                <k.icon className="h-4 w-4 text-primary-foreground" />
+              </div>
+            </div>
+            <div className="font-display text-3xl font-bold mt-3 tabular-nums">
+              {statsLoading ? "—" : k.value.toLocaleString()}
+            </div>
+            <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <TrendingUp className="h-3 w-3" /> dados em tempo real
             </div>
           </div>
         ))}

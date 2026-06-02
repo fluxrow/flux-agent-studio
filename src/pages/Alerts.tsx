@@ -2,9 +2,11 @@ import { alerts } from "@/lib/analytics-mock";
 import { AlertTriangle, Bell, Info, TrendingDown } from "lucide-react";
 
 const sev = (s: string) =>
-  s === "high" ? { color: "destructive", Icon: TrendingDown, label: "Crítico" } :
-  s === "warning" ? { color: "warning", Icon: AlertTriangle, label: "Atenção" } :
-  { color: "primary", Icon: Info, label: "Info" };
+  s === "high"
+    ? { Icon: TrendingDown, wrap: "border-destructive/30 bg-gradient-to-r from-destructive/10 to-transparent", chip: "bg-destructive/15 text-destructive" }
+    : s === "warning"
+    ? { Icon: AlertTriangle, wrap: "border-warning/30 bg-gradient-to-r from-warning/10 to-transparent", chip: "bg-warning/15 text-warning" }
+    : { Icon: Info, wrap: "border-primary/30 bg-gradient-to-r from-primary/10 to-transparent", chip: "bg-primary/15 text-primary-glow" };
 
 const rules = [
   { name: "Queda de conversão > 15%", trigger: "Em janela de 6h", channel: "Email + WhatsApp", on: true },

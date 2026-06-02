@@ -19,8 +19,8 @@ export default function Knowledge() {
   const { workspace } = useWorkspace();
   const workspaceId = workspace?.id ?? "ws_local_demo";
   const [tick, setTick] = useState(0);
-  useEffect(() => knowledgeStore.subscribe(() => setTick((t) => t + 1)), []);
-  useEffect(() => knowledgeCost.subscribe(() => setTick((t) => t + 1)), []);
+  useEffect(() => { const u = knowledgeStore.subscribe(() => setTick((t) => t + 1)); return () => { u(); }; }, []);
+  useEffect(() => { const u = knowledgeCost.subscribe(() => setTick((t) => t + 1)); return () => { u(); }; }, []);
 
   const bases = useMemo(() => knowledgeStore.listBases(workspaceId), [workspaceId, tick]);
   const [activeBaseId, setActiveBaseId] = useState<string | null>(null);

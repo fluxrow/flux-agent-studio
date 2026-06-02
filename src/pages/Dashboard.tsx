@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, ArrowUpRight, Bot, Activity, Zap, Sparkles, A
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
 
 const smartAlerts = [
   { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/leads" },

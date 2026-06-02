@@ -143,7 +143,7 @@ export function SystemHealthPanel() {
       status: eventTelemetry && eventTelemetry.calls > 0 ? "ok" : "warn",
       detail: eventTelemetry
         ? `${eventTelemetry.calls} eventos · ${eventTelemetry.errors} erros`
-        : `Aguardando primeiro evento (bus tem ${runtimeEventBus.size?.() ?? "?"} assinantes).`,
+        : `Aguardando primeiro evento da Runtime.`,
     },
   ];
 

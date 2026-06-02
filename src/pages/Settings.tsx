@@ -13,6 +13,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { USE_SUPABASE } from "@/lib/runtime-config";
 import { seedDemoData } from "@/lib/seed";
+import { SystemHealthPanel } from "@/components/system/SystemHealthPanel";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ export default function Settings() {
           <TabsTrigger value="billing"><CreditCard className="h-3.5 w-3.5 mr-1.5" />Plano</TabsTrigger>
           <TabsTrigger value="api"><KeyRound className="h-3.5 w-3.5 mr-1.5" />API & Webhooks</TabsTrigger>
           <TabsTrigger value="notify"><Bell className="h-3.5 w-3.5 mr-1.5" />Notificações</TabsTrigger>
+          <TabsTrigger value="system"><Database className="h-3.5 w-3.5 mr-1.5" />Sistema</TabsTrigger>
         </TabsList>
 
         {/* Perfil */}
@@ -298,6 +300,11 @@ export default function Settings() {
               </div>
             ))}
           </div>
+        </TabsContent>
+
+        {/* System Health */}
+        <TabsContent value="system" className="mt-6">
+          <SystemHealthPanel />
         </TabsContent>
       </Tabs>
     </div>

@@ -23,10 +23,10 @@ export function useBasicStats() {
   return useQuery({
     queryKey: basicStatsKey,
     queryFn: async (): Promise<BasicStats> => {
-      const [botsPage, leadsPage, convs] = await Promise.all([
+      const [botsPage, leadsPage, convsPage] = await Promise.all([
         persistence.bots.list({ page: 1, pageSize: 1 }),
         persistence.leads.list({ page: 1, pageSize: 1 }),
-        persistence.conversations.list(),
+        persistence.conversations.list({ page: 1, pageSize: 1 }),
       ]);
 
       // Conversões = leads em estágios "vendido"/"qualificado" (best-effort).

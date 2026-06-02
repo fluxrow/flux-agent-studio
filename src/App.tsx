@@ -40,6 +40,7 @@ import Errors from "./pages/Errors";
 import QA from "./pages/QA";
 import Onboarding from "./pages/Onboarding";
 import Beta from "./pages/Beta";
+import Docs from "./pages/Docs";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
@@ -93,6 +94,7 @@ const App = () => (
                 <Route path="/connectors" element={<Connectors />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/beta" element={<Beta />} />
+                <Route path="/docs" element={<Docs />} />
               </Route>
               {/* Internal/admin-only diagnostic routes. */}
               <Route

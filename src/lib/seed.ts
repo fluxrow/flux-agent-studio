@@ -59,7 +59,7 @@ export async function seedDemoData() {
     account: c.account ?? null,
     coming_soon: c.status === "soon",
   }));
-  await supabase.from("channels").insert(channelRows);
+  await supabase.from("channels").insert(channelRows as any);
 
   return {
     skipped: false,

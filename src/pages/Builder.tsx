@@ -264,6 +264,7 @@ function BuilderInner() {
       </div>
 
       {showPreview && <PreviewPanel onClose={() => setShowPreview(false)} />}
+      <PublishDialog open={showPublish} onOpenChange={setShowPublish} />
     </div>
   );
 }

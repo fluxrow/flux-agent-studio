@@ -15,6 +15,7 @@ import {
   type PublicBot as PublicBotType,
 } from "@/lib/public-runtime";
 import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/tracking";
+import { webChannel, webChannelHelpers } from "@/channels";
 import type { Flow } from "@/types";
 import { getRenderer, listRenderers, resolveVariant, type RendererId } from "@/renderers";
 
@@ -86,6 +87,7 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
   const flow = bot.snapshot as Flow;
   const { engine, state } = useEngine(flow);
   const sessionIdRef = useRef<string | null>(null);
+  const channelSessionIdRef = useRef<string | null>(null);
   const draftLeadRef = useRef<Record<string, string>>({});
   const leadCreatedRef = useRef(false);
 
@@ -116,6 +118,10 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         const sid = await startPublicSession(bot.slug, bot.id, bot.workspaceId, visitorId);
         if (cancelled) return;
         sessionIdRef.current = sid;
+        const channelSession = await webChannelHelpers.openWebSession({
+          visitorId, runtimeSessionId: sid, botId: bot.id, workspaceId: bot.workspaceId,
+        });
+        channelSessionIdRef.current = channelSession.id;
         if (attribution) {
           recordPublicAttribution(bot.slug, visitorId, sid, attribution).catch(() => undefined);
         }
@@ -138,10 +144,14 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
       const sid = sessionIdRef.current;
       if (!sid) return;
       if (ev.type === "message") {
-        recordPublicMessage(sid, "bot", ev.text, ev.blockId);
+        const csid = channelSessionIdRef.current;
+        if (csid) await webChannelHelpers.sendText(csid, ev.text, ev.blockId);
+        else recordPublicMessage(sid, "bot", ev.text, ev.blockId);
         recordPublicEvent(sid, "block_exited", { text: ev.text }, ev.blockId);
       }
       if (ev.type === "ended") {
+        const csid = channelSessionIdRef.current;
+        if (csid) webChannel.closeSession(csid).catch(() => undefined);
         const d = draftLeadRef.current;
         const candidate = d.name || d["lead.name"];
         if (candidate && !leadCreatedRef.current) {
@@ -183,16 +193,18 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
   const submitInput = (value: string) => {
     if (!engine) return;
     const sid = sessionIdRef.current;
-    if (sid) recordPublicMessage(sid, "user", value);
+    const csid = channelSessionIdRef.current;
+    if (csid) webChannelHelpers.receiveText(csid, value);
+    else if (sid) recordPublicMessage(sid, "user", value);
     engine.submitInput(value);
   };
   const submitChoice = (opt: string) => {
     if (!engine) return;
     const sid = sessionIdRef.current;
-    if (sid) {
-      recordPublicMessage(sid, "user", opt);
-      recordPublicEvent(sid, "choice_selected", { option: opt });
-    }
+    const csid = channelSessionIdRef.current;
+    if (csid) webChannelHelpers.receiveText(csid, opt);
+    else if (sid) recordPublicMessage(sid, "user", opt);
+    if (sid) recordPublicEvent(sid, "choice_selected", { option: opt });
     engine.submitChoice(opt);
   };
 

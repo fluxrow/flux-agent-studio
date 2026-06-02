@@ -23,6 +23,7 @@ import {
   disconnectConnector, disableConnector,
 } from "@/connectors";
 import type { Connector, ConnectorLifecycle, ConnectorManifest } from "@/connectors";
+import { ConnectorInspector } from "@/components/builder/ConnectorInspector";
 
 const lifecycleMeta: Record<ConnectorLifecycle, { label: string; tone: string; icon: typeof Circle }> = {
   installed:    { label: "Instalado",    tone: "bg-muted text-muted-foreground",          icon: Circle },

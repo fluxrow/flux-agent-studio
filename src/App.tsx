@@ -30,6 +30,7 @@ import DebugRepositories from "./pages/DebugRepositories";
 import ChannelsDebug from "./pages/ChannelsDebug";
 import AIPlayground from "./pages/AIPlayground";
 import Knowledge from "./pages/Knowledge";
+import AIBuilder from "./pages/AIBuilder";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";

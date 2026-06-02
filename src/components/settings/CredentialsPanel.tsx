@@ -29,6 +29,7 @@ export function CredentialsPanel() {
   const [provider, setProvider] = useState<CredentialProvider>("openai");
   const [label, setLabel] = useState("");
   const [value, setValue] = useState("");
+  const [toRemove, setToRemove] = useState<CredentialRecord | null>(null);
 
   const refresh = () => setCreds(listCredentials());
 

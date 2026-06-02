@@ -69,6 +69,14 @@ const App = () => (
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/simulator" element={<Simulator />} />
               </Route>
+              <Route
+                path="/debug/repositories"
+                element={
+                  <ProtectedRoute>
+                    <DebugRepositories />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </WorkspaceProvider>

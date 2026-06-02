@@ -56,35 +56,46 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { pathname } = useLocation();
+  const { workspace } = useWorkspace();
+  const workspaceId = workspace?.id ?? "ws_local_demo";
   const isActive = (url: string) =>
     url === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(url);
 
-  const renderGroup = (label: string, items: typeof main) => (
-    <SidebarGroup className="mt-4 first:mt-0">
-      <SidebarGroupLabel className="text-[11px] uppercase tracking-widest text-muted-foreground/70">
-        {label}
-      </SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((i) => (
-            <SidebarMenuItem key={i.title}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(i.url)}
-                tooltip={i.title}
-                className="data-[active=true]:bg-primary/15 data-[active=true]:text-primary-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary"
-              >
-                <NavLink to={i.url}>
-                  <i.icon className="h-4 w-4" />
-                  <span>{i.title}</span>
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  );
+  // Feature-flag filter: hide nav items whose flag is off so beta users
+  // don't bump into mock-only modules.
+  const visible = (items: NavItem[]) =>
+    items.filter((i) => !i.flag || isFeatureEnabled(workspaceId, i.flag));
+
+  const renderGroup = (label: string, items: NavItem[]) => {
+    const list = visible(items);
+    if (list.length === 0) return null;
+    return (
+      <SidebarGroup className="mt-4 first:mt-0">
+        <SidebarGroupLabel className="text-[11px] uppercase tracking-widest text-muted-foreground/70">
+          {label}
+        </SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {list.map((i) => (
+              <SidebarMenuItem key={i.title}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive(i.url)}
+                  tooltip={i.title}
+                  className="data-[active=true]:bg-primary/15 data-[active=true]:text-primary-foreground data-[active=true]:border-l-2 data-[active=true]:border-primary"
+                >
+                  <NavLink to={i.url}>
+                    <i.icon className="h-4 w-4" />
+                    <span>{i.title}</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">

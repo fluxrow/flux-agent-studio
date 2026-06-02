@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Bot, Users, MessageSquare,
   BarChart3, LayoutTemplate, Settings, Sparkles,
   Activity, Target, DollarSign, Bell, Plug, PlayCircle, BookOpen, Wand2,
-  Rocket, HeartPulse, AlertOctagon, ClipboardCheck, FlaskConical,
+  Rocket, HeartPulse, AlertOctagon, ClipboardCheck, FlaskConical, LifeBuoy,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -30,6 +30,7 @@ const main: NavItem[] = [
   { title: "Templates",     url: "/templates",     icon: LayoutTemplate },
   { title: "Canais",        url: "/channels",      icon: Plug },
   { title: "Conectores",    url: "/connectors",    icon: Plug, flag: "connectors" },
+  { title: "Documentação",  url: "/docs",          icon: LifeBuoy },
   { title: "Configurações", url: "/settings",      icon: Settings },
 ];
 
@@ -121,15 +122,17 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border p-2">
         {!collapsed && (
-          <div className="rounded-xl border border-primary/30 bg-primary/5 p-3">
+          <NavLink
+            to="/docs"
+            className="block rounded-xl border border-primary/30 bg-primary/5 p-3 hover:border-primary/50 transition"
+          >
             <div className="flex items-center gap-2 text-xs font-semibold text-primary-glow">
-              <Sparkles className="h-3.5 w-3.5" /> Plano Pro
+              <LifeBuoy className="h-3.5 w-3.5" /> Precisa de ajuda?
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">Você usou 64% das mensagens IA do mês.</p>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full w-[64%] gradient-primary" />
-            </div>
-          </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Abra a Central de Documentação.
+            </p>
+          </NavLink>
         )}
       </SidebarFooter>
     </Sidebar>

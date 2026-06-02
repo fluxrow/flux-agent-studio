@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const tempIcon = { quente: Flame, morno: Thermometer, frio: Snowflake } as const;
 const tempColor = { quente: "text-destructive", morno: "text-warning", frio: "text-accent" } as const;
+const stageDot: Record<string,string> = { novo:"bg-muted-foreground", qualificado:"bg-accent", negociacao:"bg-warning", convertido:"bg-success", perdido:"bg-destructive" };
 
 export default function Leads() {
   return (
@@ -23,7 +24,7 @@ export default function Leads() {
             <div key={s.id} className="flex flex-col rounded-2xl border border-border bg-card/40 min-h-[600px]">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <div className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full bg-${s.color}`} />
+                  <span className={`h-2 w-2 rounded-full ${stageDot[s.id]}`} />
                   <span className="font-semibold text-sm">{s.label}</span>
                   <span className="text-xs text-muted-foreground">{items.length}</span>
                 </div>

@@ -144,10 +144,14 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
       const sid = sessionIdRef.current;
       if (!sid) return;
       if (ev.type === "message") {
-        recordPublicMessage(sid, "bot", ev.text, ev.blockId);
+        const csid = channelSessionIdRef.current;
+        if (csid) await webChannelHelpers.sendText(csid, ev.text, ev.blockId);
+        else recordPublicMessage(sid, "bot", ev.text, ev.blockId);
         recordPublicEvent(sid, "block_exited", { text: ev.text }, ev.blockId);
       }
       if (ev.type === "ended") {
+        const csid = channelSessionIdRef.current;
+        if (csid) webChannel.closeSession(csid).catch(() => undefined);
         const d = draftLeadRef.current;
         const candidate = d.name || d["lead.name"];
         if (candidate && !leadCreatedRef.current) {

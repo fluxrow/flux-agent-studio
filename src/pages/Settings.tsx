@@ -47,6 +47,8 @@ export default function Settings() {
   };
 
   const handleLogout = async () => {
+    const { recordAudit } = await import("@/compliance");
+    recordAudit({ action: "logout", actor: user?.email ?? "anonymous" });
     await signOut();
     navigate("/auth", { replace: true });
   };

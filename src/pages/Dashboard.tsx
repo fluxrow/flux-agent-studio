@@ -26,7 +26,7 @@ export default function Dashboard() {
       <div className="flex items-end justify-between">
         <div>
           <div className="text-xs uppercase tracking-widest text-primary-glow font-medium">Workspace · FluxBot Premium</div>
-          <h1 className="font-display text-3xl font-bold mt-1.5">Bom dia, Lucas 👋</h1>
+          <h1 className="font-display text-3xl font-bold mt-1.5">Bom dia, Cauã 👋</h1>
           <p className="text-muted-foreground text-sm mt-1">Veja o desempenho dos seus agentes hoje.</p>
         </div>
         <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">

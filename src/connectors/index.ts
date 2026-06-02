@@ -8,9 +8,16 @@ import { connectorRegistry } from "./registry";
 import { connectorStore } from "./store";
 import { emitConnectorEvent } from "./events";
 import { builtInConnectors } from "./builtins";
+import { bootstrapAdapters } from "./adapters";
 import type { ConnectorAction } from "./types";
 
 export * from "./types";
+export { connectorRegistry } from "./registry";
+export { connectorStore } from "./store";
+export { emitConnectorEvent } from "./events";
+export { builtInConnectors } from "./builtins";
+export { bootstrapAdapters, adapterRegistry } from "./adapters";
+export * from "./runtime";
 export { connectorRegistry } from "./registry";
 export { connectorStore } from "./store";
 export { emitConnectorEvent } from "./events";

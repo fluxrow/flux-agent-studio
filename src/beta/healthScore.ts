@@ -100,7 +100,6 @@ async function compute(workspaceId: string): Promise<{ score: number; criteria: 
   return { score, criteria, tier: tierFor(score) };
 }
 
-import { useWorkspace } from "@/auth/WorkspaceProvider";
 
 export function useWorkspaceHealth() {
   const { workspace } = useWorkspace();

@@ -1,5 +1,5 @@
-import { kpis, conversionsChart, channelChart, recentActivity, bots } from "@/lib/mock";
-import { TrendingUp, TrendingDown, ArrowUpRight, Bot, Activity, Zap, Sparkles, AlertTriangle, Flame, DollarSign } from "lucide-react";
+import { conversionsChart, channelChart, recentActivity, bots } from "@/lib/mock";
+import { TrendingUp, ArrowUpRight, Bot, Activity, Zap, Sparkles, AlertTriangle, Flame, DollarSign, MessageSquare, Users, Target } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
 import { LeadIntelligenceWidget } from "@/components/dashboard/LeadIntelligenceWidget";
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
+import { useBasicStats } from "@/lib/analytics-basic";
 
 function greetingFor(date: Date): string {
   const h = date.getHours();

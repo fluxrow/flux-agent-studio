@@ -335,3 +335,54 @@ Aggregated counters at the top of the Destinations panel:
 3. Open `/tracking` → "Destination Dispatch": you should see
    `flow_completed → meta → Lead (skipped)` and `flow_completed → google → generate_lead (skipped)`.
 4. Add Pixel ID / Measurement ID, disable mock — outcomes flip to `success` (or `failure` with error message).
+
+---
+
+## Phase 9 — Conversational Experience Engine
+
+The Runtime keeps emitting blocks; presentation is now fully decoupled
+behind a **ConversationRenderer** layer.
+
+```
+RuntimeEngine ──► EngineState ──► ConversationRenderer (Theme + Typing) ──► UI
+```
+
+### Renderer Architecture (`src/renderers`)
+- `types.ts` — `ConversationRenderer`, `RendererProps`, `RendererTheme`, `TypingConfig`, `DelayConfig`, `Variant`.
+- `ConversationFrame.tsx` — shared shell (header / transcript / composer / typing indicator / choices).
+- `builtins.tsx` — `whatsappRenderer`, `instagramRenderer`, `messengerRenderer`, `chatgptRenderer`, `formRenderer`.
+- `registry.ts` — `getRenderer(id, variant)`, `listRenderers()`, `resolveVariant()` (A/B foundation).
+
+### Theme Engine (`src/renderers/themes.ts`)
+Each renderer ships a default `RendererTheme` (background, surface, header, bubbles, accent, font, avatar, bubble radius, subtitle). Themes are pure data — swap to repaint the surface; the engine is untouched.
+
+### Typing Simulation (`src/renderers/typing.ts`)
+`useTyping(state, typing, delay)` returns a truncated transcript + `typing` flag, dripping bot messages over time.
+Modes:
+- `instant` — no delay.
+- `realistic` — `msPerChar * text.length` clamped between `minDelayMs` and `maxDelayMs`.
+- `custom` — caller supplies `msPerChar`.
+
+### Human Delay
+Stacked on top of typing:
+- `fixed` — adds `fixedMs` to every message.
+- `random` — uniform between `randomMinMs` and `randomMaxMs`.
+- `per_block` — adds the block-level `delay` (ms) to the simulated wait.
+
+### Dynamic Personalization (`src/renderers/personalization.ts`)
+`personalize(text, variables)` resolves `{{nome}}`, `{{empresa}}`, `{{cidade}}`, `{{email}}`, `{{telefone}}` (with English aliases). Used by the frame on titles, subtitles, placeholders, and rendered bubbles.
+
+### Public Runtime selector
+`/bot/:slug?mode=whatsapp|instagram|messenger|chatgpt|form` — visitors can switch render mode; the published bot honors the query string and persists `mode` in tracking events.
+
+### Builder preview
+`Builder → Preview` now exposes the renderer selector in its header — same flow, five experiences.
+
+### A/B Testing Foundation
+`registry.ts` accepts multiple variants per renderer id; `resolveVariant(id, visitorId)` is the hook for experiments (returns `"a"` today). Analytics integration intentionally deferred.
+
+### Smoke test
+1. Open `/bot/<slug>` — default WhatsApp theme renders with typing dots.
+2. Click "Instagram DM", "Messenger", "ChatGPT", "Formulário" — same conversation, different chrome.
+3. Builder → Preview — toggle renderers mid-conversation; transcript persists.
+4. Trigger a block with text containing `{{nome}}` after capturing a `name` variable — the bubble renders the personalized value.

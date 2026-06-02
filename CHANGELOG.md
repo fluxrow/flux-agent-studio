@@ -12,6 +12,14 @@ completos por fase.
 - `.env.example` documentando variáveis públicas
 - `.editorconfig` para consistência entre editores
 
+## Phase 18.5 — Beta Readiness Program
+- `src/beta/` (featureFlags, betaUsers, onboarding, health, errors,
+  feedback, analytics, qa, smokeTemplates)
+- Páginas `/onboarding`, `/beta`, `/system-health`, `/errors`, `/qa`
+- `FeedbackWidget` global no `AppLayout` (bug / sugestão / dúvida / feature)
+- Novo grupo **Beta** na sidebar
+- Sem mudanças em Runtime, CRM, Tracking, AI, Knowledge, Connectors ou Intelligence
+
 ## Phase 18 — Lead Intelligence Engine
 - `src/intelligence/` (scorer, summary, insights, recommendations, forecast, attribution)
 - `LeadIntelligencePanel` (tab em LeadDetail) e `LeadIntelligenceWidget` (Dashboard)

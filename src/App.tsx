@@ -35,6 +35,11 @@ import Connectors from "./pages/Connectors";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import DataDeletion from "./pages/DataDeletion";
+import SystemHealth from "./pages/SystemHealth";
+import Errors from "./pages/Errors";
+import QA from "./pages/QA";
+import Onboarding from "./pages/Onboarding";
+import Beta from "./pages/Beta";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
@@ -85,6 +90,11 @@ const App = () => (
                 <Route path="/knowledge" element={<Knowledge />} />
                 <Route path="/ai-builder" element={<AIBuilder />} />
                 <Route path="/connectors" element={<Connectors />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/system-health" element={<SystemHealth />} />
+                <Route path="/errors" element={<Errors />} />
+                <Route path="/qa" element={<QA />} />
+                <Route path="/beta" element={<Beta />} />
               </Route>
               <Route
                 path="/debug/repositories"

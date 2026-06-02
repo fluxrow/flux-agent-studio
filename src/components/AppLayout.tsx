@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { USE_SUPABASE } from "@/lib/runtime-config";
+import { FeedbackWidget } from "@/components/beta/FeedbackWidget";
 
 export default function AppLayout() {
   const navigate = useNavigate();
@@ -83,6 +84,7 @@ export default function AppLayout() {
           <main className="flex-1 overflow-auto animate-fade-in">
             <Outlet />
           </main>
+          <FeedbackWidget />
         </div>
       </div>
     </SidebarProvider>

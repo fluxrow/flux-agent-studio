@@ -31,19 +31,19 @@ export default function Settings() {
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-2xl gradient-accent shadow-glow" />
               <div>
-                <div className="font-semibold text-lg">Lucas Martins</div>
-                <div className="text-xs text-muted-foreground">lucas@fluxbot.app</div>
+                <div className="font-semibold text-lg">Cauã Martins</div>
+                <div className="text-xs text-muted-foreground">caua@fluxbot.app</div>
               </div>
               <Button size="sm" variant="outline" className="ml-auto bg-secondary/40">Alterar foto</Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-muted-foreground">Nome</label>
-                <Input defaultValue="Lucas Martins" className="mt-1 bg-background border-border" />
+                <Input defaultValue="Cauã Martins" className="mt-1 bg-background border-border" />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">Email</label>
-                <Input defaultValue="lucas@fluxbot.app" className="mt-1 bg-background border-border" />
+                <Input defaultValue="caua@fluxbot.app" className="mt-1 bg-background border-border" />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">Fuso horário</label>
@@ -90,7 +90,7 @@ export default function Settings() {
             </div>
             <div className="space-y-2">
               {[
-                { n: "Lucas Martins", e: "lucas@fluxbot.app", r: "Owner" },
+                { n: "Cauã Martins", e: "caua@fluxbot.app", r: "Owner" },
                 { n: "Bianca Lopes",  e: "bianca@fluxbot.app", r: "Admin" },
                 { n: "André Silva",   e: "andre@fluxbot.app",  r: "Editor" },
                 { n: "Paula Reis",    e: "paula@fluxbot.app",  r: "Viewer" },

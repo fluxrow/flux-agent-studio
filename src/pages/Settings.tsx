@@ -6,8 +6,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   User, Building2, CreditCard, KeyRound, Bell, Users2, Sparkles, Copy,
-  Database, LogOut, Loader2, Wand2, Plug,
+  Database, LogOut, Loader2, Wand2, Plug, Link2,
 } from "lucide-react";
+import { ConnectedAccountsPanel } from "@/components/settings/ConnectedAccountsPanel";
 import { toast } from "sonner";
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
@@ -61,6 +62,7 @@ export default function Settings() {
           <TabsTrigger value="billing"><CreditCard className="h-3.5 w-3.5 mr-1.5" />Plano</TabsTrigger>
           <TabsTrigger value="api"><KeyRound className="h-3.5 w-3.5 mr-1.5" />API & Webhooks</TabsTrigger>
           <TabsTrigger value="notify"><Bell className="h-3.5 w-3.5 mr-1.5" />Notificações</TabsTrigger>
+          <TabsTrigger value="accounts"><Link2 className="h-3.5 w-3.5 mr-1.5" />Contas conectadas</TabsTrigger>
           <TabsTrigger value="destinations"><Plug className="h-3.5 w-3.5 mr-1.5" />Destinations</TabsTrigger>
           <TabsTrigger value="system"><Database className="h-3.5 w-3.5 mr-1.5" />Sistema</TabsTrigger>
         </TabsList>
@@ -302,6 +304,11 @@ export default function Settings() {
               </div>
             ))}
           </div>
+        </TabsContent>
+
+        {/* Connected accounts */}
+        <TabsContent value="accounts" className="mt-6">
+          <ConnectedAccountsPanel />
         </TabsContent>
 
         {/* Tracking destinations */}

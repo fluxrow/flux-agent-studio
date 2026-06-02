@@ -21,9 +21,25 @@ import {
 import { metaAdapter } from "./meta";
 import { googleAdapter } from "./google";
 import { linkedinAdapter, n8nAdapter, tiktokAdapter, webhookAdapter } from "./stubs";
+import {
+  SENSITIVE_KEYS,
+  getSecrets,
+  mergeSecrets,
+} from "@/security/secretVault";
 
 const STORAGE_KEY = "fluxbot.tracking.destinations.v1";
 const MAX_RECORDS = 200;
+
+/** Split credentials into (publicMeta, secrets) using the shared vault rules. */
+function splitCredentials(creds: Record<string, string> = {}) {
+  const publicMeta: Record<string, string> = {};
+  const secrets: Record<string, string> = {};
+  for (const [key, value] of Object.entries(creds)) {
+    if (SENSITIVE_KEYS.has(key)) secrets[key] = String(value);
+    else publicMeta[key] = String(value);
+  }
+  return { publicMeta, secrets };
+}
 
 interface RegistryState {
   configs: Record<string, DestinationConfig>;

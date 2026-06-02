@@ -72,7 +72,19 @@ class DestinationRegistry {
   /* ------------ Public surface ------------ */
 
   list(): DestinationAdapter[] { return [...this.adapters]; }
-  getConfig(id: string): DestinationConfig { return this.state.configs[id] ?? { ...DEFAULT_CONFIG }; }
+  /**
+   * Returns the full config including secrets pulled live from the vault.
+   * Adapters call this through `dispatch`; UI should use `getPublicConfig`.
+   */
+  getConfig(id: string): DestinationConfig {
+    const cfg = this.state.configs[id] ?? { ...DEFAULT_CONFIG };
+    const vaulted = getSecrets("tracking", id);
+    return { ...cfg, credentials: { ...(cfg.credentials ?? {}), ...vaulted } };
+  }
+  /** Same as getConfig but never includes secret fields — safe for UI/telemetry. */
+  getPublicConfig(id: string): DestinationConfig {
+    return this.state.configs[id] ?? { ...DEFAULT_CONFIG };
+  }
   getRecords(): DispatchRecord[] { return [...this.state.records].reverse(); }
   getQueueSize(): number { return this.state.queue; }
 

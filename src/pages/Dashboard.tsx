@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  TrendingUp, ArrowUpRight, Bot, Sparkles, MessageSquare, Users, Target, Plus,
+  TrendingUp, ArrowUpRight, Bot, Sparkles, MessageSquare, Users, Target, Plus, PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
@@ -8,10 +8,15 @@ import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
 import { LeadIntelligenceWidget } from "@/components/dashboard/LeadIntelligenceWidget";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
+import { OnboardingChecklist } from "@/components/beta/OnboardingChecklist";
+import { WorkspaceHealthCard } from "@/components/beta/WorkspaceHealthCard";
+import { ContextualFeedback } from "@/components/beta/ContextualFeedback";
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { useBasicStats } from "@/lib/analytics-basic";
 import { useBots } from "@/domain/hooks";
+import { setDemoMode, isDemoMode } from "@/beta/demoMode";
+import { toast } from "sonner";
 
 function greetingFor(date: Date): string {
   const h = date.getHours();

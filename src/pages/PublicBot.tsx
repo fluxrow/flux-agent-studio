@@ -87,6 +87,7 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
   const flow = bot.snapshot as Flow;
   const { engine, state } = useEngine(flow);
   const sessionIdRef = useRef<string | null>(null);
+  const channelSessionIdRef = useRef<string | null>(null);
   const draftLeadRef = useRef<Record<string, string>>({});
   const leadCreatedRef = useRef(false);
 

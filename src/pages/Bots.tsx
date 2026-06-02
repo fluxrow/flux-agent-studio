@@ -23,9 +23,11 @@ export default function Bots() {
           <h1 className="font-display text-3xl font-bold">Bots</h1>
           <p className="text-muted-foreground text-sm mt-1">{bots.length} agentes no workspace</p>
         </div>
-        <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
-          <Plus className="h-4 w-4 mr-1.5" /> Criar bot
-        </Button>
+        <Link to="/bots/new">
+          <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
+            <Plus className="h-4 w-4 mr-1.5" /> Criar bot
+          </Button>
+        </Link>
       </div>
 
       <div className="flex gap-3">

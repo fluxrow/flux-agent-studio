@@ -142,6 +142,23 @@ export function CredentialsPanel() {
           ))}
         </div>
       </div>
+
+      <AlertDialog open={!!toRemove} onOpenChange={(o) => !o && setToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover credencial?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A credencial <strong>{toRemove?.label}</strong> ({toRemove?.provider}) será removida do cofre. Esta ação é permanente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

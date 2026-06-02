@@ -36,10 +36,22 @@ export default function Builder() {
   const { id } = useParams();
   const { data: flow, isLoading } = useFlow(id);
 
-  if (isLoading || !flow) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-3.5rem)] text-muted-foreground text-sm">
         Carregando flow…
+      </div>
+    );
+  }
+
+  if (!flow) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-3.5rem)] gap-3 text-center px-6">
+        <div className="text-sm font-semibold">Nenhum flow encontrado para este bot</div>
+        <div className="text-xs text-muted-foreground max-w-sm">
+          O bot <code className="font-mono">{id}</code> ainda não possui um fluxo. Volte e selecione um bot com flow publicado, ou crie um novo a partir de um template.
+        </div>
+        <Link to="/bots"><Button size="sm" variant="outline"><ChevronLeft className="h-4 w-4 mr-1.5" /> Voltar para bots</Button></Link>
       </div>
     );
   }

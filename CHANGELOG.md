@@ -12,6 +12,39 @@ completos por fase.
 - `.env.example` documentando variáveis públicas
 - `.editorconfig` para consistência entre editores
 
+## Phase 20 — UX, Tooltips e Documentação
+
+### Zero State
+- `src/pages/Dashboard.tsx`: removidos `smartAlerts`, `recentActivity`,
+  `bots`, `conversionsChart` e `channelChart` mockados. Quando o workspace
+  está vazio, exibe `EmptyState` com CTA "Criar bot" + link para `/docs`.
+- "Top bots" agora vem de `useBots()` (dados reais) com fallback "Nenhum
+  bot publicado ainda."
+- `src/pages/Analytics.tsx`: removidos `funnelSteps`, `blockPerf` e
+  `conversionsChart` hardcoded. Zero state com CTA quando não há leads
+  nem conversas.
+- `src/components/AppSidebar.tsx`: removido card "Plano Pro · 64%"
+  mockado do footer; substituído por atalho real para `/docs`.
+
+### Tooltips globais
+- `src/components/shared/InfoTooltip.tsx` (novo): componente reutilizável
+  baseado no shadcn Tooltip (já há `TooltipProvider` em `App.tsx`).
+  Aplicado nos KPIs do Dashboard e do Analytics; pronto para uso em
+  Leads/CRM/Tracking/Knowledge/Channels/IA.
+
+### Documentação
+- `src/pages/Docs.tsx` (novo) + rota `/docs` em `src/App.tsx`.
+- Estrutura com 8 seções: Primeiros Passos, Builder, CRM, Analytics,
+  Tracking, IA, Knowledge Base, Integrações.
+- Item "Documentação" adicionado ao grupo "Principal" da sidebar.
+
+### Product Tour Foundation
+- `src/tours/registry.ts` (novo): `tourRegistry` estático com definições
+  para os tours futuros do Dashboard, Builder e CRM. Não há runtime de
+  tour ainda — apenas a fundação. KPIs do Dashboard expõem
+  `data-tour="dashboard-kpis"` para futuro target.
+
+
 ## Phase 19 — First User Experience
 
 ### Bot creation

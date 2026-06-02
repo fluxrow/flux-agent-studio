@@ -260,8 +260,14 @@ export class RuntimeEngine {
     }
 
     for (const [key, value] of Object.entries(result.variableUpdates)) {
-      this.context.variables[key] = value;
-      this.emitExecution("variable_updated", { variable: key, value }, block.id);
+      const coerced =
+        value === null || ["string", "number", "boolean"].includes(typeof value)
+          ? (value as string | number | boolean | null)
+          : Array.isArray(value)
+            ? value.map(String).join(", ")
+            : JSON.stringify(value);
+      this.context.variables[key] = coerced;
+      this.emitExecution("variable_updated", { variable: key, value: coerced }, block.id);
     }
 
     this.emitExecution("block_exited", { blockId: block.id }, block.id);

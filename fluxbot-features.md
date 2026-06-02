@@ -429,3 +429,72 @@ live stream of every sent / received message.
 starts and routes every bot/user message through `webChannelHelpers`.
 Visible behaviour is unchanged; the inspector and future omnichannel work
 are unlocked.
+
+## Phase 11 — OAuth Foundation + Omnichannel Setup
+
+Architectural groundwork to connect external accounts (Instagram, Facebook,
+WhatsApp, Telegram, Google Business) and bind bots to channels. **No real
+OAuth flows yet** — every provider is a stub that simulates the handshake
+so the UI, store and event bus can be exercised end-to-end.
+
+### Connected Accounts (`src/types/connectedAccount.ts`)
+Domain model with fields `id`, `workspaceId`, `provider`, `accountName`,
+`accountIdentifier`, `status`, `connectedAt`, `lastSyncAt`, `meta`.
+Status: `connected | disconnected | expired | pending`.
+Persisted in `localStorage` via `src/oauth/store.ts` (subscribable). The
+store also keeps `ChannelBinding` rows linking `bot → account`.
+
+### OAuth Manager (`src/oauth/manager.ts`)
+Single facade used by the UI and future webhook layers:
+- `oauthManager.connect(workspaceId, provider, name?)`
+- `oauthManager.disconnect(accountId)`
+- `oauthManager.reconnect(accountId)` (refresh)
+- `oauthManager.remove(accountId)`
+- `oauthManager.bindBot({ workspaceId, botId, accountId })`
+- `oauthManager.unbindBot(botId)`
+- `oauthManager.list() / .bindings() / .subscribe()`
+
+Each provider implements `OAuthProvider`:
+```ts
+connect(input?): Promise<OAuthConnectResult>
+disconnect(account): Promise<void>
+refresh(account): Promise<OAuthConnectResult>
+getStatus(account): Promise<ConnectedAccountStatus>
+```
+Stubs live in `src/oauth/providers.ts` — when real adapters exist they
+replace the stubs one-for-one; consumers do not change.
+
+### Account Center
+**Settings → Contas conectadas** lists every account with provider, status,
+identifier, connected/last-sync timestamps and a per-account bot binder.
+Buttons: **Conectar**, **Desconectar**, **Reconectar**, **Remover**.
+
+### Channel Binding
+A bot can be linked to one connected account at a time
+(`Bot → ConnectedAccount → Channel`). Bindings are stored in
+`oauthStore` and surfaced in the Account Center.
+
+### Inbox Foundation (`src/inbox/sources.ts`)
+Declares `ConversationSource` for `web` (ready) and stubs for `instagram`,
+`facebook`, `whatsapp`, `telegram`. Future Inbox UI reads from this
+registry — no real messages yet.
+
+### Omnichannel Dashboard Widget
+`src/components/dashboard/OmnichannelWidget.tsx` shows: connected accounts,
+bound bots, active channels, plus a chip row of all inbox sources.
+
+### Events (routed through the existing runtime EventBus)
+- `account_connected`
+- `account_disconnected`
+- `account_reconnected`
+- `channel_bound`
+- `channel_unbound`
+
+These events are visible in the Event Inspector and consumed by Tracking
+Destinations exactly like every other runtime event.
+
+### Migration path to real integrations
+When real providers arrive (Meta, WhatsApp Cloud API, Telegram Bot API,
+GBP), only `src/oauth/providers.ts` changes — every consumer
+(`ConnectedAccountsPanel`, `OmnichannelWidget`, Channel adapters) keeps
+working against the same `OAuthProvider` contract.

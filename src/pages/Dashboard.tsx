@@ -6,6 +6,16 @@ import { Button } from "@/components/ui/button";
 import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
 import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
 import { LeadIntelligenceWidget } from "@/components/dashboard/LeadIntelligenceWidget";
+import { useAuth } from "@/auth/AuthProvider";
+import { useWorkspace } from "@/auth/WorkspaceProvider";
+
+function greetingFor(date: Date): string {
+  const h = date.getHours();
+  if (h < 5) return "Boa madrugada";
+  if (h < 12) return "Bom dia";
+  if (h < 18) return "Boa tarde";
+  return "Boa noite";
+}
 
 const smartAlerts = [
   { id: 1, icon: Flame,         tone: "destructive", title: "3 leads quentes sem resposta",       desc: "Score >85 aguardando há mais de 8min no bot SDR Imobiliária.",   cta: "Ver leads",   to: "/leads" },
@@ -23,13 +33,22 @@ const alertTone: Record<string,string> = {
 const channelColors = ["hsl(265 89% 66%)", "hsl(190 95% 55%)", "hsl(220 95% 60%)", "hsl(270 95% 75%)"];
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const { workspace } = useWorkspace();
+  const firstName = ((user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "").split(" ")[0];
+  const greeting = greetingFor(new Date());
+
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
       {/* header */}
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-xs uppercase tracking-widest text-primary-glow font-medium">Workspace · FluxBot Premium</div>
-          <h1 className="font-display text-3xl font-bold mt-1.5">Bom dia, Cauã 👋</h1>
+          <div className="text-xs uppercase tracking-widest text-primary-glow font-medium">
+            {workspace?.name ? `Workspace · ${workspace.name}` : "Workspace"}
+          </div>
+          <h1 className="font-display text-3xl font-bold mt-1.5">
+            {greeting}{firstName ? `, ${firstName}` : ""} 👋
+          </h1>
           <p className="text-muted-foreground text-sm mt-1">Veja o desempenho dos seus agentes hoje.</p>
         </div>
         <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">

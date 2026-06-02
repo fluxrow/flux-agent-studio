@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { submitFeedback, type FeedbackKind } from "@/beta";
 
@@ -18,7 +18,7 @@ const KINDS: { key: FeedbackKind; label: string; icon: typeof Bug }[] = [
 
 export function FeedbackWidget() {
   const { workspace } = useWorkspace();
-  const { toast } = useToast();
+  // toast imported from sonner
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<FeedbackKind>("bug");
@@ -31,7 +31,7 @@ export function FeedbackWidget() {
       workspaceId: workspace?.id ?? "ws_local_demo",
       kind, message: message.trim(), page: pathname, email: email.trim() || undefined,
     });
-    toast({ title: "Feedback enviado", description: "Obrigado! Vamos analisar em breve." });
+    toast.success("Feedback enviado", { description: "Obrigado! Vamos analisar em breve." });
     setMessage(""); setEmail(""); setOpen(false);
   };
 

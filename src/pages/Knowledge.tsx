@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import {
   knowledgeStore, knowledgeCost, createKnowledgeBase, ingestDocument,
@@ -14,6 +19,11 @@ import {
 import type {
   KnowledgeBase, KnowledgeDocument, KnowledgeSearchResult, KnowledgeSourceKind,
 } from "@/knowledge/types";
+
+type Confirm =
+  | { kind: "base"; id: string; name: string }
+  | { kind: "doc"; id: string; title: string }
+  | null;
 
 export default function Knowledge() {
   const { workspace } = useWorkspace();
@@ -31,6 +41,21 @@ export default function Knowledge() {
 
   const docs: KnowledgeDocument[] = activeBase ? knowledgeStore.listDocuments(activeBase.id) : [];
   const stats = knowledgeCost.stats(workspaceId);
+
+  const [confirmAction, setConfirmAction] = useState<Confirm>(null);
+  const runConfirm = () => {
+    if (!confirmAction) return;
+    if (confirmAction.kind === "base") {
+      knowledgeStore.deleteBase(confirmAction.id);
+      setActiveBaseId(null);
+      toast.success("Base removida");
+    } else {
+      knowledgeStore.deleteDocument(confirmAction.id);
+      toast.success("Documento removido");
+    }
+    setConfirmAction(null);
+  };
+
 
   // ---- create base ----
   const [newBaseName, setNewBaseName] = useState("");
@@ -146,12 +171,7 @@ export default function Knowledge() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => {
-                    if (confirm("Apagar esta base e seus chunks?")) {
-                      knowledgeStore.deleteBase(activeBase.id);
-                      setActiveBaseId(null);
-                    }
-                  }}
+                  onClick={() => setConfirmAction({ kind: "base", id: activeBase.id, name: activeBase.name })}
                   className="text-destructive"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -172,7 +192,7 @@ export default function Knowledge() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => knowledgeStore.deleteDocument(d.id)}
+                      onClick={() => setConfirmAction({ kind: "doc", id: d.id, title: d.title })}
                       className="text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -267,6 +287,27 @@ export default function Knowledge() {
           )}
         </div>
       </div>
+
+      <AlertDialog open={!!confirmAction} onOpenChange={(o) => !o && setConfirmAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction?.kind === "base" ? "Apagar base de conhecimento?" : "Apagar documento?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction?.kind === "base"
+                ? `A base "${confirmAction.name}" e todos os seus chunks serão removidos. Esta ação é permanente.`
+                : `O documento "${confirmAction?.kind === "doc" ? confirmAction.title : ""}" será removido. Esta ação é permanente.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={runConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

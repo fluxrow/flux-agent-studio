@@ -154,7 +154,15 @@ export type QAItemKey =
   | "knowledge_base"
   | "connectors"
   | "tracking"
-  | "ai_builder";
+  | "ai_builder"
+  | "builder_dnd"
+  | "builder_move"
+  | "builder_connect"
+  | "builder_save_reload"
+  | "publish_valid"
+  | "publish_invalid_blocked"
+  | "public_link"
+  | "lead_in_crm";
 
 export interface QAItem {
   key: QAItemKey;

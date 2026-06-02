@@ -4,6 +4,10 @@ import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { KeyRound, Plus, RotateCw, Trash2, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -25,6 +29,7 @@ export function CredentialsPanel() {
   const [provider, setProvider] = useState<CredentialProvider>("openai");
   const [label, setLabel] = useState("");
   const [value, setValue] = useState("");
+  const [toRemove, setToRemove] = useState<CredentialRecord | null>(null);
 
   const refresh = () => setCreds(listCredentials());
 
@@ -54,10 +59,13 @@ export function CredentialsPanel() {
     toast.success("Credencial rotacionada.");
   };
 
-  const remove = (c: CredentialRecord) => {
-    if (!confirm(`Remover credencial ${c.label}?`)) return;
-    removeCredential(c.id);
+  const remove = (c: CredentialRecord) => setToRemove(c);
+  const confirmRemove = () => {
+    if (!toRemove) return;
+    removeCredential(toRemove.id);
+    setToRemove(null);
     refresh();
+    toast.success("Credencial removida");
   };
 
   return (
@@ -134,6 +142,23 @@ export function CredentialsPanel() {
           ))}
         </div>
       </div>
+
+      <AlertDialog open={!!toRemove} onOpenChange={(o) => !o && setToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover credencial?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A credencial <strong>{toRemove?.label}</strong> ({toRemove?.provider}) será removida do cofre. Esta ação é permanente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

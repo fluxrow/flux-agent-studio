@@ -12,12 +12,13 @@
 import type {
   Bot, BotCreateInput,
   Flow, Block, Connection,
-  Lead, PipelineStage, LeadStage,
+  Lead, LeadCreateInput, PipelineStage, LeadStage, CrmStats,
   Conversation, Session, Message,
   Template,
   Channel,
   Variable,
   ID, ListParams, Paginated,
+  ExecutionEvent,
 } from "@/types";
 
 export interface BotRepository {

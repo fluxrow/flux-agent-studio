@@ -4,6 +4,7 @@ import type { TrackedEvent } from "@/tracking/types";
 import { Activity, Globe, Radio, User, Link2, Eraser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { resetVisitor } from "@/tracking/visitor";
+import { TrackingAnalyticsWidget } from "@/components/tracking/TrackingAnalyticsWidget";
 
 const eventBadge: Record<string, string> = {
   flow_started: "bg-primary/15 text-primary-glow border-primary/30",

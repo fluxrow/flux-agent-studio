@@ -22,11 +22,12 @@ const main = [
 ];
 
 const intel = [
-  { title: "Simulator",   url: "/simulator",   icon: PlayCircle },
-  { title: "Tracking",    url: "/tracking",    icon: Activity },
-  { title: "Attribution", url: "/attribution", icon: Target },
-  { title: "Revenue",     url: "/revenue",     icon: DollarSign },
-  { title: "Alertas",     url: "/alerts",      icon: Bell },
+  { title: "Simulator",     url: "/simulator",     icon: PlayCircle },
+  { title: "AI Playground", url: "/ai/playground", icon: Sparkles },
+  { title: "Tracking",      url: "/tracking",      icon: Activity },
+  { title: "Attribution",   url: "/attribution",   icon: Target },
+  { title: "Revenue",       url: "/revenue",       icon: DollarSign },
+  { title: "Alertas",       url: "/alerts",        icon: Bell },
 ];
 
 export function AppSidebar() {

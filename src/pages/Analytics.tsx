@@ -1,15 +1,17 @@
-import { funnelSteps, conversionsChart } from "@/lib/mock";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, BarChart, Bar, Cell } from "recharts";
-import { Bot, MessageSquare, Target, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Bot, MessageSquare, Target, Users, Plus } from "lucide-react";
 import { useBasicStats } from "@/lib/analytics-basic";
+import { InfoTooltip } from "@/components/shared/InfoTooltip";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Button } from "@/components/ui/button";
 
-const blockPerf = [
-  { name: "Saudação", value: 98 },
-  { name: "Coleta nome", value: 91 },
-  { name: "Coleta email", value: 78 },
-  { name: "Qualificação IA", value: 64 },
-  { name: "Agendamento", value: 41 },
-];
+const KPI_HELP: Record<string, string> = {
+  Bots:       "Quantidade de agentes (ativos + rascunhos) neste workspace.",
+  Leads:      "Total de leads capturados pelos seus bots.",
+  Conversas:  "Sessões de chat já registradas.",
+  Conversões: "Leads que avançaram para estágios finais do pipeline.",
+};
 
 export default function Analytics() {
   const { data: stats, isLoading } = useBasicStats();

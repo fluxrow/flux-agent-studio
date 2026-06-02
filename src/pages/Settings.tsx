@@ -304,6 +304,11 @@ export default function Settings() {
           </div>
         </TabsContent>
 
+        {/* Tracking destinations */}
+        <TabsContent value="destinations" className="mt-6">
+          <TrackingDestinationsPanel />
+        </TabsContent>
+
         {/* System Health */}
         <TabsContent value="system" className="mt-6">
           <SystemHealthPanel />

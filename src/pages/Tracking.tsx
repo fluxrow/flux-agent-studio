@@ -5,6 +5,7 @@ import { Activity, Globe, Radio, User, Link2, Eraser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { resetVisitor } from "@/tracking/visitor";
 import { TrackingAnalyticsWidget } from "@/components/tracking/TrackingAnalyticsWidget";
+import { DispatchInspector } from "@/components/tracking/DispatchInspector";
 
 const eventBadge: Record<string, string> = {
   flow_started: "bg-primary/15 text-primary-glow border-primary/30",
@@ -109,6 +110,9 @@ export default function Tracking() {
 
       {/* Analytics aggregations */}
       <TrackingAnalyticsWidget />
+
+      <DispatchInspector />
+
 
 
 

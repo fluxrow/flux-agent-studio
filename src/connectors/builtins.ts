@@ -77,6 +77,12 @@ export const builtInConnectors: ConnectorManifest[] = [
         { key: "channel", label: "Canal", type: "string", required: true },
         { key: "text", label: "Texto", type: "string", required: true },
       ]},
+      { key: "lookup_channel", name: "Buscar canal", parameters: [
+        { key: "name", label: "Nome do canal", type: "string", required: true },
+      ]},
+      { key: "lookup_user", name: "Buscar usuário por email", parameters: [
+        { key: "email", label: "Email", type: "string", required: true },
+      ]},
     ],
     triggers: [
       { key: "message_received", name: "Mensagem recebida", samplePayload: { channel: "general", user: "U123", text: "hi" } },

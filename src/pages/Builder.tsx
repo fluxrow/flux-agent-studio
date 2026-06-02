@@ -16,6 +16,8 @@ import { blockRegistry, toneClass } from "@/builder/blockRegistry";
 import { ValidationPanel } from "@/components/builder/ValidationPanel";
 import { PreviewPanel } from "@/components/builder/PreviewPanel";
 import { PublishDialog } from "@/components/builder/PublishDialog";
+import { AIBlockEditor } from "@/components/builder/AIBlockEditor";
+import { AIInspectorPanel } from "@/components/builder/AIInspectorPanel";
 import type { Block, FlowMetadata } from "@/types";
 
 const paletteGroups = [
@@ -239,11 +241,14 @@ function BuilderInner() {
         {/* right sidebar — tabs: properties / validation / metadata */}
         <aside className="w-80 border-l border-border bg-card/60 overflow-hidden flex flex-col">
           <Tabs defaultValue="props" className="flex flex-col flex-1 min-h-0">
-            <TabsList className="m-3 grid grid-cols-3 bg-background/60">
+            <TabsList className="m-3 grid grid-cols-4 bg-background/60">
               <TabsTrigger value="props" className="text-xs">Propriedades</TabsTrigger>
               <TabsTrigger value="validation" className="text-xs gap-1">
                 Validação
                 {!validation.valid && <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-destructive" />}
+              </TabsTrigger>
+              <TabsTrigger value="ai" className="text-xs gap-1">
+                <Sparkles className="h-3 w-3" /> IA
               </TabsTrigger>
               <TabsTrigger value="meta" className="text-xs">Flow</TabsTrigger>
             </TabsList>
@@ -254,6 +259,10 @@ function BuilderInner() {
 
             <TabsContent value="validation" className="flex-1 overflow-y-auto m-0 px-3 pb-5">
               <ValidationPanel report={validation} onSelectBlock={selectBlock} />
+            </TabsContent>
+
+            <TabsContent value="ai" className="flex-1 overflow-y-auto m-0 px-3 pb-5">
+              <AIInspectorPanel flowId={flow.botId} />
             </TabsContent>
 
             <TabsContent value="meta" className="flex-1 overflow-y-auto m-0 px-5 pb-5 space-y-4">

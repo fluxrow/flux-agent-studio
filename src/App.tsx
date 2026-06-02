@@ -80,6 +80,16 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/channels/debug"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<ChannelsDebug />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </WorkspaceProvider>

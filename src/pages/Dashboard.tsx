@@ -36,8 +36,16 @@ const channelColors = ["hsl(265 89% 66%)", "hsl(190 95% 55%)", "hsl(220 95% 60%)
 export default function Dashboard() {
   const { user } = useAuth();
   const { workspace } = useWorkspace();
+  const { data: stats, isLoading: statsLoading } = useBasicStats();
   const firstName = ((user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "").split(" ")[0];
   const greeting = greetingFor(new Date());
+
+  const kpiCards = [
+    { label: "Bots",        value: stats?.bots ?? 0,          icon: Bot },
+    { label: "Leads",       value: stats?.leads ?? 0,         icon: Users },
+    { label: "Conversas",   value: stats?.conversations ?? 0, icon: MessageSquare },
+    { label: "Conversões",  value: stats?.conversions ?? 0,   icon: Target },
+  ];
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">

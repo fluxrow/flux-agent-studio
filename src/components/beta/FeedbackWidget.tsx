@@ -31,7 +31,7 @@ export function FeedbackWidget() {
       workspaceId: workspace?.id ?? "ws_local_demo",
       kind, message: message.trim(), page: pathname, email: email.trim() || undefined,
     });
-    toast({ title: "Feedback enviado", description: "Obrigado! Vamos analisar em breve." });
+    toast.success("Feedback enviado", { description: "Obrigado! Vamos analisar em breve." });
     setMessage(""); setEmail(""); setOpen(false);
   };
 

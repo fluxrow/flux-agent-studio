@@ -107,6 +107,11 @@ export default function Tracking() {
         </Card>
       </div>
 
+      {/* Analytics aggregations */}
+      <TrackingAnalyticsWidget />
+
+
+
       {/* Events stream */}
       <div className="rounded-2xl border border-border bg-card/60 p-5">
         <div className="flex items-center justify-between mb-3">

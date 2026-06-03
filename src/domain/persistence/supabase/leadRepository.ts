@@ -5,6 +5,7 @@ import type {
 } from "@/types";
 import type { LeadRepository } from "../contracts";
 import { getCurrentWorkspaceId } from "../workspaceContext";
+import { countConverted } from "@/lib/leadStages";
 
 const STAGES: PipelineStage[] = [
   { id: "novo",        label: "Novo",          color: "muted" },

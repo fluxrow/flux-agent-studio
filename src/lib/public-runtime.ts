@@ -117,6 +117,7 @@ export async function startPublicSession(slug: string, botId: string, _workspace
 }
 
 export async function recordPublicEvent(sessionId: string, type: string, payload: Record<string, unknown> = {}, blockKey?: string | null) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) {
     // Mock mode: rely on runtimeEventBus + mock event repository (auto-wired by engine)
     return;
@@ -131,6 +132,7 @@ export async function recordPublicEvent(sessionId: string, type: string, payload
 }
 
 export async function recordPublicMessage(sessionId: string, role: "bot" | "user" | "system", text: string, blockKey?: string | null) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const { error } = await supabase.rpc("record_public_message" as any, {
     _session_id: sessionId,
@@ -151,6 +153,7 @@ export interface PublicLeadInput {
 }
 
 export async function recordPublicLead(sessionId: string, botId: string, workspaceId: string, lead: PublicLeadInput): Promise<string | null> {
+  if (isDemoMode()) return `demo_lead_${Date.now()}`;
   if (!USE_SUPABASE) {
     const created = await persistence.leads.create({
       name: lead.name,
@@ -195,6 +198,7 @@ export interface PublicVisitorProfileInput {
 }
 
 export async function recordPublicVisitorProfile(slug: string, visitorId: string, profile: PublicVisitorProfileInput) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const { error } = await supabase.rpc("record_public_visitor_profile" as any, {
     _slug: slug,
@@ -226,6 +230,7 @@ export interface PublicAttributionInput {
 }
 
 export async function recordPublicAttribution(slug: string, visitorId: string, sessionId: string | null, attr: PublicAttributionInput) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const hasAny = Object.values(attr).some((v) => v != null && v !== "");
   if (!hasAny) return;
@@ -249,6 +254,7 @@ export async function recordPublicAttribution(slug: string, visitorId: string, s
 }
 
 export async function attachAttributionToLead(sessionId: string, leadId: string, visitorId: string) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const { error } = await supabase.rpc("attach_public_attribution_to_lead" as any, {
     _session_id: sessionId,

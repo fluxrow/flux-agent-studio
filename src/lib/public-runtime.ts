@@ -13,6 +13,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { USE_SUPABASE } from "@/lib/runtime-config";
 import { persistence } from "@/domain/persistence";
+import { isDemoMode } from "@/beta/demoMode";
+import { DEMO_BOTS, DEMO_FLOW } from "@/beta/demoDataset";
 import type { Flow, Bot } from "@/types";
 
 export interface PublicBot {
@@ -37,6 +39,21 @@ export function getOrCreateVisitorId(slug: string): string {
 }
 
 export async function loadPublicBot(slug: string): Promise<PublicBot | null> {
+  // Phase 26B.1C — Demo Runtime: short-circuit before hitting any backend.
+  if (isDemoMode()) {
+    const bot = DEMO_BOTS.find((b) => b.slug === slug);
+    if (!bot) return null;
+    return {
+      id: bot.id,
+      slug: bot.slug ?? slug,
+      name: bot.name,
+      description: bot.description,
+      channel: bot.channel,
+      workspaceId: bot.workspaceId,
+      snapshot: DEMO_FLOW,
+      publishedAt: bot.publishedAt ?? null,
+    };
+  }
   if (!USE_SUPABASE) {
     const bot: Bot | null = (await persistence.bots.getBySlug?.(slug)) ?? null;
     if (!bot) return null;
@@ -75,6 +92,9 @@ export async function loadPublicBot(slug: string): Promise<PublicBot | null> {
 }
 
 export async function startPublicSession(slug: string, botId: string, _workspaceId: string, visitorId: string): Promise<string> {
+  if (isDemoMode()) {
+    return `demo_session_${visitorId}`;
+  }
   if (!USE_SUPABASE) {
     const session = await persistence.sessions.create({
       id: `pub_${Math.random().toString(36).slice(2, 10)}`,
@@ -97,6 +117,7 @@ export async function startPublicSession(slug: string, botId: string, _workspace
 }
 
 export async function recordPublicEvent(sessionId: string, type: string, payload: Record<string, unknown> = {}, blockKey?: string | null) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) {
     // Mock mode: rely on runtimeEventBus + mock event repository (auto-wired by engine)
     return;
@@ -111,6 +132,7 @@ export async function recordPublicEvent(sessionId: string, type: string, payload
 }
 
 export async function recordPublicMessage(sessionId: string, role: "bot" | "user" | "system", text: string, blockKey?: string | null) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const { error } = await supabase.rpc("record_public_message" as any, {
     _session_id: sessionId,
@@ -131,6 +153,7 @@ export interface PublicLeadInput {
 }
 
 export async function recordPublicLead(sessionId: string, botId: string, workspaceId: string, lead: PublicLeadInput): Promise<string | null> {
+  if (isDemoMode()) return `demo_lead_${Date.now()}`;
   if (!USE_SUPABASE) {
     const created = await persistence.leads.create({
       name: lead.name,
@@ -175,6 +198,7 @@ export interface PublicVisitorProfileInput {
 }
 
 export async function recordPublicVisitorProfile(slug: string, visitorId: string, profile: PublicVisitorProfileInput) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const { error } = await supabase.rpc("record_public_visitor_profile" as any, {
     _slug: slug,
@@ -206,6 +230,7 @@ export interface PublicAttributionInput {
 }
 
 export async function recordPublicAttribution(slug: string, visitorId: string, sessionId: string | null, attr: PublicAttributionInput) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const hasAny = Object.values(attr).some((v) => v != null && v !== "");
   if (!hasAny) return;
@@ -229,6 +254,7 @@ export async function recordPublicAttribution(slug: string, visitorId: string, s
 }
 
 export async function attachAttributionToLead(sessionId: string, leadId: string, visitorId: string) {
+  if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const { error } = await supabase.rpc("attach_public_attribution_to_lead" as any, {
     _session_id: sessionId,

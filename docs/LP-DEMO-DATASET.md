@@ -67,11 +67,17 @@ Fonte única: [`src/beta/demoDataset.ts`](../src/beta/demoDataset.ts).
 ## 3. Como ativar
 
 1. Abrir o **Dashboard**.
-2. Toggle **"Demo mode"** (já existe — `setDemoMode(true)`).
-3. Recarregar a página — a seed determinística é injetada em `src/mocks/index.ts` ao carregar.
-4. O banner de demo permanece visível para sinalizar visualmente que o workspace é de demonstração.
+2. Toggle **"Explorar workspace demo"** (`setDemoMode(true)`).
+3. **Sem reload necessário** — React Query é invalidado e todas as telas
+   recarregam diretamente do `demoPersistence` (Fase 26B.1C).
+4. O workspace real (Supabase ou mocks) **não é consultado** enquanto
+   demo mode está ativo — overlay no persistence facade intercepta cada
+   chamada e serve do dataset determinístico.
 
-> Toggle persiste em `localStorage` (`fluxbot.demoMode = "1"`). Não cria dados em backend real.
+Detalhes completos do runtime em [`docs/DEMO-RUNTIME.md`](./DEMO-RUNTIME.md).
+
+> Toggle persiste em `localStorage` (`fluxbot.demoMode = "1"`). Não cria
+> dados em backend real.
 
 ---
 

@@ -6,6 +6,11 @@
  *   - true            → Supabase adapters. Requires authenticated user
  *                       and an active workspace (see WorkspaceProvider).
  *
+ * Demo Runtime overlay (Phase 26B.1C): when `isDemoMode()` is true at
+ * call time, every domain's READ methods are intercepted and served
+ * from `demoPersistence` (deterministic "Agência Growth Demo" dataset).
+ * The real workspace is never consulted in demo mode.
+ *
  * Page code never touches adapters directly — only `persistence`.
  *
  * Every repository is instrumented (see persistence-telemetry) so the
@@ -14,6 +19,8 @@
  */
 import { USE_SUPABASE } from "@/lib/runtime-config";
 import { instrumentRepository } from "@/lib/persistence-telemetry";
+import { isDemoMode } from "@/beta/demoMode";
+import { demoPersistence } from "@/beta/demoPersistence";
 import type { Persistence } from "./contracts";
 
 import { repositories as coreMockRepositories } from "@/domain";
@@ -65,19 +72,39 @@ const supabasePersistence: Persistence = {
   events: supabaseEventRepository,
 };
 
-/**
- * Phase 18.6 collapsed the previous stub list: flows, conversations,
- * versions and variables now have real Supabase adapters. `templates`
- * remains a stub until the marketplace schema lands.
- */
 const STUB_DOMAINS: DomainKey[] = USE_SUPABASE ? ["templates"] : [];
 
 const chosen: Persistence = USE_SUPABASE ? supabasePersistence : mockPersistence;
 
-const instrumented = Object.fromEntries(
+/**
+ * Wrap a domain repository with the Demo Runtime overlay. At call time,
+ * if demo mode is active AND the overlay provides the requested method,
+ * the overlay handles the call — otherwise the real repository does.
+ */
+function withDemoOverlay<T extends object>(domain: DomainKey, real: T): T {
+  return new Proxy(real, {
+    get(target, prop, receiver) {
+      if (isDemoMode()) {
+        const overlay = (demoPersistence as Record<string, any>)[domain as string];
+        const fn = overlay?.[prop as string];
+        if (typeof fn === "function") return fn.bind(overlay);
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+  }) as T;
+}
+
+const overlaid = Object.fromEntries(
   (Object.keys(chosen) as DomainKey[]).map((domain) => [
     domain,
-    instrumentRepository(domain, chosen[domain] as object),
+    withDemoOverlay(domain, chosen[domain] as object),
+  ]),
+) as unknown as Persistence;
+
+const instrumented = Object.fromEntries(
+  (Object.keys(overlaid) as DomainKey[]).map((domain) => [
+    domain,
+    instrumentRepository(domain, overlaid[domain] as object),
   ]),
 ) as unknown as Persistence;
 

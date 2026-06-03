@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import {
-  TrendingUp, ArrowUpRight, Bot, Sparkles, MessageSquare, Users, Target, Plus, PlayCircle, Wand2, BookOpen,
+  TrendingUp, ArrowUpRight, Bot, Sparkles, MessageSquare, Users, Target, PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
 import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
-import { EmptyState } from "@/components/shared/EmptyState";
+
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
 import { WorkspaceHealthCard } from "@/components/beta/WorkspaceHealthCard";
 import { ContextualFeedback } from "@/components/beta/ContextualFeedback";

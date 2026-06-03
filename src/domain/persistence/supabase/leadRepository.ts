@@ -249,7 +249,7 @@ export const supabaseLeadRepository: LeadRepository = {
       acc[s.id] = leads.filter((l) => l.stage === s.id).length;
       return acc;
     }, {} as Record<LeadStage, number>);
-    const won = byStage.convertido;
+    const won = countConverted(leads, (l) => l.stage);
     const lost = byStage.perdido;
     const decided = won + lost;
     return {

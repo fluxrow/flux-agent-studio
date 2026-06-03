@@ -529,6 +529,21 @@ function BuilderInner() {
 
       {showPreview && <PreviewPanel onClose={() => setShowPreview(false)} />}
       <PublishDialog open={showPublish} onOpenChange={setShowPublish} />
+      <LeadCaptureWarningDialog
+        open={showCaptureWarning}
+        missing={leadCapture.missing}
+        onOpenChange={setShowCaptureWarning}
+        onPublishAnyway={() => {
+          setShowCaptureWarning(false);
+          doPublish();
+        }}
+        onAddCapture={() => {
+          setShowCaptureWarning(false);
+          // Drop a fresh input block on the canvas for the user to configure.
+          addBlock("input", { x: 400, y: 200 });
+          toast.message("Bloco de Input adicionado — configure a variável (ex: lead_email).");
+        }}
+      />
       <BuilderTour />
       <PreviewHint show={flow.blocks.length > 0 && !showPreview} onDismiss={() => {}} />
     </div>

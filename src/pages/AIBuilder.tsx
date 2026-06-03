@@ -62,6 +62,14 @@ export default function AIBuilder() {
         process: process || undefined,
         objective: (objective || undefined) as AIBuilderObjective | undefined,
       });
+      // Phase 26C.2A — polish: in demo mode, replace mock placeholders
+      // ("bot_name_mock", "summary_mock") with realistic Lumina copy so the
+      // screenshot reads as a finished product, not a stub.
+      if (demo) {
+        bp.bot.name = "Agente Lumina · Avaliação Estética";
+        bp.bot.description =
+          "SDR para Clínica Lumina que qualifica leads vindos de Meta Ads, coleta nome e WhatsApp, identifica a área de interesse e encaminha para um consultor humano.";
+      }
       setBlueprint(bp);
       aiBuilderCost.record(aiBuilderCost.fromBlueprint(description, bp));
       setRuns(aiBuilderCost.list());

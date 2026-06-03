@@ -99,3 +99,119 @@
     background-size: 24px 24px;
   }
 }
+
+/* ─── Landing Page V2 — scoped tokens + keyframes ─── */
+.lp-v2 {
+  --lp-bg:           #09090C;
+  --lp-bg-elevated:  #0F0F14;
+  --lp-bg-subtle:    #141419;
+  --lp-primary:      #0D9488;
+  --lp-primary-dark: #0F766E;
+  --lp-primary-glow: #14B8A6;
+  --lp-accent:       #D97706;
+  --lp-accent-light: #F59E0B;
+  --lp-accent-glow:  rgba(217,119,6,0.20);
+  --lp-fg:           #F8FAFC;
+  --lp-fg-muted:     #94A3B8;
+  --lp-fg-subtle:    #475569;
+  --lp-border:       rgba(255,255,255,0.07);
+  --lp-border-mid:   rgba(255,255,255,0.12);
+  --lp-teal-5:       rgba(13,148,136,0.05);
+  --lp-teal-10:      rgba(13,148,136,0.10);
+  --lp-teal-20:      rgba(13,148,136,0.20);
+  background-color: var(--lp-bg);
+  color: var(--lp-fg);
+}
+
+@keyframes lpEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes lpEnterScale {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes lpFade {
+  from { opacity: 0; }
+  to   { opacity: 0.7; }
+}
+@keyframes lpDrawLine {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes lpNodeAppear {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes lpBubble {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes lpTypingDot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%           { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes lpAiGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(13,148,136,0); }
+  50%      { box-shadow: 0 0 20px 4px rgba(13,148,136,0.28); }
+}
+@keyframes lpHeroGlow {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%      { opacity: 0.22; transform: scale(1.04); }
+}
+
+.lp-enter-1  { animation: lpEnter 500ms cubic-bezier(0.16,1,0.3,1) 100ms both; }
+.lp-enter-2  { animation: lpEnter 500ms cubic-bezier(0.16,1,0.3,1) 250ms both; }
+.lp-enter-3  { animation: lpEnter 500ms cubic-bezier(0.16,1,0.3,1) 380ms both; }
+.lp-enter-4  { animation: lpEnter 450ms cubic-bezier(0.16,1,0.3,1) 650ms both; }
+.lp-enter-5  { animation: lpEnter 400ms cubic-bezier(0.16,1,0.3,1) 800ms both; }
+.lp-fade-6   { animation: lpFade  350ms ease-out                    900ms both; }
+.lp-enter-mock { animation: lpEnterScale 600ms cubic-bezier(0.16,1,0.3,1) 1000ms both; }
+
+.lp-hero-glow-bg {
+  animation: lpHeroGlow 5000ms cubic-bezier(0.4,0,0.6,1) infinite;
+}
+
+.lp-ai-glow {
+  animation: lpAiGlow 3000ms cubic-bezier(0.4,0,0.6,1) 3250ms infinite;
+}
+
+.lp-connection-line {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+}
+.lp-line-draw {
+  animation: lpDrawLine 250ms cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+.lp-node { opacity: 0; }
+.lp-node-show { animation: lpNodeAppear 300ms cubic-bezier(0.16,1,0.3,1) forwards; }
+.lp-node-show-slow { animation: lpNodeAppear 400ms cubic-bezier(0.16,1,0.3,1) forwards; }
+
+.lp-bubble { opacity: 0; }
+.lp-bubble-show { animation: lpBubble 300ms cubic-bezier(0.16,1,0.3,1) forwards; }
+
+.lp-typing { display: flex; gap: 3px; align-items: center; padding: 8px 12px; opacity: 0; }
+.lp-typing-show { animation: lpBubble 200ms ease forwards; }
+.lp-typing span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--lp-fg-muted);
+  animation: lpTypingDot 1.2s ease-in-out infinite;
+}
+.lp-typing span:nth-child(2) { animation-delay: 0.2s; }
+.lp-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-v2 [class*="lp-enter"],
+  .lp-v2 [class*="lp-fade"],
+  .lp-v2 .lp-enter-mock {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .lp-v2 .lp-hero-glow-bg,
+  .lp-v2 .lp-ai-glow { animation: none !important; }
+  .lp-v2 .lp-node,
+  .lp-v2 .lp-bubble,
+  .lp-v2 .lp-typing { opacity: 1 !important; }
+  .lp-v2 .lp-connection-line { stroke-dashoffset: 0 !important; }
+}

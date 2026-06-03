@@ -24,6 +24,8 @@ import { CanvasEmptyState } from "@/components/builder/CanvasEmptyState";
 import { BuilderTour } from "@/components/builder/BuilderTour";
 import { FlowSummaryPanel } from "@/components/builder/FlowSummaryPanel";
 import { PreviewHint } from "@/components/builder/PreviewHint";
+import { LeadCaptureWarningDialog } from "@/components/builder/LeadCaptureWarningDialog";
+import { analyzeLeadCapture } from "@/builder/leadCapture";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Block, BlockType, FlowMetadata, ID } from "@/types";
 
@@ -121,6 +123,7 @@ function BuilderInner() {
 
   const [showPreview, setShowPreview] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
+  const [showCaptureWarning, setShowCaptureWarning] = useState(false);
   const [connectingFrom, setConnectingFrom] = useState<ID | null>(null);
   const metadata = flow.metadata as FlowMetadata;
   const nodeMap = useMemo(
@@ -147,13 +150,23 @@ function BuilderInner() {
     });
   }, [centerRequest]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const leadCapture = useMemo(() => analyzeLeadCapture(flow), [flow]);
+
+  const doPublish = () => {
+    publish();
+    setShowPublish(true);
+  };
+
   const handlePublish = () => {
     if (!validation.valid) {
       toast.error(`Flow inválido — ${validation.errors.length} erro(s) impedem a publicação.`);
       return;
     }
-    publish();
-    setShowPublish(true);
+    if (!leadCapture.capturesAny) {
+      setShowCaptureWarning(true);
+      return;
+    }
+    doPublish();
   };
 
   const handleSave = async () => {
@@ -516,6 +529,21 @@ function BuilderInner() {
 
       {showPreview && <PreviewPanel onClose={() => setShowPreview(false)} />}
       <PublishDialog open={showPublish} onOpenChange={setShowPublish} />
+      <LeadCaptureWarningDialog
+        open={showCaptureWarning}
+        missing={leadCapture.missing}
+        onOpenChange={setShowCaptureWarning}
+        onPublishAnyway={() => {
+          setShowCaptureWarning(false);
+          doPublish();
+        }}
+        onAddCapture={() => {
+          setShowCaptureWarning(false);
+          // Drop a fresh input block on the canvas for the user to configure.
+          addBlock("input", { x: 400, y: 200 });
+          toast.message("Bloco de Input adicionado — configure a variável (ex: lead_email).");
+        }}
+      />
       <BuilderTour />
       <PreviewHint show={flow.blocks.length > 0 && !showPreview} onDismiss={() => {}} />
     </div>

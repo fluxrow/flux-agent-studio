@@ -1,6 +1,7 @@
 import { CheckCircle2, AlertTriangle, Play, Rocket, Blocks, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBuilder } from "@/builder/BuilderContext";
+import { FlowHealthCheck } from "./FlowHealthCheck";
 
 interface Props {
   onPreview: () => void;
@@ -61,6 +62,8 @@ export function FlowSummaryPanel({ onPreview, onPublish }: Props) {
           </>
         )}
       </div>
+
+      <FlowHealthCheck />
 
       <div className="space-y-2">
         <Button variant="outline" className="w-full bg-secondary/40" onClick={onPreview}>

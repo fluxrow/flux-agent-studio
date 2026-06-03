@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Flame, Snowflake, Thermometer, Mail, Loader2 } from "lucide-react";
+import { Plus, Flame, Snowflake, Thermometer, Mail, Loader2, AlertTriangle, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
+  useBots,
+  useConversations,
   useCreateLead, useLeadsByStage, usePipelineStages, useUpdateLeadStage,
 } from "@/domain/hooks";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -31,9 +33,16 @@ const stageDot: Record<string, string> = {
 export default function Leads() {
   const { data: stages = [] } = usePipelineStages();
   const { data: byStage, isLoading } = useLeadsByStage();
+  const { data: conversationsData } = useConversations();
+  const { data: bots = [] } = useBots();
   const createLead = useCreateLead();
   const updateStage = useUpdateLeadStage();
   const total = byStage ? Object.values(byStage).reduce((a, l) => a + l.length, 0) : 0;
+  const conversationCount = Array.isArray(conversationsData)
+    ? conversationsData.length
+    : conversationsData?.items?.length ?? 0;
+  const showCaptureAlert = total === 0 && conversationCount > 0;
+  const firstBotId = bots[0]?.id;
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
@@ -89,6 +98,29 @@ export default function Leads() {
           </Dialog>
         }
       />
+
+      {showCaptureAlert && (
+        <div className="rounded-2xl border border-warning/40 bg-warning/5 p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold">
+              Seu agente está recebendo conversas, mas nenhum lead foi capturado.
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Adicione uma pergunta no fluxo para coletar nome, email ou telefone.
+              Sem isso, as conversas não viram leads no CRM.
+            </p>
+          </div>
+          {firstBotId && (
+            <Link to={`/builder/${firstBotId}`}>
+              <Button size="sm" variant="outline" className="bg-secondary/40 shrink-0">
+                <Wand2 className="h-3.5 w-3.5 mr-1.5" /> Abrir Builder
+              </Button>
+            </Link>
+          )}
+        </div>
+      )}
+
 
       {isLoading || !byStage ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground">

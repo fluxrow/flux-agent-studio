@@ -219,15 +219,45 @@ export const DEMO_SESSIONS: Session[] = [
 ];
 
 export const DEMO_MESSAGES: Message[] = [
-  { id: "dm1", sessionId: "demo-s1", role: "bot",  text: "Olá! 👋 Sou o assistente da Clínica Lumina. Posso te ajudar a agendar sua avaliação estética?", blockId: "lq_hello", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm2", sessionId: "demo-s1", role: "user", text: "Oi! Sim, quero agendar uma avaliação facial.", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm3", sessionId: "demo-s1", role: "bot",  text: "Para começar, qual é o seu nome?", blockId: "lq_name", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm4", sessionId: "demo-s1", role: "user", text: "Marina Costa", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm5", sessionId: "demo-s1", role: "bot",  text: "Prazer, Marina! 😊 Qual área você quer tratar?", blockId: "lq_thanks", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm6", sessionId: "demo-s1", role: "user", text: "Facial", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm7", sessionId: "demo-s1", role: "bot",  text: "Para quando você gostaria de agendar?", blockId: "lq_when", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm8", sessionId: "demo-s1", role: "user", text: "Esta semana se possível", sentAt: fixedIso(1), ...msgTs },
-  { id: "dm9", sessionId: "demo-s1", role: "bot",  text: "Perfeito! Qual é o seu WhatsApp para confirmação?", blockId: "lq_phone", sentAt: fixedIso(1), ...msgTs },
+  // ---- s1 · Marina Costa (WhatsApp · ativa) ----
+  { id: "dm1",  sessionId: "demo-s1", role: "bot",  text: "Olá! 👋 Sou o assistente da Clínica Lumina. Posso te ajudar a agendar sua avaliação estética?", blockId: "lq_hello", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm2",  sessionId: "demo-s1", role: "user", text: "Oi! Sim, quero agendar uma avaliação facial.", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm3",  sessionId: "demo-s1", role: "bot",  text: "Para começar, qual é o seu nome?", blockId: "lq_name", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm4",  sessionId: "demo-s1", role: "user", text: "Marina Costa", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm5",  sessionId: "demo-s1", role: "bot",  text: "Prazer, Marina! 😊 Qual área você quer tratar?", blockId: "lq_thanks", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm6",  sessionId: "demo-s1", role: "user", text: "Facial — quero algo para textura e linhas finas.", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm7",  sessionId: "demo-s1", role: "bot",  text: "Anotado ✨ Para quando você gostaria de agendar?", blockId: "lq_when", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm8",  sessionId: "demo-s1", role: "user", text: "Esta semana, se possível 🙏", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm9",  sessionId: "demo-s1", role: "bot",  text: "Perfeito! Qual é o seu WhatsApp para confirmação?", blockId: "lq_phone", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm10", sessionId: "demo-s1", role: "user", text: "+55 11 98441-2210", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm11", sessionId: "demo-s1", role: "bot",  text: "Tudo certo, Marina! Nosso time confirma os horários disponíveis em instantes. 💆‍♀️", sentAt: fixedIso(1), ...msgTs },
+
+  // ---- s2 · Bruna Almeida (handoff humano) ----
+  { id: "dm20", sessionId: "demo-s2", role: "bot",   text: "Oi! 👋 Sou a assistente da Lumina. Como posso te ajudar?", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm21", sessionId: "demo-s2", role: "user",  text: "Quero entender preços do protocolo facial completo.", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm22", sessionId: "demo-s2", role: "bot",   text: "Claro, Bruna! Posso passar você para a Camila, nossa consultora, que monta o orçamento certinho. Tudo bem?", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm23", sessionId: "demo-s2", role: "user",  text: "Pode ser, obrigada!", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm24", sessionId: "demo-s2", role: "bot",   text: "Vou te transferir para a nossa consultora 💆 Um momento…", sentAt: fixedIso(1), ...msgTs },
+  { id: "dm25", sessionId: "demo-s2", role: "agent", text: "Oi Bruna, aqui é a Camila 👋 Vi que você se interessou pelo protocolo facial. Posso te mandar a tabela personalizada agora?", sentAt: fixedIso(0), ...msgTs },
+
+  // ---- s3 · Felipe Tavares (convertido) ----
+  { id: "dm30", sessionId: "demo-s3", role: "bot",   text: "Olá, Felipe! Vi que você concluiu a avaliação ontem. Posso te ajudar a confirmar o protocolo?", sentAt: fixedIso(3), ...msgTs },
+  { id: "dm31", sessionId: "demo-s3", role: "user",  text: "Sim, quero fechar o pacote completo.", sentAt: fixedIso(3), ...msgTs },
+  { id: "dm32", sessionId: "demo-s3", role: "bot",   text: "Perfeito! Tenho terça às 14h ou quinta às 10h. Qual prefere?", sentAt: fixedIso(3), ...msgTs },
+  { id: "dm33", sessionId: "demo-s3", role: "user",  text: "Terça 14h 👍", sentAt: fixedIso(3), ...msgTs },
+  { id: "dm34", sessionId: "demo-s3", role: "bot",   text: "Confirmado para terça-feira às 14h. ✨ Te mandamos o lembrete na véspera.", sentAt: fixedIso(3), ...msgTs },
+
+  // ---- s4 · Tiago Monteiro (follow-up pós-avaliação) ----
+  { id: "dm40", sessionId: "demo-s4", role: "bot",   text: "Oi Tiago! Tudo bem? Passando para saber como foi sua avaliação de ontem 🙂", sentAt: fixedIso(2), ...msgTs },
+  { id: "dm41", sessionId: "demo-s4", role: "user",  text: "Adorei o atendimento, vou fechar o protocolo.", sentAt: fixedIso(2), ...msgTs },
+  { id: "dm42", sessionId: "demo-s4", role: "bot",   text: "Que ótimo! Reservei o protocolo completo iniciando na próxima semana. Confirma?", sentAt: fixedIso(2), ...msgTs },
+  { id: "dm43", sessionId: "demo-s4", role: "user",  text: "Obrigado! Já reservei o protocolo completo.", sentAt: fixedIso(2), ...msgTs },
+
+  // ---- s5 · Paula Nogueira (Instagram · ativa) ----
+  { id: "dm50", sessionId: "demo-s5", role: "user",  text: "Oi, vi no Instagram e queria saber preço…", sentAt: fixedIso(0), ...msgTs },
+  { id: "dm51", sessionId: "demo-s5", role: "bot",   text: "Oi Paula! 👋 Posso te enviar a tabela. Qual área te interessa: facial, corporal ou capilar?", sentAt: fixedIso(0), ...msgTs },
+  { id: "dm52", sessionId: "demo-s5", role: "user",  text: "Facial 💆‍♀️", sentAt: fixedIso(0), ...msgTs },
+  { id: "dm53", sessionId: "demo-s5", role: "bot",   text: "Perfeito! Para te enviar o melhor protocolo, me passa seu WhatsApp?", sentAt: fixedIso(0), ...msgTs },
 ];
 
 export const DEMO_CONVERSATIONS: Conversation[] = [

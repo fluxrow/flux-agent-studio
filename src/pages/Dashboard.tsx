@@ -18,6 +18,7 @@ import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { useBasicStats } from "@/lib/analytics-basic";
 import { useBots } from "@/domain/hooks";
 import { setDemoMode, isDemoMode } from "@/beta/demoMode";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 function greetingFor(date: Date): string {
@@ -40,6 +41,7 @@ export default function Dashboard() {
   const { workspace } = useWorkspace();
   const { data: stats, isLoading: statsLoading } = useBasicStats();
   const { data: botsPage } = useBots({ page: 1, pageSize: 4 });
+  const queryClient = useQueryClient();
 
   const firstName = ((user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "").split(" ")[0];
   const greeting = greetingFor(new Date());
@@ -79,10 +81,13 @@ export default function Dashboard() {
             onClick={() => {
               const on = !isDemoMode();
               setDemoMode(on);
+              // Force every active query to refetch so the new persistence
+              // overlay (demo or real) takes effect immediately.
+              queryClient.invalidateQueries();
               toast.success(on ? "Modo demonstração ativado" : "Modo demonstração desativado", {
                 description: on
-                  ? "Explore o produto com dados de exemplo (workspace real não é afetado)."
-                  : "Voltando ao seu workspace.",
+                  ? "Explore o produto com dados Agência Growth Demo (workspace real não é afetado)."
+                  : "Voltando ao seu workspace real.",
               });
             }}
           >

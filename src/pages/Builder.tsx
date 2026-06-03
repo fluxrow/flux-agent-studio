@@ -321,7 +321,7 @@ function BuilderInner() {
 
       <div className="flex flex-1 min-h-0">
         {/* blocks palette */}
-        <aside className="w-64 border-r border-border bg-card/40 overflow-y-auto">
+        <aside data-tour="palette" className="w-64 border-r border-border bg-card/40 overflow-y-auto">
           <div className="p-3">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -331,32 +331,41 @@ function BuilderInner() {
               Arraste um bloco para o canvas. Clique nos pontos das bordas para conectar.
             </p>
           </div>
-          <div className="px-3 pb-6 space-y-5">
-            {paletteGroups.map((g) => (
-              <div key={g.label}>
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{g.label}</div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {g.types.map((t) => {
-                    const meta = blockRegistry[t];
-                    return (
-                      <div
-                        key={t}
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData(DND_MIME, t);
-                          e.dataTransfer.effectAllowed = "copy";
-                        }}
-                        className="flex flex-col items-center gap-1 rounded-lg border border-border bg-background/60 p-2.5 cursor-grab active:cursor-grabbing hover:border-primary/40 hover:bg-card transition text-[10px]"
-                      >
-                        <meta.icon className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-center">{meta.label}</span>
-                      </div>
-                    );
-                  })}
+          <TooltipProvider delayDuration={250}>
+            <div className="px-3 pb-6 space-y-5">
+              {paletteGroups.map((g) => (
+                <div key={g.label}>
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{g.label}</div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {g.types.map((t) => {
+                      const meta = blockRegistry[t];
+                      return (
+                        <Tooltip key={t}>
+                          <TooltipTrigger asChild>
+                            <div
+                              draggable
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData(DND_MIME, t);
+                                e.dataTransfer.effectAllowed = "copy";
+                              }}
+                              className="flex flex-col items-center gap-1 rounded-lg border border-border bg-background/60 p-2.5 cursor-grab active:cursor-grabbing hover:border-primary/40 hover:bg-card transition text-[10px]"
+                            >
+                              <meta.icon className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-center">{meta.label}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-[220px] text-xs">
+                            <div className="font-semibold mb-0.5">{meta.label}</div>
+                            <div className="text-muted-foreground">{meta.description}</div>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </TooltipProvider>
         </aside>
 
         {/* canvas */}

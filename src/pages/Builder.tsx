@@ -150,13 +150,23 @@ function BuilderInner() {
     });
   }, [centerRequest]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const leadCapture = useMemo(() => analyzeLeadCapture(flow), [flow]);
+
+  const doPublish = () => {
+    publish();
+    setShowPublish(true);
+  };
+
   const handlePublish = () => {
     if (!validation.valid) {
       toast.error(`Flow inválido — ${validation.errors.length} erro(s) impedem a publicação.`);
       return;
     }
-    publish();
-    setShowPublish(true);
+    if (!leadCapture.capturesAny) {
+      setShowCaptureWarning(true);
+      return;
+    }
+    doPublish();
   };
 
   const handleSave = async () => {

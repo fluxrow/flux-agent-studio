@@ -123,17 +123,14 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border p-2">
         {!collapsed && (
-          <NavLink
-            to="/docs"
-            className="block rounded-xl border border-primary/30 bg-primary/5 p-3 hover:border-primary/50 transition"
-          >
-            <div className="flex items-center gap-2 text-xs font-semibold text-primary-glow">
-              <LifeBuoy className="h-3.5 w-3.5" /> Precisa de ajuda?
+          <div className="rounded-xl border border-border bg-card/60 p-3">
+            <div className="flex items-center gap-2">
+              <span className="rounded-md bg-primary/15 text-primary-glow border border-primary/30 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider">
+                BETA
+              </span>
+              <span className="text-xs font-medium">Workspace ativo</span>
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              Abra a Central de Documentação.
-            </p>
-          </NavLink>
+          </div>
         )}
       </SidebarFooter>
     </Sidebar>

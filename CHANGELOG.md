@@ -6,6 +6,43 @@ completos por fase.
 
 ## [Unreleased]
 
+## Phase 23A — Trust & Empty States
+
+### Dados fabricados removidos das telas voltadas ao beta
+- `src/pages/Revenue.tsx` — KPIs falsos (R$ 184k, ROAS 4.8x, CAC R$ 42),
+  `revenueSeries`, `aiCosts`, `aiInsights` e gráfico Recharts removidos;
+  substituídos por empty state honesto com CTA "Ver leads".
+- `src/pages/Attribution.tsx` — `attributionTouches`, `campaignPerf`,
+  `sources` e tabela de campanhas falsas removidos; substituídos por
+  empty state com CTA "Ver bots".
+- `src/pages/Alerts.tsx` — `alerts` mock, regras fictícias e KPIs
+  fabricados removidos; empty state com CTA "Ver analytics".
+- `src/pages/Variables.tsx` — lista hardcoded `vars` removida; empty
+  state com CTA "Abrir bots".
+- `src/pages/Conversations.tsx` — `conversations` e `sampleChat` de
+  `src/lib/mock` removidos; agora consome `useConversations()` real e
+  cai em empty state quando vazio.
+
+### Dashboard sem teatro de dados
+- `LeadIntelligenceWidget` (que computava sobre `mockLeads`) removido
+  do Dashboard.
+- Empty state do workspace vazio reescrito para "Bem-vindo ao Flux
+  Agent Studio" com 3 CTAs (Criar Bot, Criar com IA, Ver Documentação),
+  conforme spec da fase.
+
+### Sidebar Footer
+- `src/components/AppSidebar.tsx` — bloco "Precisa de ajuda?" no rodapé
+  substituído por badge `BETA` + label "Workspace ativo". Confirma
+  remoção completa da barra de progresso fake "Plano Pro / 64% das
+  mensagens IA do mês".
+
+### Regra global
+- Após esta fase, nenhuma das telas listadas exibe métricas, gráficos,
+  leads, conversas, alertas, receitas ou variáveis simuladas para o
+  usuário. Quando não há dado real, é mostrado empty state com CTA.
+
+
+
 ### Docs
 - README, CONTRIBUTING, SECURITY, CHANGELOG, LICENSE, CODE_OF_CONDUCT
 - `docs/ARCHITECTURE.md` com visão de camadas e fluxo de eventos

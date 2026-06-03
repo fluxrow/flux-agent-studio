@@ -121,18 +121,23 @@ export default function Dashboard() {
       {isEmptyWorkspace ? (
         <EmptyState
           icon={Bot}
-          title="Você ainda não criou seu primeiro bot"
-          description="Quando seus bots começarem a conversar com leads, esta tela mostrará desempenho, alertas inteligentes e atribuição em tempo real."
+          title="Bem-vindo ao Flux Agent Studio"
+          description="Seu workspace ainda está vazio. Crie seu primeiro agente para começar a capturar leads e visualizar métricas reais."
           action={
             <div className="flex flex-wrap items-center justify-center gap-2">
               <Link to="/bots/new">
                 <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
-                  <Plus className="h-4 w-4 mr-1.5" /> Criar bot
+                  <Plus className="h-4 w-4 mr-1.5" /> Criar Bot
+                </Button>
+              </Link>
+              <Link to="/ai-builder">
+                <Button variant="outline" className="bg-card/60">
+                  <Wand2 className="h-4 w-4 mr-1.5" /> Criar com IA
                 </Button>
               </Link>
               <Link to="/docs">
                 <Button variant="outline" className="bg-card/60">
-                  Ver documentação
+                  <BookOpen className="h-4 w-4 mr-1.5" /> Ver Documentação
                 </Button>
               </Link>
             </div>
@@ -182,8 +187,6 @@ export default function Dashboard() {
               </div>
             )}
           </div>
-
-          <LeadIntelligenceWidget />
 
           <div className="flex justify-end">
             <ContextualFeedback surface="dashboard" />

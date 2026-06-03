@@ -20,6 +20,11 @@ import { PreviewPanel } from "@/components/builder/PreviewPanel";
 import { PublishDialog } from "@/components/builder/PublishDialog";
 import { AIBlockEditor } from "@/components/builder/AIBlockEditor";
 import { AIInspectorPanel } from "@/components/builder/AIInspectorPanel";
+import { CanvasEmptyState } from "@/components/builder/CanvasEmptyState";
+import { BuilderTour } from "@/components/builder/BuilderTour";
+import { FlowSummaryPanel } from "@/components/builder/FlowSummaryPanel";
+import { PreviewHint } from "@/components/builder/PreviewHint";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Block, BlockType, FlowMetadata, ID } from "@/types";
 
 const paletteGroups = [
@@ -80,13 +85,25 @@ function SaveStatusBadge() {
     );
   }
   if (saveStatus === "error") {
-    return <span className="text-[11px] text-destructive" title={saveError ?? ""}>Erro ao salvar</span>;
+    return (
+      <span className="flex items-center gap-1 text-[11px] text-destructive" title={saveError ?? ""}>
+        <AlertTriangle className="h-3 w-3" /> Erro ao salvar
+      </span>
+    );
   }
   if (state.dirty) {
-    return <span className="text-[11px] text-warning">• alterado</span>;
+    return (
+      <span className="flex items-center gap-1 text-[11px] text-warning">
+        <AlertTriangle className="h-3 w-3" /> Não salvo
+      </span>
+    );
   }
   if (saveStatus === "saved") {
-    return <span className="flex items-center gap-1 text-[11px] text-success"><CheckCircle2 className="h-3 w-3" /> Salvo</span>;
+    return (
+      <span className="flex items-center gap-1 text-[11px] text-success">
+        <CheckCircle2 className="h-3 w-3" /> Salvo
+      </span>
+    );
   }
   return null;
 }
@@ -304,7 +321,7 @@ function BuilderInner() {
 
       <div className="flex flex-1 min-h-0">
         {/* blocks palette */}
-        <aside className="w-64 border-r border-border bg-card/40 overflow-y-auto">
+        <aside data-tour="palette" className="w-64 border-r border-border bg-card/40 overflow-y-auto">
           <div className="p-3">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -314,32 +331,41 @@ function BuilderInner() {
               Arraste um bloco para o canvas. Clique nos pontos das bordas para conectar.
             </p>
           </div>
-          <div className="px-3 pb-6 space-y-5">
-            {paletteGroups.map((g) => (
-              <div key={g.label}>
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{g.label}</div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {g.types.map((t) => {
-                    const meta = blockRegistry[t];
-                    return (
-                      <div
-                        key={t}
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData(DND_MIME, t);
-                          e.dataTransfer.effectAllowed = "copy";
-                        }}
-                        className="flex flex-col items-center gap-1 rounded-lg border border-border bg-background/60 p-2.5 cursor-grab active:cursor-grabbing hover:border-primary/40 hover:bg-card transition text-[10px]"
-                      >
-                        <meta.icon className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-center">{meta.label}</span>
-                      </div>
-                    );
-                  })}
+          <TooltipProvider delayDuration={250}>
+            <div className="px-3 pb-6 space-y-5">
+              {paletteGroups.map((g) => (
+                <div key={g.label}>
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{g.label}</div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {g.types.map((t) => {
+                      const meta = blockRegistry[t];
+                      return (
+                        <Tooltip key={t}>
+                          <TooltipTrigger asChild>
+                            <div
+                              draggable
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData(DND_MIME, t);
+                                e.dataTransfer.effectAllowed = "copy";
+                              }}
+                              className="flex flex-col items-center gap-1 rounded-lg border border-border bg-background/60 p-2.5 cursor-grab active:cursor-grabbing hover:border-primary/40 hover:bg-card transition text-[10px]"
+                            >
+                              <meta.icon className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-center">{meta.label}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-[220px] text-xs">
+                            <div className="font-semibold mb-0.5">{meta.label}</div>
+                            <div className="text-muted-foreground">{meta.description}</div>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </TooltipProvider>
         </aside>
 
         {/* canvas */}
@@ -446,14 +472,7 @@ function BuilderInner() {
               );
             })}
 
-            {flow.blocks.length === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center text-center text-muted-foreground text-sm pointer-events-none">
-                <div>
-                  <Sparkles className="h-6 w-6 mx-auto mb-2 text-primary-glow" />
-                  Arraste um bloco da paleta para começar.
-                </div>
-              </div>
-            )}
+            {flow.blocks.length === 0 && <CanvasEmptyState />}
           </div>
         </div>
 
@@ -473,8 +492,10 @@ function BuilderInner() {
             </TabsList>
 
             <TabsContent value="props" className="flex-1 overflow-y-auto m-0 px-5 pb-5">
-              {selectedBlock ? <PropertiesEditor block={selectedBlock} onChange={(p) => updateConfig(selectedBlock.id, p)} onLabel={(l) => updateBlock(selectedBlock.id, { label: l })} /> : (
-                <p className="text-xs text-muted-foreground py-6 text-center">Selecione um bloco no canvas.</p>
+              {selectedBlock ? (
+                <PropertiesEditor block={selectedBlock} onChange={(p) => updateConfig(selectedBlock.id, p)} onLabel={(l) => updateBlock(selectedBlock.id, { label: l })} />
+              ) : (
+                <FlowSummaryPanel onPreview={() => setShowPreview(true)} onPublish={handlePublish} />
               )}
             </TabsContent>
 
@@ -495,6 +516,8 @@ function BuilderInner() {
 
       {showPreview && <PreviewPanel onClose={() => setShowPreview(false)} />}
       <PublishDialog open={showPublish} onOpenChange={setShowPublish} />
+      <BuilderTour />
+      <PreviewHint show={flow.blocks.length > 0 && !showPreview} onDismiss={() => {}} />
     </div>
   );
 }

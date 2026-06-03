@@ -123,6 +123,7 @@ function BuilderInner() {
 
   const [showPreview, setShowPreview] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
+  const [showCaptureWarning, setShowCaptureWarning] = useState(false);
   const [connectingFrom, setConnectingFrom] = useState<ID | null>(null);
   const metadata = flow.metadata as FlowMetadata;
   const nodeMap = useMemo(

@@ -53,11 +53,9 @@ export default function Dashboard() {
     { label: "Conversões",  value: stats?.conversions ?? 0,   icon: Target },
   ];
 
-  const isEmptyWorkspace =
-    !statsLoading &&
-    (stats?.bots ?? 0) === 0 &&
-    (stats?.leads ?? 0) === 0 &&
-    (stats?.conversations ?? 0) === 0;
+  // Layout estável: sempre renderiza o mesmo grid para evitar que
+  // cards apareçam/desapareçam durante loading e refetches do react-query.
+  // Cards internos (CRM, Omnichannel, Top bots) já tratam o próprio empty state.
 
   const topBots = (botsPage?.items ?? []).slice(0, 4);
 

@@ -63,6 +63,8 @@ export function FlowSummaryPanel({ onPreview, onPublish }: Props) {
         )}
       </div>
 
+      <FlowHealthCheck />
+
       <div className="space-y-2">
         <Button variant="outline" className="w-full bg-secondary/40" onClick={onPreview}>
           <Play className="h-4 w-4 mr-1.5" /> Preview

@@ -44,11 +44,11 @@ export default function Conversations() {
               <div className="min-w-0">
                 <div className="font-medium truncate">{c.leadName ?? c.id}</div>
                 <div className="text-xs text-muted-foreground truncate">
-                  {c.channel ?? "—"} · {c.status ?? "ativa"}
+                  {c.botName ?? "—"} · {c.status ?? "ativa"}
                 </div>
               </div>
               <span className="text-[11px] text-muted-foreground tabular-nums">
-                {new Date(c.updatedAt ?? c.createdAt ?? Date.now()).toLocaleString("pt-BR")}
+                {c.time ?? new Date(c.updatedAt ?? c.createdAt ?? Date.now()).toLocaleString("pt-BR")}
               </span>
             </div>
           ))}

@@ -9,6 +9,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { persistence } from "@/domain/persistence";
+import { isConvertedStage } from "@/lib/leadStages";
 
 export interface BasicStats {
   bots: number;

@@ -125,63 +125,54 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {isEmptyWorkspace ? (
-        <div className="grid lg:grid-cols-2 gap-4">
+      <div className="grid lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-4">
+          <CrmDashboardWidget />
+          <OmnichannelWidget />
           <AIBuilderHighlightCard />
-          <ActivationTasksCard />
         </div>
-      ) : (
-        <>
-          <div className="grid lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 space-y-4">
-              <CrmDashboardWidget />
-              <OmnichannelWidget />
-              <AIBuilderHighlightCard />
-            </div>
-            <div className="space-y-4">
-              <ActivationTasksCard />
-              <WorkspaceHealthCard />
-            </div>
-          </div>
+        <div className="space-y-4">
+          <ActivationTasksCard />
+          <WorkspaceHealthCard />
+        </div>
+      </div>
 
-          {/* Top bots (reais) */}
-          <div className="rounded-2xl border border-border bg-card/60 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Bot className="h-4 w-4 text-primary-glow" /> Top bots
-                <InfoTooltip content="Bots mais recentes do workspace, ordenados por última atividade." />
-              </h3>
-              <Link to="/bots" className="text-xs text-primary-glow flex items-center gap-1">
-                Ver todos <ArrowUpRight className="h-3 w-3" />
+      {/* Top bots (reais) */}
+      <div className="rounded-2xl border border-border bg-card/60 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Bot className="h-4 w-4 text-primary-glow" /> Top bots
+            <InfoTooltip content="Bots mais recentes do workspace, ordenados por última atividade." />
+          </h3>
+          <Link to="/bots" className="text-xs text-primary-glow flex items-center gap-1">
+            Ver todos <ArrowUpRight className="h-3 w-3" />
+          </Link>
+        </div>
+        {topBots.length === 0 ? (
+          <p className="text-xs text-muted-foreground">Nenhum bot publicado ainda.</p>
+        ) : (
+          <div className="space-y-3">
+            {topBots.map((b) => (
+              <Link key={b.id} to={`/builder/${b.id}`} className="flex items-center gap-3 rounded-xl border border-transparent hover:border-primary/30 hover:bg-background/40 p-2 -mx-2 transition">
+                <div className="h-9 w-9 rounded-lg gradient-accent flex-shrink-0 flex items-center justify-center font-display font-bold text-primary-foreground">
+                  {b.name.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">{b.name}</div>
+                  <div className="text-xs text-muted-foreground capitalize">{b.status} · {b.channel}</div>
+                </div>
+                <div className="text-xs text-muted-foreground tabular-nums">
+                  {b.metrics.conversations.toLocaleString()} conv.
+                </div>
               </Link>
-            </div>
-            {topBots.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Nenhum bot publicado ainda.</p>
-            ) : (
-              <div className="space-y-3">
-                {topBots.map((b) => (
-                  <Link key={b.id} to={`/builder/${b.id}`} className="flex items-center gap-3 rounded-xl border border-transparent hover:border-primary/30 hover:bg-background/40 p-2 -mx-2 transition">
-                    <div className="h-9 w-9 rounded-lg gradient-accent flex-shrink-0 flex items-center justify-center font-display font-bold text-primary-foreground">
-                      {b.name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{b.name}</div>
-                      <div className="text-xs text-muted-foreground capitalize">{b.status} · {b.channel}</div>
-                    </div>
-                    <div className="text-xs text-muted-foreground tabular-nums">
-                      {b.metrics.conversations.toLocaleString()} conv.
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            ))}
           </div>
+        )}
+      </div>
 
-          <div className="flex justify-end">
-            <ContextualFeedback surface="dashboard" />
-          </div>
-        </>
-      )}
+      <div className="flex justify-end">
+        <ContextualFeedback surface="dashboard" />
+      </div>
     </div>
   );
 }

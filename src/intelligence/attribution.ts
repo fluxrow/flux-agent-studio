@@ -4,6 +4,7 @@
  */
 import type { Lead } from "@/types/lead";
 import type { RevenueAttributionRow } from "./types";
+import { isConvertedStage } from "@/lib/leadStages";
 
 export interface AttributionInput {
   lead: Lead;
@@ -13,7 +14,7 @@ export interface AttributionInput {
 }
 
 export function buildAttributionRow(input: AttributionInput): RevenueAttributionRow {
-  const converted = input.lead.stage === "convertido";
+  const converted = isConvertedStage(input.lead.stage);
   return {
     source: input.lead.source,
     campaign: input.campaign,

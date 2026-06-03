@@ -99,6 +99,29 @@ export default function Leads() {
         }
       />
 
+      {showCaptureAlert && (
+        <div className="rounded-2xl border border-warning/40 bg-warning/5 p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold">
+              Seu agente está recebendo conversas, mas nenhum lead foi capturado.
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Adicione uma pergunta no fluxo para coletar nome, email ou telefone.
+              Sem isso, as conversas não viram leads no CRM.
+            </p>
+          </div>
+          {firstBotId && (
+            <Link to={`/builder/${firstBotId}`}>
+              <Button size="sm" variant="outline" className="bg-secondary/40 shrink-0">
+                <Wand2 className="h-3.5 w-3.5 mr-1.5" /> Abrir Builder
+              </Button>
+            </Link>
+          )}
+        </div>
+      )}
+
+
       {isLoading || !byStage ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />

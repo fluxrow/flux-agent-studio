@@ -124,7 +124,7 @@ export const mockLeadRepository: LeadRepository = {
       acc[s.id] = store.filter((l) => l.stage === s.id).length;
       return acc;
     }, {} as Record<LeadStage, number>);
-    const won = byStage.convertido ?? 0;
+    const won = countConverted(store, (l) => l.stage);
     const lost = byStage.perdido ?? 0;
     const decided = won + lost;
     return delay({

@@ -85,13 +85,25 @@ function SaveStatusBadge() {
     );
   }
   if (saveStatus === "error") {
-    return <span className="text-[11px] text-destructive" title={saveError ?? ""}>Erro ao salvar</span>;
+    return (
+      <span className="flex items-center gap-1 text-[11px] text-destructive" title={saveError ?? ""}>
+        <AlertTriangle className="h-3 w-3" /> Erro ao salvar
+      </span>
+    );
   }
   if (state.dirty) {
-    return <span className="text-[11px] text-warning">• alterado</span>;
+    return (
+      <span className="flex items-center gap-1 text-[11px] text-warning">
+        <AlertTriangle className="h-3 w-3" /> Não salvo
+      </span>
+    );
   }
   if (saveStatus === "saved") {
-    return <span className="flex items-center gap-1 text-[11px] text-success"><CheckCircle2 className="h-3 w-3" /> Salvo</span>;
+    return (
+      <span className="flex items-center gap-1 text-[11px] text-success">
+        <CheckCircle2 className="h-3 w-3" /> Salvo
+      </span>
+    );
   }
   return null;
 }

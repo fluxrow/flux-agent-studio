@@ -6,6 +6,7 @@ import type { LeadRepository } from "../repositories";
 import { mockLeads, mockStages } from "@/mocks";
 import { nowIso } from "@/mocks/_shared";
 import { delay, filterBySearch, paginate } from "./_helpers";
+import { countConverted } from "@/lib/leadStages";
 
 const store: Lead[] = [...mockLeads];
 const timelines = new Map<ID, ExecutionEvent[]>();

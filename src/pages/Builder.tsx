@@ -20,6 +20,11 @@ import { PreviewPanel } from "@/components/builder/PreviewPanel";
 import { PublishDialog } from "@/components/builder/PublishDialog";
 import { AIBlockEditor } from "@/components/builder/AIBlockEditor";
 import { AIInspectorPanel } from "@/components/builder/AIInspectorPanel";
+import { CanvasEmptyState } from "@/components/builder/CanvasEmptyState";
+import { BuilderTour } from "@/components/builder/BuilderTour";
+import { FlowSummaryPanel } from "@/components/builder/FlowSummaryPanel";
+import { PreviewHint } from "@/components/builder/PreviewHint";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Block, BlockType, FlowMetadata, ID } from "@/types";
 
 const paletteGroups = [

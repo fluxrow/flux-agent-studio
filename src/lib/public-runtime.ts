@@ -92,6 +92,9 @@ export async function loadPublicBot(slug: string): Promise<PublicBot | null> {
 }
 
 export async function startPublicSession(slug: string, botId: string, _workspaceId: string, visitorId: string): Promise<string> {
+  if (isDemoMode()) {
+    return `demo_session_${visitorId}`;
+  }
   if (!USE_SUPABASE) {
     const session = await persistence.sessions.create({
       id: `pub_${Math.random().toString(36).slice(2, 10)}`,

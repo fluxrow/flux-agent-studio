@@ -6,6 +6,7 @@ import type { LeadRepository } from "../repositories";
 import { mockLeads, mockStages } from "@/mocks";
 import { nowIso } from "@/mocks/_shared";
 import { delay, filterBySearch, paginate } from "./_helpers";
+import { countConverted } from "@/lib/leadStages";
 
 const store: Lead[] = [...mockLeads];
 const timelines = new Map<ID, ExecutionEvent[]>();
@@ -124,7 +125,7 @@ export const mockLeadRepository: LeadRepository = {
       acc[s.id] = store.filter((l) => l.stage === s.id).length;
       return acc;
     }, {} as Record<LeadStage, number>);
-    const won = byStage.convertido ?? 0;
+    const won = countConverted(store, (l) => l.stage);
     const lost = byStage.perdido ?? 0;
     const decided = won + lost;
     return delay({

@@ -5,6 +5,7 @@ import type {
 } from "@/types";
 import type { LeadRepository } from "../contracts";
 import { getCurrentWorkspaceId } from "../workspaceContext";
+import { countConverted } from "@/lib/leadStages";
 
 const STAGES: PipelineStage[] = [
   { id: "novo",        label: "Novo",          color: "muted" },
@@ -249,7 +250,7 @@ export const supabaseLeadRepository: LeadRepository = {
       acc[s.id] = leads.filter((l) => l.stage === s.id).length;
       return acc;
     }, {} as Record<LeadStage, number>);
-    const won = byStage.convertido;
+    const won = countConverted(leads, (l) => l.stage);
     const lost = byStage.perdido;
     const decided = won + lost;
     return {

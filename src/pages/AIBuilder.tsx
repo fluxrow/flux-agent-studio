@@ -12,6 +12,8 @@ import {
   generateBlueprint, materializeBlueprint, aiBuilderCost,
   type BotBlueprint, type AIBuilderObjective,
 } from "@/ai-builder";
+import { isDemoMode } from "@/beta/demoMode";
+import { DEMO_AI_BUILDER_PROMPT, DEMO_AI_BUILDER_CONTEXT } from "@/beta/demoDataset";
 
 const objectiveOptions: Array<{ value: AIBuilderObjective; label: string }> = [
   { value: "qualificar_leads", label: "Qualificar leads (SDR)" },
@@ -32,11 +34,15 @@ export default function AIBuilder() {
   const navigate = useNavigate();
   // toast from sonner
 
-  const [description, setDescription] = useState("");
-  const [segment, setSegment] = useState("");
-  const [product, setProduct]   = useState("");
-  const [process, setProcess]   = useState("");
-  const [objective, setObjective] = useState<AIBuilderObjective | "">("");
+  // Phase 26B.1B — In demo mode, pre-fill the hero scenario so the page is
+  // immediately screenshot-ready ("Agência Growth Demo" / Clínica Lumina).
+  const demo = isDemoMode();
+
+  const [description, setDescription] = useState(demo ? DEMO_AI_BUILDER_PROMPT : "");
+  const [segment, setSegment] = useState(demo ? DEMO_AI_BUILDER_CONTEXT.segment : "");
+  const [product, setProduct]   = useState(demo ? DEMO_AI_BUILDER_CONTEXT.product : "");
+  const [process, setProcess]   = useState(demo ? DEMO_AI_BUILDER_CONTEXT.process : "");
+  const [objective, setObjective] = useState<AIBuilderObjective | "">(demo ? DEMO_AI_BUILDER_CONTEXT.objective : "");
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [blueprint, setBlueprint] = useState<BotBlueprint | null>(null);

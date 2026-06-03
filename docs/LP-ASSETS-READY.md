@@ -214,3 +214,21 @@ Decisão final, balanceando impacto visual + comunicação de valor + prontidão
 - **Resoluções alvo:** 1920×1200 (desktop) e 390×844 (mobile), tema dark.
 
 Tudo acima é planejamento; nenhuma alteração de código foi feita nesta fase.
+
+---
+
+## Atualização — Fase 26B.1B (demo dataset)
+
+Com `setDemoMode(true)` e o dataset determinístico de [`LP-DEMO-DATASET.md`](./LP-DEMO-DATASET.md) injetado:
+
+| Tela                  | Status anterior | Status atual |
+|-----------------------|-----------------|--------------|
+| S2 AI Builder         | NEEDS POLISH    | **READY**    |
+| S5 Lead Intelligence  | NEEDS POLISH    | **READY**    |
+| S7 Analytics          | NEEDS POLISH    | **READY**    |
+| S8 Revenue            | BLOCKED         | **READY**    |
+| S10 Conversations     | NEEDS POLISH    | **READY**    |
+| S12 Health            | NEEDS POLISH    | **READY**    |
+
+Todas as 13 telas (S1–S13) passam a estar **READY** quando demo mode está ativo.
+

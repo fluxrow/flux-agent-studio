@@ -516,6 +516,8 @@ function BuilderInner() {
 
       {showPreview && <PreviewPanel onClose={() => setShowPreview(false)} />}
       <PublishDialog open={showPublish} onOpenChange={setShowPublish} />
+      <BuilderTour />
+      <PreviewHint show={flow.blocks.length > 0 && !showPreview} onDismiss={() => {}} />
     </div>
   );
 }

@@ -24,6 +24,8 @@ import { CanvasEmptyState } from "@/components/builder/CanvasEmptyState";
 import { BuilderTour } from "@/components/builder/BuilderTour";
 import { FlowSummaryPanel } from "@/components/builder/FlowSummaryPanel";
 import { PreviewHint } from "@/components/builder/PreviewHint";
+import { LeadCaptureWarningDialog } from "@/components/builder/LeadCaptureWarningDialog";
+import { analyzeLeadCapture } from "@/builder/leadCapture";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Block, BlockType, FlowMetadata, ID } from "@/types";
 

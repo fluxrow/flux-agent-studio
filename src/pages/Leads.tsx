@@ -33,12 +33,14 @@ const stageDot: Record<string, string> = {
 export default function Leads() {
   const { data: stages = [] } = usePipelineStages();
   const { data: byStage, isLoading } = useLeadsByStage();
-  const { data: conversations = [] } = useConversations();
+  const { data: conversationsData } = useConversations();
   const { data: bots = [] } = useBots();
   const createLead = useCreateLead();
   const updateStage = useUpdateLeadStage();
   const total = byStage ? Object.values(byStage).reduce((a, l) => a + l.length, 0) : 0;
-  const conversationCount = conversations.length;
+  const conversationCount = Array.isArray(conversationsData)
+    ? conversationsData.length
+    : conversationsData?.items?.length ?? 0;
   const showCaptureAlert = total === 0 && conversationCount > 0;
   const firstBotId = bots[0]?.id;
 

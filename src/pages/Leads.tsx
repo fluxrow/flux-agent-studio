@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Flame, Snowflake, Thermometer, Mail, Loader2 } from "lucide-react";
+import { Plus, Flame, Snowflake, Thermometer, Mail, Loader2, AlertTriangle, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
+  useBots,
+  useConversations,
   useCreateLead, useLeadsByStage, usePipelineStages, useUpdateLeadStage,
 } from "@/domain/hooks";
 import { PageHeader } from "@/components/shared/PageHeader";

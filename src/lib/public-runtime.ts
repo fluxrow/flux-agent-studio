@@ -13,6 +13,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { USE_SUPABASE } from "@/lib/runtime-config";
 import { persistence } from "@/domain/persistence";
+import { isDemoMode } from "@/beta/demoMode";
+import { DEMO_BOTS, DEMO_FLOW } from "@/beta/demoDataset";
 import type { Flow, Bot } from "@/types";
 
 export interface PublicBot {
@@ -37,6 +39,21 @@ export function getOrCreateVisitorId(slug: string): string {
 }
 
 export async function loadPublicBot(slug: string): Promise<PublicBot | null> {
+  // Phase 26B.1C — Demo Runtime: short-circuit before hitting any backend.
+  if (isDemoMode()) {
+    const bot = DEMO_BOTS.find((b) => b.slug === slug);
+    if (!bot) return null;
+    return {
+      id: bot.id,
+      slug: bot.slug ?? slug,
+      name: bot.name,
+      description: bot.description,
+      channel: bot.channel,
+      workspaceId: bot.workspaceId,
+      snapshot: DEMO_FLOW,
+      publishedAt: bot.publishedAt ?? null,
+    };
+  }
   if (!USE_SUPABASE) {
     const bot: Bot | null = (await persistence.bots.getBySlug?.(slug)) ?? null;
     if (!bot) return null;

@@ -83,8 +83,8 @@ export function LeadIntelligencePanel({ lead, eventCount = 0 }: Props) {
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary-glow" />
             <h3 className="font-display text-base font-semibold">Resumo</h3>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground ml-auto">
-              {summary.provider}
+            <span className="text-[10px] uppercase tracking-wider text-primary/80 ml-auto inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5">
+              <Brain className="h-3 w-3" /> IA · Inteligência
             </span>
           </div>
           <p className="mt-3 text-sm leading-relaxed">{summary.narrative}</p>

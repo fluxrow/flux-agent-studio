@@ -7,9 +7,12 @@ import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
 import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
-import { OnboardingChecklist } from "@/components/beta/OnboardingChecklist";
 import { WorkspaceHealthCard } from "@/components/beta/WorkspaceHealthCard";
 import { ContextualFeedback } from "@/components/beta/ContextualFeedback";
+import { ActivationBanner } from "@/components/beta/ActivationBanner";
+import { ActivationTasksCard } from "@/components/beta/ActivationTasksCard";
+import { NextStepCTA } from "@/components/beta/NextStepCTA";
+import { AIBuilderHighlightCard } from "@/components/beta/AIBuilderHighlightCard";
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { useBasicStats } from "@/lib/analytics-basic";
@@ -93,7 +96,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <OnboardingChecklist />
+      <ActivationBanner />
+      <NextStepCTA />
 
       {/* KPIs — agregações reais com tooltips explicativos */}
       <div data-tour="dashboard-kpis" className="grid grid-cols-2 lg:grid-cols-4 gap-4">

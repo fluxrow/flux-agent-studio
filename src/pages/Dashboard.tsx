@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom";
 import {
-  TrendingUp, ArrowUpRight, Bot, Sparkles, MessageSquare, Users, Target, Plus, PlayCircle, Wand2, BookOpen,
+  TrendingUp, ArrowUpRight, Bot, Sparkles, MessageSquare, Users, Target, PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CrmDashboardWidget } from "@/components/dashboard/CrmDashboardWidget";
 import { OmnichannelWidget } from "@/components/dashboard/OmnichannelWidget";
-import { EmptyState } from "@/components/shared/EmptyState";
+
 import { InfoTooltip } from "@/components/shared/InfoTooltip";
-import { OnboardingChecklist } from "@/components/beta/OnboardingChecklist";
 import { WorkspaceHealthCard } from "@/components/beta/WorkspaceHealthCard";
 import { ContextualFeedback } from "@/components/beta/ContextualFeedback";
+import { ActivationBanner } from "@/components/beta/ActivationBanner";
+import { ActivationTasksCard } from "@/components/beta/ActivationTasksCard";
+import { NextStepCTA } from "@/components/beta/NextStepCTA";
+import { AIBuilderHighlightCard } from "@/components/beta/AIBuilderHighlightCard";
 import { useAuth } from "@/auth/AuthProvider";
 import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { useBasicStats } from "@/lib/analytics-basic";
@@ -93,7 +96,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <OnboardingChecklist />
+      <ActivationBanner />
+      <NextStepCTA />
 
       {/* KPIs — agregações reais com tooltips explicativos */}
       <div data-tour="dashboard-kpis" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -119,38 +123,20 @@ export default function Dashboard() {
       </div>
 
       {isEmptyWorkspace ? (
-        <EmptyState
-          icon={Bot}
-          title="Bem-vindo ao Flux Agent Studio"
-          description="Seu workspace ainda está vazio. Crie seu primeiro agente para começar a capturar leads e visualizar métricas reais."
-          action={
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <Link to="/bots/new">
-                <Button className="gradient-primary text-primary-foreground border-0 shadow-elegant">
-                  <Plus className="h-4 w-4 mr-1.5" /> Criar Bot
-                </Button>
-              </Link>
-              <Link to="/ai-builder">
-                <Button variant="outline" className="bg-card/60">
-                  <Wand2 className="h-4 w-4 mr-1.5" /> Criar com IA
-                </Button>
-              </Link>
-              <Link to="/docs">
-                <Button variant="outline" className="bg-card/60">
-                  <BookOpen className="h-4 w-4 mr-1.5" /> Ver Documentação
-                </Button>
-              </Link>
-            </div>
-          }
-        />
+        <div className="grid lg:grid-cols-2 gap-4">
+          <AIBuilderHighlightCard />
+          <ActivationTasksCard />
+        </div>
       ) : (
         <>
           <div className="grid lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2 space-y-4">
               <CrmDashboardWidget />
               <OmnichannelWidget />
+              <AIBuilderHighlightCard />
             </div>
             <div className="space-y-4">
+              <ActivationTasksCard />
               <WorkspaceHealthCard />
             </div>
           </div>

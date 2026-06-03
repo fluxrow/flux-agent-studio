@@ -29,12 +29,12 @@ export function useBasicStats() {
         persistence.conversations.list({ page: 1, pageSize: 1 }),
       ]);
 
-      // Conversões = leads em estágios "vendido"/"qualificado" (best-effort).
+      // Conversões = leads em estágios convertidos (single source of truth).
       let conversions = 0;
       try {
         const byStage = await persistence.leads.byStage();
         for (const stage of Object.keys(byStage)) {
-          if (/(vendido|ganho|qualificado|won)/i.test(stage)) {
+          if (isConvertedStage(stage)) {
             conversions += byStage[stage as keyof typeof byStage]?.length ?? 0;
           }
         }

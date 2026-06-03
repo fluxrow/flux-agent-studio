@@ -472,14 +472,7 @@ function BuilderInner() {
               );
             })}
 
-            {flow.blocks.length === 0 && (
-              <div className="absolute inset-0 flex items-center justify-center text-center text-muted-foreground text-sm pointer-events-none">
-                <div>
-                  <Sparkles className="h-6 w-6 mx-auto mb-2 text-primary-glow" />
-                  Arraste um bloco da paleta para começar.
-                </div>
-              </div>
-            )}
+            {flow.blocks.length === 0 && <CanvasEmptyState />}
           </div>
         </div>
 

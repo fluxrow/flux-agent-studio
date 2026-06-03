@@ -1,6 +1,7 @@
 import { CheckCircle2, AlertTriangle, Play, Rocket, Blocks, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBuilder } from "@/builder/BuilderContext";
+import { FlowHealthCheck } from "./FlowHealthCheck";
 
 interface Props {
   onPreview: () => void;

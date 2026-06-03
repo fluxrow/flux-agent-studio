@@ -492,8 +492,10 @@ function BuilderInner() {
             </TabsList>
 
             <TabsContent value="props" className="flex-1 overflow-y-auto m-0 px-5 pb-5">
-              {selectedBlock ? <PropertiesEditor block={selectedBlock} onChange={(p) => updateConfig(selectedBlock.id, p)} onLabel={(l) => updateBlock(selectedBlock.id, { label: l })} /> : (
-                <p className="text-xs text-muted-foreground py-6 text-center">Selecione um bloco no canvas.</p>
+              {selectedBlock ? (
+                <PropertiesEditor block={selectedBlock} onChange={(p) => updateConfig(selectedBlock.id, p)} onLabel={(l) => updateBlock(selectedBlock.id, { label: l })} />
+              ) : (
+                <FlowSummaryPanel onPreview={() => setShowPreview(true)} onPublish={handlePublish} />
               )}
             </TabsContent>
 

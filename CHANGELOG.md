@@ -303,3 +303,4 @@ completos por fase.
 ## Phases 3 → 12
 Ver `fluxbot-features.md` para histórico completo de Runtime, Builder,
 Persistence, Supabase, AI Block, Tracking, CRM, Omnichannel etc.
+- Phase 23C — Auto activation: ActivationBanner, NextStepCTA, ActivationTasksCard, AIBuilderHighlight wired into Dashboard; steps auto-derived from real workspace state.

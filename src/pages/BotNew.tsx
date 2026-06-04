@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Bot, Sparkles, MessageCircle, ShoppingCart, Headphones, Calendar, Loader2 } from "lucide-react";
+import { ArrowLeft, Bot, Sparkles, MessageCircle, ShoppingCart, Headphones, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,8 +10,6 @@ import { SectionCard } from "@/components/shared/SectionCard";
 import { cn } from "@/lib/utils";
 import { useCreateBot } from "@/domain/hooks";
 import { toast } from "sonner";
-import { recordActivation } from "@/beta/activation";
-import { useWorkspace } from "@/auth/WorkspaceProvider";
 
 const presets = [
   { id: "blank",   icon: Sparkles,      title: "Em branco",       desc: "Comece do zero com um canvas vazio." },
@@ -22,44 +20,15 @@ const presets = [
   { id: "lead",    icon: MessageCircle, title: "Captura de Lead", desc: "Formulário conversacional moderno." },
 ];
 
-const channels = [
-  { label: "WhatsApp",   value: "whatsapp" },
-  { label: "Instagram",  value: "instagram" },
-  { label: "Web Widget", value: "web" },
-  { label: "Telegram",   value: "telegram" },
-];
+const channels = ["WhatsApp", "Instagram", "Web Widget", "Telegram"];
 
 export default function BotNew() {
   const navigate = useNavigate();
-  const createBot = useCreateBot();
-  const { workspace } = useWorkspace();
   const [preset, setPreset] = useState("sdr");
-  const [channel, setChannel] = useState("whatsapp");
+  const [channel, setChannel] = useState("WhatsApp");
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-
-  const submitting = createBot.isPending;
-
-  async function handleCreate() {
-    const trimmed = name.trim();
-    if (!trimmed) {
-      toast.error("Dê um nome ao seu bot antes de continuar.");
-      return;
-    }
-    try {
-      const bot = await createBot.mutateAsync({
-        name: trimmed,
-        description: description.trim(),
-        channel,
-      });
-      toast.success(`Bot "${bot.name}" criado.`);
-      recordActivation(workspace?.id ?? "ws_local_demo", "first_bot_created");
-      navigate(`/builder/${bot.id}`);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Falha ao criar bot.";
-      toast.error(msg);
-    }
-  }
+  const [desc, setDesc] = useState("");
+  const createBot = useCreateBot();
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-5xl mx-auto">
@@ -117,16 +86,16 @@ export default function BotNew() {
             <div className="flex flex-wrap gap-2">
               {channels.map((c) => (
                 <button
-                  key={c.value}
-                  onClick={() => setChannel(c.value)}
+                  key={c}
+                  onClick={() => setChannel(c)}
                   className={cn(
                     "text-xs px-3 py-1.5 rounded-full border transition",
-                    channel === c.value
+                    channel === c
                       ? "border-primary bg-primary/15 text-primary-foreground"
                       : "border-border bg-background/40 text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  {c.label}
+                  {c}
                 </button>
               ))}
             </div>
@@ -135,8 +104,8 @@ export default function BotNew() {
             <Label htmlFor="bot-desc">Descrição (opcional)</Label>
             <Textarea
               id="bot-desc"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
               placeholder="Para que serve esse agente?"
               className="bg-background/60 min-h-[90px]"
             />
@@ -145,19 +114,26 @@ export default function BotNew() {
       </SectionCard>
 
       <div className="flex items-center justify-end gap-2">
-        <Button variant="ghost" onClick={() => navigate("/bots")} disabled={submitting}>
-          Cancelar
-        </Button>
+        <Button variant="ghost" onClick={() => navigate("/bots")}>Cancelar</Button>
         <Button
           className="gradient-primary text-primary-foreground border-0 shadow-elegant"
-          onClick={handleCreate}
-          disabled={submitting || !name.trim()}
+          disabled={createBot.isPending}
+          onClick={async () => {
+            const botName = name.trim() || presets.find((p) => p.id === preset)?.title || "Novo bot";
+            try {
+              const bot = await createBot.mutateAsync({
+                name: botName,
+                description: desc.trim() || undefined,
+                channel,
+                preset,
+              });
+              navigate(`/builder/${bot.id}`);
+            } catch {
+              toast.error("Não foi possível criar o bot. Tente novamente.");
+            }
+          }}
         >
-          {submitting ? (
-            <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> Criando…</>
-          ) : (
-            "Criar e abrir builder"
-          )}
+          {createBot.isPending ? "Criando…" : "Criar e abrir builder"}
         </Button>
       </div>
     </div>

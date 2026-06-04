@@ -123,10 +123,36 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  // Resolve conversation_id — upsert conversation for this recipient so the
+  // outbound message satisfies the NOT NULL FK constraint.
+  const externalConvoId = recipient_id;
+  const { data: convRow, error: convErr } = await serviceClient
+    .from("meta_conversations")
+    .upsert({
+      workspace_id:            conn.workspace_id,
+      connection_id:           connection_id,
+      platform:                conn.platform,
+      external_conversation_id: externalConvoId,
+      contact_external_id:     recipient_id,
+      contact_name:            recipient_id,   // best name we have at send time
+      preview:                 message_text.slice(0, 120),
+      last_message_at:         new Date().toISOString(),
+    }, { onConflict: "connection_id,external_conversation_id", ignoreDuplicates: false })
+    .select("id")
+    .single();
+
+  if (convErr || !convRow) {
+    console.error("[meta-send] failed to upsert conversation", convErr);
+    return new Response(JSON.stringify({ error: "Failed to resolve conversation" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   // Store outbound message
   await serviceClient.from("meta_messages").insert({
     workspace_id:        conn.workspace_id,
-    conversation_id:     null, // best-effort: could resolve by recipient_id
+    conversation_id:     convRow.id,
     external_message_id: (metaBody as any).messages?.[0]?.id ?? crypto.randomUUID(),
     direction:           "outbound",
     message_type:        "text",

@@ -12,8 +12,10 @@ import { useWorkspace } from "@/auth/WorkspaceProvider";
 import { USE_SUPABASE } from "@/lib/runtime-config";
 import { FeedbackWidget } from "@/components/beta/FeedbackWidget";
 import { BetaBanner } from "@/components/beta/BetaBanner";
+import { useMetaLeadBridge } from "@/hooks/useMetaLeadBridge";
 
 export default function AppLayout() {
+  useMetaLeadBridge();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { workspace } = useWorkspace();

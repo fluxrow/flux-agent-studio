@@ -422,6 +422,29 @@ Além dos critérios de beta, o produto está pronto para lançamento público q
 
 ---
 
+### 2026-06-04 — Meta Channels implementados + smoke test + fixes (FASE 27A.4–27A.6)
+
+**O que mudou:**
+- FASE 27A.4: WhatsApp/Instagram/Messenger implementados ponta-a-ponta (`ffde1bf`)
+  - 3 tabelas Supabase + RLS + 2 RPCs SECURITY DEFINER
+  - 2 Edge Functions: `meta-webhook` (HMAC-SHA256) + `meta-send` (proxy CORS)
+  - Hooks Realtime, ChannelBadge, MetaConnectModal, Conversations page rewrite
+- FASE 27A.5: Smoke test identificou 4 bugs (`f751493`)
+  - Prontidão medida em 38%
+- FASE 27A.6: 4 bugs corrigidos — prontidão sobe para 62%
+  - BUG-01 CORRIGIDO: HMAC fail-closed (`meta-webhook/index.ts`)
+  - BUG-02 CORRIGIDO: `conversation_id` nunca mais null (`meta-send/index.ts`)
+  - BUG-03 CORRIGIDO: `supabase_realtime` publication adicionada (nova migration)
+  - BUG-04 CORRIGIDO: `useMetaLeadBridge` — lead criado automaticamente ao receber mensagem Meta
+
+**Estado atual dos Meta Channels:**
+- Código: sem bugs conhecidos
+- Deploy pendente: `supabase db push` + `supabase functions deploy`
+- Testes end-to-end: dependem de Meta App configurado + dispositivo físico
+- Documentos: `META-CHANNELS-IMPLEMENTATION-REPORT.md` · `META-SMOKE-TEST-REPORT.md` · `META-SMOKE-TEST-FIXES.md`
+
+---
+
 ## 12. Timeline Visual
 
 ```

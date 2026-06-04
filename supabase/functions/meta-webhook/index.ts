@@ -164,12 +164,14 @@ Deno.serve(async (req: Request) => {
   if (req.method === "POST") {
     const rawBody = await req.text();
 
-    // Verify HMAC (skip in dev if secret not set)
-    if (META_APP_SECRET) {
-      const sig = req.headers.get("x-hub-signature-256");
-      const valid = await verifySignature(rawBody, sig);
-      if (!valid) return new Response("Invalid signature", { status: 401 });
+    // Verify HMAC — fail closed: if secret is not configured, reject all requests.
+    if (!META_APP_SECRET) {
+      console.error("[meta-webhook] META_APP_SECRET not configured — rejecting request");
+      return new Response("Webhook not configured", { status: 401 });
     }
+    const sig = req.headers.get("x-hub-signature-256");
+    const valid = await verifySignature(rawBody, sig);
+    if (!valid) return new Response("Invalid signature", { status: 401 });
 
     let body: any;
     try { body = JSON.parse(rawBody); } catch {

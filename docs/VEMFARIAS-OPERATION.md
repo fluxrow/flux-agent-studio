@@ -355,3 +355,10 @@ Os itens 3, 4 e 5 são o que separa o produto do que @vemfarias precisa de verda
 *Documento criado em: 2026-06-04*
 *Baseado em: REALITY-CHECK-AUDIT.md · FLUXROW-GAP-ANALYSIS.md · leitura direta do código-fonte*
 *Sem marketing. Sem posicionamento. Só operação.*
+
+---
+
+**Ver também:**
+- `docs/MASTER-ROADMAP.md` — plano completo de execução (Sprint 2 cobre o @vemfarias)
+- `docs/30-DAY-EXECUTION-PLAN.md` — detalhe da semana 2 com tarefas e critérios
+- `docs/OPENAI-IMPLEMENTATION-PLAN.md` — como resolver o Bloqueador 2 (IA mock)

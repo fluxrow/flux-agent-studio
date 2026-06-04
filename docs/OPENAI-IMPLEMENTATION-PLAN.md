@@ -619,3 +619,10 @@ O provider OpenAI está implementado corretamente quando **todos** os seguintes 
 
 *Fonte: leitura direta de `src/ai/types.ts`, `src/ai/providers/index.ts`, `src/ai/providers/_mock.ts`, `src/ai/registry.ts`, `src/ai/runner.ts`, `src/ai/schema.ts`, `src/ai/inspector.ts`, `.env`, `.env.example`*  
 *Nenhuma suposição. Cada referência tem arquivo e linha verificados.*
+
+---
+
+**Ver também:**
+- `docs/MASTER-ROADMAP.md` — contexto de onde este plano se encaixa no projeto (Sprint 1, P0-S1-B)
+- `docs/AI-BUILDER-REALITY.md` — auditoria de o que o AI Builder realmente gera hoje
+- `docs/30-DAY-EXECUTION-PLAN.md` — sequência completa de prioridades

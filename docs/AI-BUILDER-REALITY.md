@@ -284,3 +284,10 @@ src/knowledge/
 | Falta para OpenAI? | Um arquivo de provider (~100 linhas) + chave de API |
 | Falta para Anthropic? | Um arquivo de provider + proxy para CORS + chave de API |
 | Esforço para provider real? | OpenAI: ~4–6h. Anthropic: ~6–10h |
+
+---
+
+**Ver também:**
+- `docs/MASTER-ROADMAP.md` — estado consolidado do projeto
+- `docs/OPENAI-IMPLEMENTATION-PLAN.md` — plano técnico completo para conectar OpenAI
+- `docs/REALITY-CHECK-AUDIT.md` — auditoria de todos os 16 módulos do produto

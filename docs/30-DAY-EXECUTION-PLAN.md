@@ -448,3 +448,9 @@ Nesse intervalo, o produto opera com Web Widget como canal principal. Para betas
 *Criado em: 2026-06-04*  
 *Baseado em: REALITY-CHECK-AUDIT.md · VEMFARIAS-OPERATION.md · FLUXROW-GAP-ANALYSIS.md · AI-BUILDER-REALITY.md*  
 *Sem roadmap aspiracional. Só desbloqueadores reais.*
+
+---
+
+**Ver também:**
+- `docs/MASTER-ROADMAP.md` — visão consolidada com todas as sprints, dependências e critérios
+- `docs/OPENAI-IMPLEMENTATION-PLAN.md` — plano técnico detalhado para a tarefa P0-S1-B (OpenAI)

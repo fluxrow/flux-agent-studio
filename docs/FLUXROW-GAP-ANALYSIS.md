@@ -404,3 +404,10 @@ Com base na análise, a sequência recomendada para viabilizar o lançamento com
 ---
 
 *Documento gerado para uso interno da equipe de produto e operações da Fluxrow. Não deve ser compartilhado externamente.*
+
+---
+
+**Ver também:**
+- `docs/MASTER-ROADMAP.md` — plano consolidado baseado nesta análise de gaps
+- `docs/30-DAY-EXECUTION-PLAN.md` — execução dos P0/P1/P2 identificados aqui
+- `docs/REALITY-CHECK-AUDIT.md` — auditoria por código dos mesmos módulos

@@ -366,3 +366,11 @@ Se um cliente acessasse o produto agora com `VITE_USE_SUPABASE=true`:
 *Fonte: leitura direta do código-fonte em `/home/user/flux-agent-studio/src/`*
 *Arquivos-chave: `channels/stubs.ts`, `channels/web.ts`, `ai/providers/index.ts`, `ai/providers/_mock.ts`, `knowledge/parsers.ts`, `pages/Revenue.tsx`, `pages/Attribution.tsx`, `pages/Conversations.tsx`, `domain/persistence/index.ts`, `.env`*
 *Nenhum documento de marketing foi consultado.*
+
+---
+
+**Ver também:**
+- `docs/MASTER-ROADMAP.md` — estado consolidado do projeto (entrada para qualquer IA ou dev)
+- `docs/AI-BUILDER-REALITY.md` — auditoria aprofundada do AI Builder
+- `docs/30-DAY-EXECUTION-PLAN.md` — plano de execução baseado nesta auditoria
+- `docs/OPENAI-IMPLEMENTATION-PLAN.md` — plano técnico para resolver o P0 do provider mock

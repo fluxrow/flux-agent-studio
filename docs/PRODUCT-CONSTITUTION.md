@@ -511,4 +511,10 @@ A barreira de 12–24 meses para imitar o AI Builder + Runtime é real. Mas um c
 
 *Documento criado: 2026-06-04*
 *Consolida: POSITIONING.md · PRODUCT-INTELLIGENCE.md · MESSAGING-ARCHITECTURE.md · ECONOMIC-ENGINE-GTM.md · LANDING-PAGE-STRATEGY.md · VoiceAndTone.md · PROJECT-CONSTITUTION.md*
+
+---
+
+**Ver também:**
+- `docs/MASTER-ROADMAP.md` — estado de execução atual do produto (onde estamos, o que falta)
+- `docs/REALITY-CHECK-AUDIT.md` — o que desta constituição já existe em código vs. roadmap
 *Próxima atualização obrigatória: após entrega do omnichannel real e da LP V2 alinhada*

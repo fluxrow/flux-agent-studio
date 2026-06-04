@@ -200,10 +200,164 @@
 .lp-typing span:nth-child(2) { animation-delay: 0.2s; }
 .lp-typing span:nth-child(3) { animation-delay: 0.4s; }
 
+/* ─── Scroll reveal ─── */
+@keyframes lpReveal {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lp-reveal { opacity: 0; }
+.lp-reveal-show {
+  animation: lpReveal 640ms cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* ─── Mockup 3-panel grid ─── */
+.lp-mockup-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr 230px;
+  min-height: 390px;
+}
+@media (max-width: 700px) {
+  .lp-mockup-grid {
+    grid-template-columns: 1fr;
+  }
+  .lp-mockup-grid > *:first-child,
+  .lp-mockup-grid > *:last-child {
+    display: none;
+  }
+}
+
+/* ─── Journey steps ─── */
+.lp-journey-grid {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+.lp-journey-step {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 20px;
+  border-radius: 16px;
+  border: 1px solid var(--lp-border);
+  background: rgba(255,255,255,0.015);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+.lp-journey-step:hover {
+  border-color: rgba(13,148,136,0.25);
+  background: rgba(13,148,136,0.03);
+}
+.lp-journey-arrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  margin-top: 28px;
+  opacity: 0.35;
+}
+@media (max-width: 900px) {
+  .lp-journey-grid {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .lp-journey-arrow {
+    transform: rotate(90deg);
+    margin: 0 auto;
+    padding: 2px 0;
+  }
+}
+
+/* ─── Differentials grid ─── */
+.lp-diffs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.lp-diff-card {
+  border-radius: 16px;
+  border: 1px solid var(--lp-border);
+  background: rgba(255,255,255,0.015);
+  padding: 24px;
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+.lp-diff-card:hover {
+  border-color: rgba(13,148,136,0.25);
+  transform: translateY(-2px);
+}
+@media (max-width: 1024px) {
+  .lp-diffs-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .lp-diffs-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Comparison table ─── */
+.lp-compare-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--lp-border);
+}
+.lp-compare-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--lp-border);
+  transition: background 150ms ease;
+}
+.lp-compare-row:last-child { border-bottom: none; }
+.lp-compare-row:hover { background: rgba(255,255,255,0.015); }
+@media (max-width: 700px) {
+  .lp-compare-header,
+  .lp-compare-row {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  /* hide ManyChat and HubSpot cols on mobile */
+  .lp-compare-header > *:nth-child(3),
+  .lp-compare-header > *:nth-child(4),
+  .lp-compare-row > *:nth-child(3),
+  .lp-compare-row > *:nth-child(4) {
+    display: none;
+  }
+}
+
+/* ─── LGPD cards ─── */
+.lp-lgpd-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.lp-lgpd-card {
+  border-radius: 14px;
+  border: 1px solid var(--lp-border);
+  background: rgba(255,255,255,0.015);
+  padding: 20px;
+}
+@media (max-width: 900px) {
+  .lp-lgpd-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .lp-lgpd-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Footer grid ─── */
+.lp-footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+@media (max-width: 900px) {
+  .lp-footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 500px) {
+  .lp-footer-grid { grid-template-columns: 1fr; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lp-v2 [class*="lp-enter"],
   .lp-v2 [class*="lp-fade"],
-  .lp-v2 .lp-enter-mock {
+  .lp-v2 .lp-enter-mock,
+  .lp-v2 .lp-reveal {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

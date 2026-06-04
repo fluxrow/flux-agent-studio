@@ -140,11 +140,27 @@ const baseLead = (i: number) => ({
  * this map directly.
  */
 export const DEMO_LEAD_VALUES: Record<string, number> = {
-  "demo-marina":  8400,
-  "demo-bruna":   6200,
+  "demo-marina":   8400,
+  "demo-bruna":    6200,
   "demo-felipe":  12500,
-  "demo-carolina": 0,
-  "demo-tiago":    0,
+  "demo-carolina": 9800,
+  "demo-tiago":    7600,
+  "demo-paula":    5400,
+  "demo-andre":    6800,
+  "demo-rafael":   4200,
+  "demo-jessica":  3800,
+  "demo-luana":    3200,
+  "demo-renata":   3600,
+  "demo-gustavo":     0,
+};
+
+/** Probabilidade de conversão por estágio — usada pelo forecast em demo. */
+export const DEMO_STAGE_PROBABILITY: Record<string, number> = {
+  novo:        0.10,
+  qualificado: 0.40,
+  negociacao:  0.70,
+  convertido:  1.00,
+  perdido:     0.00,
 };
 
 export const DEMO_LEADS: Lead[] = [

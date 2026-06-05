@@ -490,6 +490,35 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 
 ---
 
+### 2026-06-05 — @vemfarias Pilot Plan (FASE 27C.1)
+
+**O que foi criado:** `docs/VEMFARIAS-PILOT.md`
+
+**Diagnóstico operacional:**
+
+| Canal | Status |
+|-------|--------|
+| Bot Web (`/bot/vemfarias`) | ✅ Funciona hoje — criar bot + publicar |
+| Captura UTM | ✅ Funciona hoje — adicionar UTM no link de bio/anúncio |
+| Score automático | ✅ Funciona hoje — calculado ao criar lead |
+| CRM / Pipeline | ✅ Funciona hoje — Supabase ativo |
+| WhatsApp | ⚠️ Deploy pendente (40 min, manual) |
+| Instagram DM | ❌ Deploy + aprovação Meta (1–4 semanas) |
+| IA real (não mock) | ❌ Implementação OpenAI pendente (~2–3h) |
+| Follow-up automático | ❌ Roadmap Sprint 3–4 |
+
+**Score esperado para lead qualificado:** ~80 pontos → 🔥 Quente
+
+**O que pode ser testado amanhã:**
+1. `supabase db push`
+2. Criar bot com 7 perguntas no AI Builder
+3. Publicar + link no bio do Instagram
+4. 3 leads reais no CRM com score automático
+
+**Documento completo:** `docs/VEMFARIAS-PILOT.md`
+
+---
+
 ## 12. Timeline Visual
 
 ```

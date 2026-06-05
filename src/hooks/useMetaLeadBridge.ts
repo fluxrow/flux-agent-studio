@@ -42,7 +42,7 @@ function mapConvRow(row: any): MetaConversation {
 
 export function useMetaLeadBridge() {
   useEffect(() => {
-    const workspaceId = getCurrentWorkspaceId();
+    const workspaceId = tryGetCurrentWorkspaceId();
     if (!workspaceId) return;
 
     const ch = supabase

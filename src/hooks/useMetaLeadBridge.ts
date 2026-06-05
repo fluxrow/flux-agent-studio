@@ -12,7 +12,7 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { persistence } from "@/domain/persistence";
-import { getCurrentWorkspaceId } from "@/domain/persistence/workspaceContext";
+import { tryGetCurrentWorkspaceId } from "@/domain/persistence/workspaceContext";
 import type { MetaConversation } from "@/channels/meta/types";
 
 const PLATFORM_SOURCE: Record<string, string> = {
@@ -42,7 +42,7 @@ function mapConvRow(row: any): MetaConversation {
 
 export function useMetaLeadBridge() {
   useEffect(() => {
-    const workspaceId = getCurrentWorkspaceId();
+    const workspaceId = tryGetCurrentWorkspaceId();
     if (!workspaceId) return;
 
     const ch = supabase

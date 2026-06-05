@@ -6,7 +6,7 @@
 >
 > Meta: qualquer IA ou dev consegue entender exatamente onde estamos em menos de 10 minutos.
 >
-> Última atualização: 2026-06-04
+> Última atualização: 2026-06-05
 > Branch ativo: `claude/sweet-meitner-bB77L`
 
 ---
@@ -516,6 +516,43 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 4. 3 leads reais no CRM com score automático
 
 **Documento completo:** `docs/VEMFARIAS-PILOT.md`
+
+---
+
+### 2026-06-05 — First Revenue Test (FASE 27C.2)
+
+**O que foi criado:** `docs/FIRST-REVENUE-TEST.md`
+
+**Meta:** 10 leads qualificados → 3 reuniões → 1 venda em 14 dias
+
+| Critério | Valor |
+|----------|-------|
+| Ticket mínimo | R$ 300/mês |
+| MRR incremental meta | R$ 300 |
+| Prazo | 14 dias corridos |
+| Canal principal | WhatsApp @vemfarias |
+
+**Documento completo:** `docs/FIRST-REVENUE-TEST.md`
+
+---
+
+### 2026-06-05 — LP Hero Video Integration (FASE 27D)
+
+**O que foi implementado:** `src/pages/Landing.tsx` — componente `HeroVideo`
+
+**Comportamento:**
+- `prefers-reduced-motion: reduce` → exibe mockup estático animado (comportamento anterior preservado)
+- Caso contrário → exibe `<video autoplay muted loop>` com sources `/hero-loop.webm` e `/hero-loop.mp4`
+- Autoplay bloqueado pelo browser → overlay com botão Play visível
+- Erro de carregamento (`onError`) → fallback automático para mockup estático
+- Analytics: `gtag("event", "hero_video_play/pause/ended")` + `CustomEvent("flux:hero_video")`
+
+**Arquivos de vídeo necessários (adicionar ao `public/`):**
+| Arquivo | Uso |
+|---------|-----|
+| `/hero-loop.webm` | Source principal (menor tamanho) |
+| `/hero-loop.mp4` | Fallback de compatibilidade |
+| `/hero-loop-poster.jpg` | Frame estático enquanto vídeo carrega |
 
 ---
 

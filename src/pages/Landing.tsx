@@ -252,6 +252,115 @@ function BtnOutline({ children, href, className = "" }: { children: React.ReactN
   );
 }
 
+/* ─── Hero video paths (replace with CDN URLs when available) ─── */
+const HERO_VIDEO_WEBM = "/hero-loop.webm";
+const HERO_VIDEO_MP4  = "/hero-loop.mp4";
+const HERO_VIDEO_POSTER = "/hero-loop-poster.jpg";
+
+function useReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return reduced;
+}
+
+function trackVideoPlay(action: "play" | "pause" | "ended") {
+  try {
+    if (typeof window !== "undefined" && (window as Record<string, unknown>).gtag) {
+      (window as Record<string, unknown>).gtag("event", "hero_video_" + action, {
+        event_category: "engagement",
+        event_label: "hero_loop",
+        non_interaction: action === "play" ? false : true,
+      });
+    }
+    window.dispatchEvent(new CustomEvent("flux:hero_video", { detail: { action } }));
+  } catch {
+    // analytics must never break the page
+  }
+}
+
+interface HeroVideoProps {
+  fallback: React.ReactNode;
+  mock: MockupState;
+  line1Ref: React.RefObject<SVGPathElement>;
+  line2Ref: React.RefObject<SVGPathElement>;
+  line3Ref: React.RefObject<SVGPathElement>;
+}
+
+function HeroVideo({ fallback }: HeroVideoProps) {
+  const reduced = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [playing, setPlaying] = useState(false);
+
+  const showVideo = !reduced && !videoFailed;
+
+  return (
+    <div className="lp-enter-mock relative mx-auto mt-16" style={{ maxWidth: 920 }}>
+      <div className="absolute pointer-events-none" style={{ inset: "-20px -40px", background: "radial-gradient(ellipse 70% 40% at 50% 110%, rgba(13,148,136,0.12) 0%, transparent 70%)", zIndex: 0 }} />
+      <div
+        className="relative rounded-2xl overflow-hidden"
+        style={{ border: "1px solid var(--lp-border-mid)", background: "var(--lp-bg-elevated)", boxShadow: "0 24px 64px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset", zIndex: 1 }}
+      >
+        {/* Chrome bar */}
+        <div className="flex items-center gap-1.5 px-4" style={{ height: 40, borderBottom: "1px solid var(--lp-border)", background: "rgba(255,255,255,0.02)" }}>
+          {[0, 1, 2].map(i => <div key={i} className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />)}
+          <div className="ml-4 flex items-center rounded-md px-3" style={{ height: 24, fontSize: 11, color: "var(--lp-fg-subtle)", fontFamily: "'JetBrains Mono', monospace", background: "rgba(255,255,255,0.04)", border: "1px solid var(--lp-border)" }}>
+            fluxagent.studio/builder/sdr
+          </div>
+        </div>
+
+        {showVideo ? (
+          /* ── Video loop ── */
+          <div className="relative" style={{ aspectRatio: "16/9", background: "#09090C" }}>
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster={HERO_VIDEO_POSTER}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              onPlay={() => { setPlaying(true); trackVideoPlay("play"); }}
+              onPause={() => { setPlaying(false); trackVideoPlay("pause"); }}
+              onEnded={() => trackVideoPlay("ended")}
+              onError={() => setVideoFailed(true)}
+            >
+              <source src={HERO_VIDEO_WEBM} type="video/webm" />
+              <source src={HERO_VIDEO_MP4}  type="video/mp4" />
+            </video>
+            {/* Play overlay — only visible when paused (autoplay was blocked) */}
+            {!playing && (
+              <button
+                aria-label="Reproduzir vídeo"
+                onClick={() => videoRef.current?.play()}
+                style={{
+                  position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "rgba(0,0,0,0.45)", border: "none", cursor: "pointer",
+                }}
+              >
+                <span style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(13,148,136,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Play size={22} fill="white" color="white" />
+                </span>
+              </button>
+            )}
+          </div>
+        ) : (
+          /* ── Static mockup fallback (reduced motion or video unavailable) ── */
+          fallback
+        )}
+      </div>
+    </div>
+  );
+
+}
+
 /* ═══════════════════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════════════════ */
@@ -384,22 +493,14 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Mockup */}
-          <div className="lp-enter-mock relative mx-auto mt-16" style={{ maxWidth: 920 }}>
-            <div className="absolute pointer-events-none" style={{ inset: "-20px -40px", background: "radial-gradient(ellipse 70% 40% at 50% 110%, rgba(13,148,136,0.12) 0%, transparent 70%)", zIndex: 0 }} />
-            <div
-              className="relative rounded-2xl overflow-hidden"
-              style={{ border: "1px solid var(--lp-border-mid)", background: "var(--lp-bg-elevated)", boxShadow: "0 24px 64px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset", zIndex: 1 }}
-            >
-              {/* Chrome bar */}
-              <div className="flex items-center gap-1.5 px-4" style={{ height: 40, borderBottom: "1px solid var(--lp-border)", background: "rgba(255,255,255,0.02)" }}>
-                {[0, 1, 2].map(i => <div key={i} className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />)}
-                <div className="ml-4 flex items-center rounded-md px-3" style={{ height: 24, fontSize: 11, color: "var(--lp-fg-subtle)", fontFamily: "'JetBrains Mono', monospace", background: "rgba(255,255,255,0.04)", border: "1px solid var(--lp-border)" }}>
-                  fluxagent.studio/builder/sdr
-                </div>
-              </div>
-
-              {/* 3-panel grid — collapses to single col on mobile via CSS */}
+          {/* Mockup / Hero Video */}
+          <HeroVideo
+            mock={mock}
+            line1Ref={line1Ref}
+            line2Ref={line2Ref}
+            line3Ref={line3Ref}
+            fallback={
+              /* 3-panel grid — collapses to single col on mobile via CSS */
               <div className="lp-mockup-grid">
                 {/* Panel 1 — Palette */}
                 <div style={{ borderRight: "1px solid var(--lp-border)", background: "rgba(255,255,255,0.01)", padding: 16 }}>
@@ -467,8 +568,8 @@ export default function Landing() {
                   )}
                 </div>
               </div>
-            </div>
-          </div>
+            }
+          />
 
           {/* Trust strip */}
           <div className="mt-10 flex items-center justify-center flex-wrap" style={{ gap: "8px 16px" }}>

@@ -604,6 +604,34 @@ Se você é uma IA entrando neste projeto agora, leia isto:
 
 ---
 
+## Infraestrutura Canonical
+
+**Fonte de verdade — auditada em 2026-06-05 (FASE 27A.8).**
+
+Toda a infraestrutura do Flux Agent Studio roda em **um único projeto Supabase / Lovable Cloud**:
+
+| Campo | Valor |
+|------|------|
+| **Project Ref** | `bgzczvsmfcnypwqveotx` |
+| **URL** | `https://bgzczvsmfcnypwqveotx.supabase.co` |
+| **Config CLI** | `supabase/config.toml` → `project_id = "bgzczvsmfcnypwqveotx"` |
+| **Env frontend** | `.env` → `VITE_SUPABASE_PROJECT_ID="bgzczvsmfcnypwqveotx"` |
+
+Comando canônico para qualquer deploy:
+
+```bash
+supabase link --project-ref bgzczvsmfcnypwqveotx
+```
+
+Cobertura: **CRM, Leads, Conversations, Revenue, Auth, Edge Functions, Realtime** — todos no mesmo ref.
+
+O projeto `espwkkaldnisriqhxyzt` (Fluxrow) **não tem relação** com este sistema; aparece apenas em nota de auditoria do `META-PHYSICAL-SMOKE-TEST-REPORT.md`.
+
+Detalhamento e evidências: [`docs/SUPABASE-REALITY.md`](./SUPABASE-REALITY.md) · [`docs/DEPLOY-TARGET.md`](./DEPLOY-TARGET.md).
+
+---
+
 *Documento criado: 2026-06-04*  
 *Consolida: PRODUCT-CONSTITUTION.md · REALITY-CHECK-AUDIT.md · AI-BUILDER-REALITY.md · FLUXROW-GAP-ANALYSIS.md · VEMFARIAS-OPERATION.md · 30-DAY-EXECUTION-PLAN.md · OPENAI-IMPLEMENTATION-PLAN.md*  
 *Branch: `claude/sweet-meitner-bB77L`*
+

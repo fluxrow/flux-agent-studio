@@ -445,6 +445,30 @@ Além dos critérios de beta, o produto está pronto para lançamento público q
 
 ---
 
+### 2026-06-05 — Deploy físico bloqueado por mismatch de projeto (FASE 27A.7)
+
+**O que foi descoberto:**
+- O projeto Supabase no `.env` (`bgzczvsmfcnypwqveotx`) não está acessível via MCP desta sessão
+- O ambiente de execução remota bloqueia rede de saída para `supabase.co`
+- O deploy físico precisa ser executado **localmente** pelo usuário
+
+**Prontidão atual: 62%** (código ok, deploy pendente)
+
+**Próximo passo obrigatório — executar localmente:**
+```bash
+supabase link --project-ref bgzczvsmfcnypwqveotx
+supabase db push
+supabase functions deploy meta-webhook --no-verify-jwt
+supabase functions deploy meta-send
+supabase secrets set META_VERIFY_TOKEN=flux_meta_verify
+supabase secrets set META_APP_SECRET=<app_secret_do_meta>
+```
+
+Após deploy: configurar webhook no Meta App Dashboard e executar teste físico com número real.
+Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
+
+---
+
 ## 12. Timeline Visual
 
 ```

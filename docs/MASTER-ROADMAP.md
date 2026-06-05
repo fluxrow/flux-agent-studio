@@ -469,6 +469,27 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 
 ---
 
+### 2026-06-05 — Inventário de infraestrutura beta (FASE 27B.1)
+
+**O que foi criado:** `docs/BETA-INFRASTRUCTURE-INVENTORY.md`
+
+**Resumo de prontidão operacional:**
+
+| Prioridade | Item | Status |
+|-----------|------|--------|
+| P0 | Supabase migrations (`supabase db push`) | ❌ Pendente |
+| P0 | Deploy Edge Functions + secrets Meta | ❌ Pendente |
+| P0 | Conectar WhatsApp no app | ❌ Pendente (depende de P0 acima) |
+| P1 | OpenAI real (trocar mock) | ❌ Pendente (~2–3h) |
+| P1 | Bot @vemfarias criado e publicado | ❌ Pendente (~2–4h) |
+| P2 | Instagram DM + Messenger | ❌ Pendente (setup + aprovação Meta) |
+
+**Tempo estimado para beta mínimo:** ~40 min de configuração + 2–4h para bot @vemfarias.
+
+**Critério de sucesso mínimo:** WhatsApp inbound → Inbox → Lead no CRM → Pipeline visível.
+
+---
+
 ## 12. Timeline Visual
 
 ```

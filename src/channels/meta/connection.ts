@@ -5,7 +5,9 @@
  * returned to the browser after initial save (SELECT * returns it — for
  * production, use a DB function that masks the token).
  */
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as supabaseTyped } from "@/integrations/supabase/client";
+// Cast: meta_channel_connections lives in a migration not yet reflected in generated types.
+const supabase = supabaseTyped as any;
 import { getCurrentWorkspaceId } from "@/domain/persistence/workspaceContext";
 import type { CreateMetaConnectionInput, MetaChannelConnection, MetaPlatform } from "./types";
 

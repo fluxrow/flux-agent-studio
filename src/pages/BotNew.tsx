@@ -125,7 +125,6 @@ export default function BotNew() {
                 name: botName,
                 description: desc.trim() || undefined,
                 channel,
-                preset,
               });
               navigate(`/builder/${bot.id}`);
             } catch {

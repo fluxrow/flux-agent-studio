@@ -4,7 +4,9 @@
  * meta-webhook Edge Function inserts new messages.
  */
 import { useState, useEffect, useCallback, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as supabaseTyped } from "@/integrations/supabase/client";
+// Cast: meta_conversations / meta_messages live in a migration not yet reflected in generated types.
+const supabase = supabaseTyped as any;
 import { getCurrentWorkspaceId } from "@/domain/persistence/workspaceContext";
 import type { MetaConversation, MetaMessage, MetaPlatform, MetaHandoffStatus } from "@/channels/meta/types";
 

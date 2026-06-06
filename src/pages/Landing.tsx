@@ -272,8 +272,9 @@ function useReducedMotion(): boolean {
 
 function trackVideoPlay(action: "play" | "pause" | "ended") {
   try {
-    if (typeof window !== "undefined" && (window as Record<string, unknown>).gtag) {
-      (window as Record<string, unknown>).gtag("event", "hero_video_" + action, {
+    const w = window as unknown as { gtag?: (...args: unknown[]) => void };
+    if (typeof window !== "undefined" && typeof w.gtag === "function") {
+      w.gtag("event", "hero_video_" + action, {
         event_category: "engagement",
         event_label: "hero_loop",
         non_interaction: action === "play" ? false : true,

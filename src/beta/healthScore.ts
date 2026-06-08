@@ -68,10 +68,17 @@ async function compute(workspaceId: string): Promise<{ score: number; criteria: 
       return Boolean(localStorage.getItem("fluxbot.tracking.destinations"));
     } catch { return false; }
   })();
+  // Lovable AI Gateway está sempre disponível neste projeto (LOVABLE_API_KEY server-side
+  // via edge function `lovable-ai`). Também aceitamos credenciais externas se o usuário
+  // tiver adicionado uma chave própria.
   const hasAI = (() => {
     try {
-      return Boolean(localStorage.getItem("ai_credentials") || localStorage.getItem("fluxbot.ai.providers"));
-    } catch { return false; }
+      const hasExternal = Boolean(
+        localStorage.getItem("ai_credentials") ||
+        localStorage.getItem("fluxbot.ai.providers"),
+      );
+      return true || hasExternal; // Lovable AI sempre ativo
+    } catch { return true; }
   })();
   const hasKnowledge = knowledgeStore.listBases(workspaceId).length > 0;
   const hasConnector = connectorStore.list(workspaceId).length > 0;
@@ -88,7 +95,7 @@ async function compute(workspaceId: string): Promise<{ score: number; criteria: 
     { key: "has_tracking",       label: "Tracking ativo",           ok: hasTracking,
       recommendation: "Conecte Meta/Google para medir conversões.", ctaHref: "/tracking",   ctaLabel: "Configurar" },
     { key: "has_ai",             label: "IA configurada",           ok: hasAI,
-      recommendation: "Adicione um provedor de IA para qualificar leads.", ctaHref: "/settings", ctaLabel: "Adicionar provedor" },
+      recommendation: "Lovable AI ativo. Você pode adicionar uma chave própria se quiser.", ctaHref: "/settings", ctaLabel: "Gerenciar IA" },
     { key: "has_knowledge",      label: "Knowledge base",           ok: hasKnowledge,
       recommendation: "Suba documentos para alimentar respostas.",  ctaHref: "/knowledge",  ctaLabel: "Abrir Knowledge" },
     { key: "has_channel",        label: "Canal conectado",          ok: hasChannel || hasConnector,

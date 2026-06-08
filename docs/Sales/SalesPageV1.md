@@ -1,206 +1,376 @@
 # Página de Vendas — Método Escala v1
-**Documento interno de copy — rascunho para revisão com Cauã**
+**Copy completo — para publicação após revisão com Renan**
 
 ---
 
-## 1. Headline
+## 1. HEADLINE PRINCIPAL
 
-**Você construiu uma empresa que não funciona sem você. Hora de mudar isso.**
-
----
-
-## 2. Subheadline
-
-O Método Escala é uma mentoria de 90 dias para fundadores de empresas de serviço, agências e SaaS entre R$30k e R$300k/mês que querem parar de ser o gargalo da própria operação — e construir uma empresa que cresce com ou sem você no centro.
+# Escale sua agência de R$30k para R$100k/mês em 90 dias — sem contratar mais gente e sem trabalhar 14 horas por dia.
 
 ---
 
-## 3. A Dor
+## 2. SUBHEADLINE
 
-Você acorda cedo. Antes de tomar café, já tem mensagem no WhatsApp. Um cliente reclamando, um colaborador com dúvida que "só você pode responder", uma proposta que trava porque o time não sabe quanto cobrar.
-
-Você resolve. Vai trabalhar. Resolve mais coisas. O dia passa rápido. À noite, você olha para a lista de tarefas e percebe que quase nada do que planejou foi feito — porque o dia todo foi gasto apagando incêndios que não deveriam ter chegado até você.
-
-O mês passa. A receita cresce um pouco. Mas você não sente que está escalando — sente que está correndo mais rápido na esteira.
-
-Você tenta delegar. Contrata. Explica. O time tenta, mas comete erros que você não cometeria. Você pega de volta, faz mais rápido, entrega melhor. E o ciclo recomeça.
-
-Você não consegue tirar férias de verdade — porque quando tira, a empresa desacelera ou alguma coisa quebra. Você chegou a ligar do aeroporto. A responder mensagem do hotel. A antecipar a volta.
-
-No fundo, você sabe que montou uma operação que depende demais de você. Mas não sabe exatamente onde consertar. E cada vez que tenta, falta tempo, falta clareza, falta alguém que entenda o que você está vivendo.
-
-Isso não é fraqueza. É o resultado natural de uma empresa que cresceu sem sistema.
+**Para donos de agências e prestadores de serviço que faturam entre R$15k e R$80k/mês, estão presos no operacional e sabem que o problema não é falta de cliente — é falta de sistema.**
 
 ---
 
-## 4. O Problema Invisível
+## 3. GANCHO DE DOR
 
-A maioria dos fundadores nessa situação acredita que o problema é esforço. Que falta trabalhar mais, contratar melhor, ou encontrar a ferramenta certa.
+Você abriu uma agência para ter liberdade. O que você construiu foi uma prisão com o seu nome na fachada.
 
-Não é isso.
+Reconhece alguma coisa nessa lista?
 
-O problema real é que você opera sem mapa. Sem uma visão clara de como cada parte da sua empresa se conecta — como o cliente entra, como a entrega acontece, quem decide o quê, o que pode ser automatizado, o que precisa de liderança humana.
+- **Você é o gargalo de tudo.** Proposta? Passa por você. Entrega? Você revisa. Cliente insatisfeito? Ele liga para você — às 22h, no sábado, de preferência no meio do almoço em família. Você tentou delegar. Não funcionou. Agora você faz mais rápido do que explica.
 
-Sem esse mapa, qualquer tentativa de escala vira caos. Você contrata e a pessoa não consegue se orientar. Você automatiza um processo que não deveria existir. Você delega sem contexto e recebe de volta com erro. Você cresce em receita mas também em complexidade — e a margem some.
+- **Sua receita oscila todo mês e você não sabe por quê.** Em março, R$42k. Em abril, R$28k. Em maio, R$51k. Você não controla o número — você torce. Não tem previsibilidade, não tem pipeline, não tem um processo comercial que funciona sem você dentro vendendo.
 
-O problema invisível é que você tomou decisões importantes sem uma arquitetura clara do seu negócio. Não por falta de inteligência ou dedicação — mas porque ninguém parou com você para montar esse mapa antes de você chegar nesse nível.
+- **Você tem clientes mas não tem margem.** O faturamento cresceu. O lucro no bolso, não. Você contratou mais gente, aumentou custo fixo, começou a entregar mais por menos, e agora o mês fecha com R$3k de sobra — se fechar. Você não sabe ao certo quanto custa cada cliente nem quanto você ganha de verdade.
 
-É isso que o Método Escala faz.
+- **Cada novo cliente parece um risco.** Porque você já está no limite de capacidade e não tem certeza se consegue entregar mais sem perder o que já tem. Crescer assusta — e você sabe que isso é um problema grave.
 
----
+Isso não é preguiça. Não é falta de talento. É o resultado previsível de uma agência que cresceu na raça, sem sistema, sem processo, sem estrutura para escalar.
 
-## 5. O Método Escala
-
-O Método Escala não é um curso. Não é uma consultoria que entrega um PDF de 80 páginas e some. E não é um coaching motivacional.
-
-É uma mentoria estruturada de 90 dias, construída em cima de um princípio simples: **você não precisa de alguém para fazer por você — você precisa de alguém para pensar junto com você.**
-
-A diferença importa. Quando alguém faz por você, você fica dependente. Quando alguém pensa junto com você, você sai diferente. Você entende o raciocínio, internaliza o modelo, e consegue aplicar sozinho depois.
-
-O Método Escala é "feito com você" porque o objetivo é que, ao final dos 90 dias, você tenha clareza suficiente para liderar a sua empresa de um lugar estratégico — não operacional. Que você consiga tomar decisões com mais velocidade e menos ansiedade. Que você tenha construído, junto com o Cauã, o mapa que faltava.
-
-A filosofia é direta: empresas que escalam não têm fundadores mais inteligentes. Têm fundadores que conseguiram sair do centro da operação sem a empresa parar. Isso se constrói. E se constrói com método.
+E o pior: você sabe disso. Mas toda vez que tenta resolver, o dia te engole e você volta para o mesmo lugar.
 
 ---
 
-## 6. O Mecanismo — As 6 Etapas do Método Escala
+## 4. PROMESSA — O QUE MUDA EM 90 DIAS
 
-O trabalho dos 90 dias segue uma sequência deliberada. Cada etapa destrava a próxima. Pular etapas é o motivo pelo qual a maioria das tentativas de escala falha.
+Em 90 dias de Método Escala, você vai ter construído o que a maioria dos donos de agência passa anos tentando montar:
 
-**Enxergar** — Antes de mudar qualquer coisa, você precisa ver com clareza o que existe. Mapeamos juntos a situação atual: onde estão os gargalos, quais processos dependem de você, o que está gerando resultado e o que está consumindo energia sem retorno. O Diagnóstico Escala estrutura esse momento.
+**Uma operação que funciona sem você no centro de tudo.**
 
-**Simplificar** — Boa parte do caos não precisa ser gerenciado — precisa ser eliminado. Nessa etapa, identificamos o que pode sair da sua empresa (ou ser descontinuado) sem impacto real na receita ou na entrega. Simplicidade não é perda — é foco.
+Mais especificamente:
 
-**Conectar** — Sua empresa tem partes que não conversam: comercial que não passa contexto para entrega, entrega que não alimenta o financeiro com informação, time que não tem clareza sobre prioridades. Nessa etapa, conectamos os elos soltos — quem reporta para quem, quem decide o quê, como a informação flui sem precisar passar por você.
+- Uma **oferta validada e posicionada** que justifica cobrar mais — e que o mercado entende e paga
+- Um **sistema de aquisição previsível**: processo claro de como novos clientes chegam, são qualificados e fecham — sem depender de indicação por sorte
+- Um **modelo de entrega escalável**: processos documentados, time orientado, padrão de qualidade que não depende de você revisando cada detalhe
+- **Clareza financeira real**: você vai saber quanto custa cada cliente, qual é sua margem real e onde está o dinheiro que desapareceu
+- O **GPT Escala configurado para o seu negócio**: um assistente estratégico disponível 24/7, treinado na realidade da sua operação, para te apoiar nas decisões sem precisar esperar a próxima sessão
 
-**Automatizar** — Com os processos mapeados e simplificados, identificamos o que pode ser automatizado de forma inteligente. Não automação pela automação — mas a eliminação de tarefas repetitivas que hoje tomam tempo do seu time (ou seu) e que uma ferramenta pode executar com mais consistência.
-
-**Liderar** — Escalar exige que você mude de papel: de executor para líder. Essa etapa trabalha como você comunica direção, como você calibra o time, como você dá feedback sem micro-gerenciar, e como você protege o seu tempo estratégico das demandas operacionais.
-
-**Acelerar** — Com clareza, estrutura e liderança no lugar certo, chegou a hora de crescer com intenção. Revisamos seus principais alavancadores de crescimento — seja aquisição, retenção, expansão de conta ou novos produtos — e montamos o plano de execução para os próximos 90 dias pós-mentoria.
-
----
-
-## 7. O Diagnóstico Escala
-
-O ponto de partida de tudo é o Diagnóstico Escala — uma análise estruturada da sua empresa em 7 dimensões. Não é um questionário genérico. É um mapeamento construído especificamente para empresas de serviço, agências e SaaS nesse estágio de crescimento.
-
-As 7 dimensões são: **Modelo de Receita**, **Processo Comercial**, **Entrega e Operação**, **Estrutura de Time**, **Gestão e Liderança**, **Financeiro e Margens**, e **Dependência do Fundador**.
-
-Cada dimensão recebe uma avaliação de maturidade (de 1 a 4) e uma análise qualitativa com os principais pontos de atenção. Ao final, você tem um mapa visual da sua empresa — onde ela está sólida, onde está frágil, e onde está o maior risco de escala.
-
-O Diagnóstico é entregue em até 48 horas após o onboarding e serve como base de trabalho para toda a mentoria. Não é um relatório para engavetar — é o documento de referência das nossas conversas ao longo dos 90 dias.
+Não é um curso. Não é um PDF. É um sistema construído junto com você, aplicado na sua agência, durante 90 dias.
 
 ---
 
-## 8. O GPT Escala
+## 5. MECANISMO ÚNICO — O QUE É O MÉTODO ESCALA
 
-Entre uma sessão e outra, surgem dúvidas. Decisões que precisam ser tomadas agora. Situações que não podem esperar até a próxima call.
+O mercado está cheio de curso de agência. Quase todos ensinam a mesma coisa: tráfego, nicho, proposta de valor, modelo de precificação. Você provavelmente já fez algum.
 
-Para isso existe o GPT Escala — um assistente estratégico com inteligência artificial, treinado com o método, com os frameworks e com o contexto da sua empresa.
+E continuou no mesmo lugar.
 
-Você pode conversar com ele quando precisar: para estruturar uma proposta comercial, para pensar em como dar um feedback difícil para alguém do time, para revisar uma decisão de contratação, para montar um processo novo, para se preparar para uma sessão.
+Por quê? Porque **curso te dá conteúdo. O Método Escala te dá construção.**
 
-O GPT Escala não substitui as sessões com o Cauã — e não é para isso que ele existe. Ele existe para que você não fique travado entre uma semana e outra. Para que você tenha acesso a um raciocínio estruturado 24 horas por dia, 7 dias por semana, no ritmo que sua empresa exige.
+A diferença é crítica. Você não trava porque não sabe o que fazer. Você trava porque não tem com quem pensar junto, testar na prática e ajustar quando não funciona como o vídeo do curso mostrou.
 
----
+O Método Escala é um **programa de mentoria estruturado em 90 dias**, baseado em três pilares que a maioria dos programas ignora:
 
-## 9. O Que Você Recebe
+**1. Diagnóstico antes de prescrição.**
+Antes de qualquer recomendação, mapeamos as 7 dimensões da sua operação: modelo de receita, processo comercial, entrega, time, gestão, financeiro e dependência de você. Só depois disso a gente define o que precisa ser construído — na ordem certa, sem pular etapas.
 
-**Dias 0 a 2 — Onboarding e Diagnóstico**
-Logo após a confirmação da sua entrada, você recebe o briefing de onboarding. Você preenche informações sobre a sua empresa, os principais gargalos que enfrenta e o que você quer ter resolvido ao final de 90 dias. Com base nesse material, o Diagnóstico Escala é elaborado e entregue em até 48 horas — com análise das 7 dimensões e os pontos prioritários para trabalharmos juntos.
+**2. Construção, não teoria.**
+Cada sessão termina com algo concreto produzido ou decidido: uma oferta reescrita, um processo mapeado, um script de venda testado, um dashboard de métricas montado. Você não sai da call com "insights" — sai com entregáveis.
 
-**Semanas 1 a 12 — O Trabalho**
-Sessões ao vivo semanais (plano individual) ou quinzenais (plano em grupo), conduzidas pelo Cauã. Cada sessão começa com um briefing pré-sessão que você preenche antes da call — para garantir que o tempo seja usado no que realmente importa, e não em alinhamento. Após cada sessão, você recebe um briefing pós-sessão com os próximos passos acordados.
+**3. Ferramenta proprietária: GPT Escala.**
+Um assistente de IA treinado no framework do método e no diagnóstico específico da sua agência. Disponível 24/7 entre as sessões para te ajudar a tomar decisões, estruturar propostas, montar processos e resolver o que aparece no dia a dia — sem precisar esperar a próxima semana.
 
-Ao longo de toda a mentoria, você tem acesso ao GPT Escala para suporte estratégico entre sessões, e a um repositório de frameworks e materiais de referência usados durante o programa.
-
-**Semana 12 — Roadmap Final**
-Ao final dos 90 dias, você recebe um Roadmap de Escala — um documento com a síntese do trabalho feito, as decisões tomadas, e o plano de execução para os próximos 90 dias. É o documento que você usa para liderar sua empresa de onde você chegou.
+Isso é o que faz o Método Escala ser um sistema, não um curso.
 
 ---
 
-## 10. Sobre o Cauã
+## 6. O QUE VOCÊ VAI CONSTRUIR
 
-Eu já fui você.
+Ao final dos 90 dias, estas são as entregas concretas que você vai ter em mãos:
 
-Já fui o fundador que trabalhava 12 horas por dia e ainda sentia que estava deixando coisas para trás. Que tentava contratar e o time nunca parecia suficiente. Que tinha medo de tirar férias porque não sabia o que voltaria a encontrar.
+**1. Oferta Validada e Posicionada**
+Sua proposta comercial reescrita com clareza de resultado, mecanismo e prazo. Uma oferta que o mercado entende sem você precisar explicar por 20 minutos. Com precificação baseada em valor — não em hora ou em medo de perder o cliente.
 
-Construí empresas do zero. Errei em escala — contratei errado, automatizei o que não precisava existir, cresci rápido demais sem estrutura, e passei por situações que me custaram caro. Mas aprendi o que cada um desses erros ensina.
+**2. Sistema de Aquisição com Processo Documentado**
+Funil de entrada mapeado: como leads chegam, como são qualificados, qual é o roteiro de conversa de venda, onde a maioria trava e o que diz quando travou. Você vai ter um processo de aquisição que seu time consegue executar — não só você.
 
-Com o tempo, fui construindo uma forma de pensar sobre empresas de serviço que vai além de teoria de gestão. Uma abordagem que leva em conta a realidade de quem está no dia a dia — a pressão, as limitações de time, o contexto financeiro, a dificuldade de sair do operacional quando o cliente liga esperando você.
+**3. GPT Escala Configurado para Sua Operação**
+O assistente configurado com o contexto da sua agência: seu nicho, sua oferta, suas objeções mais comuns, seu modelo de entrega. Disponível para consulta estratégica a qualquer hora — estrutura uma proposta, revisa uma decisão, te ajuda a preparar uma conversa difícil com cliente.
 
-O Método Escala foi construído a partir dessa experiência — do que funcionou, do que não funcionou, e do que eu vi funcionar em outros fundadores com quem trabalhei. Não é um método importado de livro. É uma estrutura que foi testada em empresas reais, com problemas reais.
+**4. Modelo de Entrega Escalável**
+Processo de onboarding de novos clientes documentado. Checklist de entrega para cada serviço. Fluxo de comunicação cliente-time sem você no meio. Você vai saber qual cliente está em qual fase, quem é responsável por quê, e onde as coisas estão travando — sem precisar perguntar.
 
-Não sou guru. Não vendo promessa de resultado mágico. Sou um fundador que passou pelo caos antes de você e que desenvolveu um método para atravessá-lo com mais clareza e menos desgaste.
+**5. Dashboard de Métricas do Negócio**
+Painel com os números que importam: faturamento por cliente, margem por projeto, taxa de retenção, pipeline de novos negócios, custo de entrega. Sem isso, você está gerindo no escuro. Com isso, você toma decisão com dado, não com sensação.
 
-Se você quer alguém para pensar junto — e não para te dizer o que fazer — é isso que ofereço.
+**6. Diagnóstico Escala nas 7 Dimensões**
+Mapa completo da sua operação com score em cada dimensão, identificação dos 3 maiores gargalos e o plano de ataque para os próximos 90 dias. Entregue por escrito, revisado a cada sessão, atualizado ao final do ciclo.
 
----
-
-## 11. Quem Deve Entrar
-
-**Fundadores de empresas de serviço, agências ou SaaS entre R$30k e R$300k/mês** que já provaram que o modelo funciona e agora precisam de estrutura para crescer sem colocar tudo nas suas costas.
-
-**Quem está cansado de ser o gargalo.** Você sabe que o problema central é a dependência do seu time em relação a você, e está disposto a trabalhar para mudar isso de forma estruturada.
-
-**Quem quer clareza antes de contratar.** Você está prestes a montar um time ou expandir a operação, e quer ter clareza sobre o que está construindo antes de escalar o caos.
-
-**Quem já tentou delegar e não funcionou.** Não por falta de esforço — mas porque faltou um sistema que suportasse a delegação. Você está pronto para construir esse sistema.
-
-**Quem está crescendo em receita mas não em liberdade.** A empresa cresce, mas você fica mais preso. Você entende que crescer sem escalar é só trabalhar mais — e não é isso que você quer.
+**7. Roadmap dos Próximos 90 Dias**
+Ao encerrar o ciclo, você recebe um plano de execução escrito para os próximos 90 dias: o que construir, em que ordem, com quais critérios de sucesso. Não é um resumo da mentoria — é o seu próximo manual de operação.
 
 ---
 
-## 12. Quem Não Deve Entrar
+## 7. PROVA SOCIAL
 
-**Quem quer resultado sem trabalho.** Essa mentoria exige participação ativa. Você vai preencher briefings, tomar decisões difíceis, implementar mudanças que geram desconforto. Se você quer alguém que resolva por você, este não é o lugar certo.
-
-**Quem está abaixo de R$30k/mês de receita.** Não porque a metodologia não se aplica — mas porque existe uma ordem nas coisas. Se você ainda está validando o modelo de negócio ou construindo a base de clientes, há um trabalho mais urgente antes de estruturar para escala.
-
-**Quem não consegue comprometer 90 dias.** O método funciona em sequência. Se você está em um momento de crise aguda, em transição de sociedade, ou com uma janela de atenção comprometida por outros fatores, o melhor é esperar o momento certo.
-
-**Quem acredita que o único problema é marketing ou vendas.** Se sua empresa não entrega bem, cresce rápido demais para aguentar, ou tem problemas estruturais de operação, escalar a aquisição vai amplificar os problemas. Não é isso que resolvemos aqui — pelo menos não na sequência.
-
-**Quem busca validação, não perspectiva.** Se você quer que alguém concorde com tudo que você já pensa, vai se frustrar. O trabalho é honesto, e honestidade às vezes incomoda.
+*[Estrutura para casos reais — preencher após primeiros resultados do programa]*
 
 ---
 
-## 13. Garantia
+**Card 1**
 
-Não vou prometer que você vai triplicar de receita em 90 dias. Qualquer um que prometa isso está te vendendo uma ilusão.
-
-O que eu garanto é o seguinte: ao final dos 90 dias, você vai ter clareza sobre onde está o gargalo real da sua operação, um diagnóstico honesto das 7 dimensões da sua empresa, um método de trabalho que você pode continuar usando depois, e um roadmap concreto de onde ir a seguir.
-
-Se ao final das primeiras duas semanas — após o diagnóstico e a primeira sessão — você entender que a mentoria não faz sentido para o seu momento, você pode sair sem custo adicional. Simples assim.
-
-Não é garantia de resultado porque resultado depende de execução. E execução é sua. O que depende de mim — clareza, estrutura, perspectiva estratégica honesta — esse eu garanto.
-
----
-
-## 14. CTA — Chamada para Ação
-
-**Vagas abertas para a próxima turma.**
-
-O programa opera com número limitado de participantes porque o nível de atenção que cada fundador recebe exige isso. Quando as vagas fecham, fecham.
-
-Se você leu até aqui e reconheceu sua empresa nessa descrição, o próximo passo é simples: **agende uma conversa de 30 minutos.**
-
-Não é uma call de vendas. É uma conversa para entender onde você está, o que você quer construir, e se o Método Escala é o caminho certo para o seu momento. Se não for, eu digo isso claramente.
-
-Se for, a gente começa.
+> **[NOME DO MENTORADO]**
+> *Dono de agência de performance | São Paulo*
+>
+> **Resultado:** [ex: "Passou de R$32k para R$67k/mês em 11 semanas. Contratou mais 1 pessoa e saiu do operacional de entrega."]
+>
+> **Depoimento:** *"[Trecho direto do mentorado descrevendo o antes e depois, no estilo dele — não editorializado. Quanto mais específico, mais crível. Idealmente com número, com contexto e com o momento de virada."]"*
 
 ---
 
-**[Quero agendar minha conversa →]**
+**Card 2**
 
-*Vagas limitadas. Próxima turma começa em breve.*
+> **[NOME DO MENTORADO]**
+> *[Segmento da agência] | [Cidade]*
+>
+> **Resultado:** [ex: "Estruturou o processo comercial em 3 semanas, fechou 4 novos clientes no mês seguinte sem fazer uma única ligação de prospecção fria."]
+>
+> **Depoimento:** *"[Depoimento em voz do mentorado — o que mudou de concreto, o que era diferente antes, qual foi o maior aprendizado. Pode ser extraído de mensagem no WhatsApp, áudio transcrito ou vídeo editado."]"*
 
 ---
 
-*Plano Individual — R$6.000 a R$15.000 | Plano em Grupo — R$2.500 a R$5.000*
-*Valores finais definidos após a conversa de diagnóstico inicial.*
+**Card 3**
+
+> **[NOME DO MENTORADO]**
+> *[Segmento] | [Cidade]*
+>
+> **Resultado:** [ex: "Aumentou o ticket médio de R$1.800 para R$4.200 com a mesma base de clientes após reposicionar a oferta."]
+>
+> **Depoimento:** *"[Foco no mecanismo que funcionou — o que especificamente o método resolveu que a pessoa não conseguia sozinha. A menção à ferramenta (GPT Escala, diagnóstico, processo de venda) aumenta credibilidade de entrega."]"*
 
 ---
 
-**Documento interno — v1 — para revisão e aprovação de Cauã antes de publicação.**
+## 8. PARA QUEM É
+
+O Método Escala foi construído para um perfil muito específico. Antes de qualquer conversa, confirme que você se encaixa:
+
+- **Você dono de agência ou prestador de serviço** com faturamento entre R$15k e R$80k/mês — você já tem clientes, já provou que o serviço funciona, e agora o problema é estrutura e previsibilidade, não produto.
+
+- **Você que está preso no operacional** e sabe disso. Você não consegue tirar uma semana sem celular, responde mensagem de cliente em horário que não deveria, e reconhece que é o maior gargalo da própria empresa.
+
+- **Você que quer escalar com margem** — não só crescer em faturamento, mas crescer de forma que o lucro no bolso acompanhe. Você entende a diferença entre receita e resultado.
+
+- **Você que já tentou implementar mudanças sozinho** — comprou curso, leu livro, tentou delegar, tentou montar processo — e não conseguiu sustentar. Não por falta de disciplina, mas porque faltou acompanhamento e método para superar a resistência do dia a dia.
+
+- **Você que consegue comprometer 90 dias** de trabalho real: participar das sessões, implementar entre as sessões, trazer os números honestos e ter conversas que incomodam quando precisar.
+
+---
+
+## 9. PARA QUEM NÃO É
+
+Clareza também é saber quando dizer que não é pra você:
+
+- **Se você ainda está abaixo de R$15k/mês**, existe uma ordem de prioridades. Antes de estruturar para escalar, você precisa validar o modelo e construir a base de clientes. O Método Escala não é o passo certo para esse momento — e seria desonesto fingir que é.
+
+- **Se você quer alguém que faça por você**, essa não é a mentoria certa. Aqui você aprende a construir, não terceiriza a construção. Se você quer uma agência que entre na sua operação e resolva por você, o Método Escala não é isso — e provavelmente vai te frustrar.
+
+- **Se você está buscando validação para o que já pensa**, vai se frustrar. O diagnóstico é honesto, as recomendações são diretas, e o trabalho inclui questionar decisões que você tomou há tempo. Se você precisa que alguém concorde com sua visão atual, não é aqui.
+
+---
+
+## 10. O QUE ESTÁ INCLUÍDO
+
+O Método Escala é composto de quatro elementos que funcionam juntos:
+
+---
+
+### 10.1 Sessões de Mentoria ao Vivo com Renan
+
+**Modalidade Individual:** 8 sessões de 60 minutos ao longo de 90 dias — encontros semanais nas primeiras 4 semanas (fase de diagnóstico e construção da base), quinzenais nas semanas seguintes (fase de execução e ajuste).
+
+**Modalidade em Grupo Reduzido (máx. 6 pessoas):** 10 encontros de 90 minutos em grupo, com 1 sessão individual de diagnóstico no início e 1 sessão individual de fechamento ao final do ciclo.
+
+Cada sessão tem **pauta enviada com antecedência**. Você chega preparado, não improvisa. Cada sessão termina com **briefing pós-sessão documentado**: decisões tomadas, próximos passos, responsável e prazo.
+
+---
+
+### 10.2 Diagnóstico Escala nas 7 Dimensões
+
+Entregue em até 48 horas após o onboarding. Avaliação estruturada da sua operação em:
+
+1. Modelo de Receita (previsibilidade, concentração, ticket, margem)
+2. Processo Comercial (pipeline, taxa de conversão, dependência do dono)
+3. Entrega e Operação (documentação, padrão, capacidade real)
+4. Estrutura de Time (quem faz o quê, gargalos, gaps de função)
+5. Gestão e Liderança (como decisões são tomadas, como o time é orientado)
+6. Financeiro e Margens (clareza de custo, lucratividade real por cliente)
+7. Dependência do Fundador (onde a empresa para se você sair por 2 semanas)
+
+Score de 1 a 4 em cada dimensão. Análise qualitativa dos principais riscos. Identificação dos 3 gargalos prioritários. Plano de ataque para as primeiras 4 semanas.
+
+---
+
+### 10.3 GPT Escala — Seu Assistente Estratégico 24/7
+
+Um assistente de IA configurado com o framework do método e com o contexto específico da sua agência. Diferente de um ChatGPT genérico, o GPT Escala conhece:
+
+- Seu nicho e modelo de negócio
+- Seus principais gargalos identificados no diagnóstico
+- Sua oferta e processo comercial
+- Os frameworks do método que estamos aplicando
+
+**Para que serve entre as sessões:**
+- Estruturar uma proposta comercial alinhada com o seu posicionamento
+- Rascunhar a resposta para uma situação difícil com cliente
+- Revisar um processo que você está tentando documentar
+- Preparar a pauta da próxima sessão
+- Tomar uma decisão que não pode esperar a semana
+
+Acesso ativo durante todo o ciclo de 90 dias.
+
+---
+
+### 10.4 Materiais e Playbooks do Método
+
+Biblioteca de recursos utilizados ao longo do programa:
+
+- **Playbook de Posicionamento de Oferta**: framework para reescrever sua proposta com clareza de resultado e mecanismo
+- **Script de Conversa de Venda**: roteiro estruturado para a conversa de qualificação e fechamento — testado em agências de serviço
+- **Canvas de Modelo de Entrega**: template para mapear e documentar o processo de entrega do seu serviço principal
+- **Planilha de Diagnóstico Financeiro**: modelo para calcular margem real por cliente e custo de entrega por serviço
+- **Framework de Delegação Gradual**: como transferir responsabilidades sem perder qualidade e sem precisar estar presente em tudo
+- **Template de Dashboard de Gestão**: painel de métricas semanais que você usa para gerir o negócio em 30 minutos por semana
+
+---
+
+## 11. GARANTIA
+
+**Nossa garantia não é sobre faturamento. É sobre clareza.**
+
+Não vamos prometer que você vai dobrar de receita em 90 dias. Qualquer mentoria que promete isso está te vendendo uma ilusão — porque resultado financeiro depende de como você executa, do seu mercado e do seu momento. Isso não está inteiramente no controle de nenhum mentor, por melhor que seja o método.
+
+O que está inteiramente no nosso controle — e o que garantimos — é a qualidade do processo:
+
+- **Diagnóstico Escala nas 7 dimensões entregue em até 48 horas** após o onboarding completo
+- **Roadmap inicial personalizado entregue por escrito** até a segunda sessão
+- **Todas as sessões previstas realizadas** com pauta enviada com antecedência e briefing pós-sessão documentado
+- **Acesso ao GPT Escala funcionando durante todo o ciclo de 90 dias**
+- **Suporte por WhatsApp em até 24 horas úteis** para dúvidas que não podem esperar a próxima sessão
+- **Relatório de encerramento** comparando o diagnóstico inicial com o resultado ao final do ciclo
+
+Se qualquer um desses itens não for entregue conforme descrito, você tem o direito de abrir uma conversa formal sobre ressarcimento proporcional.
+
+O que esperamos de você em troca: honestidade no diagnóstico, presença nas sessões e disposição para implementar o que acordarmos. Mentoria é parceria — não é serviço passivo.
+
+*Para os termos completos da garantia, consulte o documento [Guarantee.md].*
+
+---
+
+## 12. OFERTA E PREÇO
+
+### Modalidade Individual
+
+**O que está incluído:**
+- 8 sessões individuais de 60 min com Renan ao longo de 90 dias
+- Diagnóstico Escala nas 7 dimensões (entrega em 48h)
+- GPT Escala configurado para a sua agência — acesso por 90 dias
+- Todos os playbooks e materiais do método
+- Suporte por WhatsApp (resposta em até 24h úteis)
+- Relatório de encerramento com roadmap dos próximos 90 dias
+
+**Investimento:** *[PLACEHOLDER — definir após validação de mercado. Referência: R$6.000 a R$12.000 no ciclo. Parcelamento disponível.]*
+
+---
+
+### Modalidade em Grupo Reduzido *(máx. 6 participantes)*
+
+**O que está incluído:**
+- 10 encontros em grupo de 90 min ao longo de 90 dias
+- 1 sessão individual de diagnóstico (60 min) no início do ciclo
+- 1 sessão individual de fechamento (60 min) ao final do ciclo
+- Diagnóstico Escala nas 7 dimensões (entrega em 48h)
+- GPT Escala configurado para a sua agência — acesso por 90 dias
+- Todos os playbooks e materiais do método
+- Suporte por WhatsApp (resposta em até 24h úteis)
+- Relatório de encerramento com roadmap dos próximos 90 dias
+- Acesso ao grupo privado de participantes da turma
+
+**Investimento:** *[PLACEHOLDER — referência: R$2.800 a R$4.500 no ciclo. Parcelamento disponível.]*
+
+---
+
+### Bônus para as Primeiras Vagas
+
+**Bônus 1 — Sessão de Revisão de Oferta antes do início do ciclo**
+Antes do onboarding formal, Renan revisa sua oferta atual e te entrega por escrito os pontos críticos de posicionamento. Você entra no programa já sabendo o que precisa ser reescrito. *(Valor de mercado: R$800 — incluso para os primeiros [X] inscritos)*
+
+**Bônus 2 — Acesso Estendido ao GPT Escala por 30 dias após o ciclo**
+Ao invés de 90 dias, você tem acesso por 120 dias. O mês pós-encerramento costuma ser o de maior necessidade — quando você está implementando o roadmap sozinho e ainda tem dúvidas. *(Incluso nas primeiras [X] vagas)*
+
+**Bônus 3 — Grupo de Alumni (acesso permanente)**
+Depois do ciclo, você entra no grupo privado de ex-participantes do Método Escala. Troca de experiências, revisão de casos, atualizações do método. Não tem prazo de expiração. *(Para todos os inscritos de qualquer modalidade)*
+
+---
+
+**Urgência:**
+
+As turmas do Método Escala são limitadas. A modalidade individual opera com no máximo 10 clientes simultâneos — porque atenção fragmentada não é mentoria. A modalidade em grupo fecha com exatamente 6 participantes para manter a qualidade das interações.
+
+Quando fecha, fecha. Não tem lista de espera sem prazo — tem próxima turma, que começa no ciclo seguinte.
+
+---
+
+## 13. CTA PRINCIPAL
+
+### Próximo passo: uma conversa de 30 minutos.
+
+Não é uma call de vendas. É uma conversa para entender onde você está, o que está travando sua agência agora, e se o Método Escala é o caminho certo para o seu momento.
+
+Se for, a gente segue.
+Se não for, você sai com clareza sobre o que deveria ser feito — e eu indico o que faz sentido para o seu estágio.
+
+Sem pressão. Sem pitch agressivo. Sem cláusula de urgência fabricada.
+
+---
+
+**[→ QUERO AGENDAR MINHA CONVERSA DE DIAGNÓSTICO GRATUITA]**
+
+*Vagas limitadas por turma. Próxima turma: [DATA/MÊS PLACEHOLDER].*
+
+---
+
+## 14. FAQ — PERGUNTAS FREQUENTES
+
+---
+
+**1. Qual a diferença entre o Método Escala e um curso de agência?**
+
+A diferença fundamental é construção versus conteúdo. Um curso te dá framework e vídeo. O Método Escala te acompanha enquanto você aplica — e ajusta o plano quando a realidade não é igual ao exemplo do material. Você sai com algo construído: oferta revisada, processo documentado, GPT configurado para o seu negócio. Não só com mais informação na cabeça.
+
+---
+
+**2. Funciona para agências pequenas, com só eu e um freelancer?**
+
+Sim. Na verdade, esse é o perfil mais comum. Empresas nesse estágio têm o maior problema de dependência do dono — porque a maioria das decisões e entregas ainda passa por você. O diagnóstico é adaptado para a sua realidade operacional, e as recomendações levam em conta o que é possível com a estrutura que você tem agora, não com uma equipe idealizada.
+
+---
+
+**3. Quanto tempo por semana eu preciso dedicar?**
+
+Além das sessões (60–90 min), conte com 2 a 4 horas semanais de implementação. Não é pouco — mas é o mínimo para que o método produza resultado. Se você não tem nem isso disponível, o problema mais urgente provavelmente não é mentoria: é tirar atividades que não deveriam estar na sua agenda.
+
+---
+
+**4. O GPT Escala substitui as sessões?**
+
+Não. O GPT Escala existe para o intervalo entre sessões — para dúvidas operacionais, estruturação de documentos, validação de decisões rápidas. As sessões com Renan existem para o que o GPT não faz: perspectiva estratégica externa, diagnóstico qualitativo, as conversas que nenhuma IA tem condição de conduzir sozinha. Os dois são complementares, não concorrentes.
+
+---
+
+**5. E se eu não conseguir implementar tudo no prazo de 90 dias?**
+
+Isso acontece — e faz parte do processo. O roadmap é revisado a cada sessão e adaptado à sua realidade. Não existe "você atrasou, perdeu". O que existe é: o que está impedindo a implementação? Falta de tempo? Falta de clareza? Resistência do time? Cada travamento tem uma causa, e identificar a causa é parte do trabalho. Você não vai ser cobrado por seguir um roteiro perfeito — vai ser apoiado para executar o que é possível no seu contexto real.
+
+---
+
+**6. Tenho uma agência de nicho específico (jurídico, saúde, imobiliário, e-commerce). O método funciona?**
+
+Sim. O Método Escala trabalha as dimensões estruturais de qualquer prestador de serviço — modelo de receita, processo comercial, entrega, time, gestão, financeiro e dependência do dono. Essas dimensões existem em qualquer agência independente do nicho. O que muda é o contexto e o vocabulário — e o diagnóstico leva isso em conta. Renan já trabalhou com agências de performance, social media, branding, desenvolvimento e consultoria de diversas indústrias.
+
+---
+
+*Versão 1 — para publicação após revisão e aprovação de Renan. Substituir todos os PLACEHOLDERs antes de publicar.*

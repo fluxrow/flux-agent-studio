@@ -100,6 +100,12 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <Seo
+        title="Entrar — Flux Agent Studio"
+        description="Acesse o Flux Agent Studio para gerenciar seus agentes de IA, leads qualificados e atribuição de receita em um só lugar."
+        path="/auth"
+        noindex
+      />
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <div className="h-9 w-9 rounded-xl gradient-primary flex items-center justify-center shadow-glow">

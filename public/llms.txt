@@ -1,0 +1,16 @@
+# Flux Agent Studio
+
+> Conversational Revenue OS — turn every conversation across WhatsApp, Instagram, Messenger and web into qualified leads and tracked revenue.
+
+Flux Agent Studio is a multi-channel AI agent builder for sales and support teams. Build bots once, deploy across Meta channels and the web, capture leads with full UTM attribution, and route every conversation through a unified inbox.
+
+## Pages
+
+- [Home](/): Product overview and main entry point.
+- [Privacy Policy](/privacy): How we collect, use, and protect your data.
+- [Terms of Service](/terms): Terms governing use of Flux Agent Studio.
+- [Data Deletion](/data-deletion): How to request deletion of your data.
+
+## Optional
+
+- [Sign in](/auth): Sign in or create an account.

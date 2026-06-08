@@ -271,6 +271,7 @@ function PublicShell({ slug, children }: { slug?: string; children: React.ReactN
       <div className="absolute inset-0" style={{ background: "var(--gradient-glow)" }} />
 
       <div className="relative w-full max-w-md">
+        <h1 className="sr-only">{slug ? `Converse com o agente ${slug}` : "Agente Flux Agent Studio"}</h1>
         <div className="text-center mb-4">
           <Link to="/" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground">
             <div className="h-5 w-5 rounded-md gradient-primary flex items-center justify-center">

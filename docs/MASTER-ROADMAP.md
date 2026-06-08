@@ -556,6 +556,29 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 
 ---
 
+### 2026-06-08 — Supabase Reality Check (FASE 27F)
+
+**Auditoria técnica executada contra o projeto canônico `bgzczvsmfcnypwqveotx`.**
+Resultado consolidado em `docs/SUPABASE-DEPLOY-CHECKLIST.md`.
+
+**Status geral: PARTIAL.**
+
+| Subsistema | Status |
+|---|---|
+| Schema núcleo + RLS (16 tabelas) | READY |
+| Auth + trigger `handle_new_user` | READY |
+| Realtime (`messages`, `sessions`) | READY |
+| Storage | N/A (não usado) |
+| Migrations Meta (`20260604000001`, `20260604000002`) | **BLOCKED — não aplicadas** |
+| Edge functions `meta-webhook` / `meta-send` | **BLOCKED — 404 (não deployadas)** |
+| Secrets `META_VERIFY_TOKEN` / `META_APP_SECRET` | **BLOCKED — ausentes** |
+
+**Conclusão:** confirma o diagnóstico da FASE 27A.7 — todo o núcleo do produto
+roda contra Supabase real, mas a stack de canais Meta continua mock-only até o
+deploy físico ser executado localmente (ver seção 8 do checklist).
+
+---
+
 ## 12. Timeline Visual
 
 ```

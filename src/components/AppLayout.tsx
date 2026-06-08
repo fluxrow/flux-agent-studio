@@ -55,7 +55,7 @@ export default function AppLayout() {
                   <span className="text-xs font-medium">{workspace.name}</span>
                 </div>
               )}
-              <Button size="sm" variant="ghost" className="text-muted-foreground"><Bell className="h-4 w-4" /></Button>
+              <Button size="sm" variant="ghost" aria-label="Notificações" className="text-muted-foreground"><Bell className="h-4 w-4" /></Button>
               <Button
                 size="sm"
                 className="gradient-primary text-primary-foreground border-0 shadow-elegant"

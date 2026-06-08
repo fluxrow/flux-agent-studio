@@ -217,7 +217,7 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 |---|---|---|---|
 | **P0** | Criar bot de qualificação via AI Builder | 2–4h | Sprint 1 concluída |
 | **P0** | Configurar tracking UTM em links de campanha | 1–2h | Nenhum |
-| **P1** | Adicionar link Calendly como último bloco do bot | 30min | Nenhum |
+| **P1** | Adicionar link Google Calendar como último bloco do bot | 30min | Nenhum |
 | **P1** | Webhook → Zapier → sequência de e-mail (workaround follow-up) | 3–5h | Conta Zapier + Brevo/ActiveCampaign |
 
 **Critério de conclusão:** interessado abre link, conversa com bot, aparece no CRM com score. Recebe e-mail de follow-up automaticamente.
@@ -410,7 +410,7 @@ Além dos critérios de beta, o produto está pronto para lançamento público q
 
 **O que mudou:**
 - Ficou claro que o fluxo "Instagram DM → IA → CRM → follow-up → agendamento" quebra em 4 dos 10 passos
-- A "operação possível hoje" foi documentada: Web Widget como entrada + CRM + Calendly link + follow-up manual
+- A "operação possível hoje" foi documentada: Web Widget como entrada + CRM + Google Calendar link + Google Meet + follow-up manual
 - Esse caso de uso passou a ser o critério de teste para cada sprint
 
 ### 2026-06-04 — AI Builder auditado (FASE R1)
@@ -618,7 +618,8 @@ D1─────────────D7          SPRINT 1 — Acender o Moto
 D8─────────────D14         SPRINT 2 — @vemfarias
 │  Bot publicado│          [P0] Bot mentoria criado e no ar
 │  UTM tracking │          [P0] Links com utm_campaign
-│  Calendly     │          [P1] Link de agendamento no bot
+│  G. Calendar  │          [P1] Link agendamento Google Calendar no bot
+│  Google Meet  │          [P1] Reunião via Google Meet
 │  Follow-up WA │          [P1] Webhook → Zapier → email
 └───────────────┘
 
@@ -715,7 +716,7 @@ Se você é uma IA entrando neste projeto agora, leia isto:
 2. Todos AI providers são `buildMockProvider()` → zero LLM real
 3. Revenue/Attribution/Conversations consomem dados hardcoded de `lib/analytics-mock` e `lib/mock`
 4. WhatsApp/Instagram/Messenger são stubs (`makeStub()`) — sem Meta API
-5. Follow-up não existe. Calendar não existe.
+5. Follow-up não existe. Google Calendar / Google Meet não integrados.
 
 **O que funciona hoje:**
 1. Web Widget conversa de verdade e pode publicar bots via link
@@ -764,32 +765,55 @@ Detalhamento e evidências: [`docs/SUPABASE-REALITY.md`](./SUPABASE-REALITY.md) 
 
 ---
 
----
+## Primeiro teste real @vemfarias
 
-### 2026-06-08 — Google Calendar Reality Check (FASE 27I)
+**Objetivo:** Converter 1 lead real em cliente pagante usando o fluxo completo do produto.
 
-**O que foi auditado:** estado real da integração Google Calendar via varredura estática (`src/**`, `supabase/functions/**`).
+**Fluxo operacional:**
 
-**Resultado:** `ROADMAP` — não existe integração.
+```
+Instagram
+    ↓
+  DM (mensagem direta recebida via Meta Webhook)
+    ↓
+  Inbox (Conversations — painel do Flux Agent Studio)
+    ↓
+  Lead Intelligence (score automático 7 fatores)
+    ↓
+  CRM (lead criado / qualificado com fonte = instagram)
+    ↓
+  Google Calendar (link de agendamento enviado manualmente ou via bot)
+    ↓
+  Google Meet (reunião de diagnóstico — 30 min)
+    ↓
+  Venda (proposta Método Escala — R$ 6.000–15.000)
+```
 
-| Capacidade | Status |
-|---|---|
-| OAuth Google (login Lovable Cloud) | ✅ REAL |
-| OAuth Google (scopes Calendar) | ❌ ROADMAP |
-| Criação de evento / leitura / freebusy | ❌ ROADMAP |
-| Google Meet auto-link | ❌ ROADMAP |
-| Webhook `events.watch` | ❌ ROADMAP |
-| Sync com CRM | ❌ ROADMAP (só copy "agendar reunião") |
-| Bloco "Agendar" no Builder | ⚠️ MOCK (template/copy sem execução) |
+**Pré-requisitos técnicos:**
 
-**Caminho mínimo para `PARCIAL`:** connector manifest `google-calendar` + adapter via gateway `https://connector-gateway.lovable.dev/google_calendar/calendar/v3`, 2 blocos Builder (`create_event`, `check_availability`), tabela `public.calendar_events` com RLS+GRANT, CRM bridge.
+| Item | Status | Ação |
+|------|--------|------|
+| Meta Webhook ativo (WhatsApp ou Instagram) | ❌ | Executar `docs/META-SETUP-CHECKLIST.md` |
+| Supabase `meta_channel_connections` populado | ❌ | INSERT manual após criar Meta App |
+| Edge Functions `meta-webhook` + `meta-send` deployadas | ❌ | `supabase functions deploy` |
+| Google Calendar — link de agendamento criado | 🟡 | Criar evento recorrente com link público |
+| Google Meet — link fixo para reuniões | 🟡 | Criar via Google Calendar (gera Meet automático) |
+| CRM operacional com dados reais | ✅ | Supabase + Realtime ativo |
 
-**Detalhe completo:** [`docs/GOOGLE-CALENDAR-REALITY.md`](./GOOGLE-CALENDAR-REALITY.md)
+**Critério de sucesso do teste:**
+
+> 1 lead entra via Instagram DM → aparece no CRM com score → reunião agendada via Google Calendar → Google Meet acontece → proposta enviada.
+
+**Referências:**
+- Setup Meta: [`docs/META-SETUP-CHECKLIST.md`](./META-SETUP-CHECKLIST.md)
+- Bloqueadores conhecidos: [`docs/META-BLOCKERS.md`](./META-BLOCKERS.md)
+- Oferta: [`docs/Product/OfferArchitecture.md`](./Product/OfferArchitecture.md)
+- Rastreamento de leads: [`docs/FIRST-REVENUE-TEST.md`](./FIRST-REVENUE-TEST.md)
 
 ---
 
 *Documento criado: 2026-06-04*  
 *Consolida: PRODUCT-CONSTITUTION.md · REALITY-CHECK-AUDIT.md · AI-BUILDER-REALITY.md · FLUXROW-GAP-ANALYSIS.md · VEMFARIAS-OPERATION.md · 30-DAY-EXECUTION-PLAN.md · OPENAI-IMPLEMENTATION-PLAN.md*  
+*Atualizado: 2026-06-08 (FASE 27H — Meta Foundation, Google Calendar/Meet, @vemfarias flow)*  
 *Branch: `claude/sweet-meitner-bB77L`*
-
 

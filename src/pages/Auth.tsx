@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useAuth } from "@/auth/AuthProvider";
+import { Seo } from "@/components/seo/Seo";
 
 const credsSchema = z.object({
   email: z.string().email("Email inválido"),

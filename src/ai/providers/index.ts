@@ -1,16 +1,5 @@
 import { buildMockProvider } from "./_mock";
-
-export const openaiProvider = buildMockProvider({
-  id: "openai",
-  label: "OpenAI",
-  description: "GPT family. Mock mode — sem chamadas reais.",
-  defaultModel: "gpt-5-mini",
-  models: [
-    { id: "gpt-5",      label: "GPT-5",      inputCostPer1k: 0.005, outputCostPer1k: 0.015 },
-    { id: "gpt-5-mini", label: "GPT-5 mini", inputCostPer1k: 0.0015, outputCostPer1k: 0.006 },
-    { id: "gpt-5-nano", label: "GPT-5 nano", inputCostPer1k: 0.0004, outputCostPer1k: 0.0012 },
-  ],
-});
+export { openaiProvider } from "./openai";
 
 export const anthropicProvider = buildMockProvider({
   id: "anthropic",

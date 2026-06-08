@@ -71,8 +71,8 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 | Módulo | O que funciona | O que bloqueia |
 |---|---|---|
 | **CRM / Pipeline** | Schema, kanban, lógica de estágios | `VITE_USE_SUPABASE` não setado → dados em memória |
-| **AI Builder** | Gera blueprint, materializa bot, UI completa | Todos providers usam `buildMockProvider()` — sem LLM real |
-| **AI Block Engine** | Schema, runner, inspector, cost tracking | Idem — provider é mock |
+| **AI Builder** | Gera blueprint, materializa bot, UI completa | OpenAI real ativo (FASE 28A). Requer `VITE_OPENAI_API_KEY`. Anthropic/Gemini ainda mock |
+| **AI Block Engine** | Schema, runner, inspector, cost tracking | OpenAI real — requer `VITE_OPENAI_API_KEY` configurada |
 | **Knowledge Base (RAG)** | Chunking, embeddings, retrieval cosine | Persistência Supabase instável; embeddings são hash-based (mock) |
 | **Lead Intelligence — dados** | Motor real, cálculo correto | Entrada de dados é mock sem Supabase + bot real gerando leads |
 | **Analytics** | Contagem de leads/bots reais com Supabase | Série temporal e funil detalhado = hardcoded |
@@ -91,7 +91,8 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 | **Omnichannel Inbox** | `src/pages/Conversations.tsx:1` → `import { conversations, sampleChat } from "@/lib/mock"` | Inbox mostra dados fixos |
 | **Revenue Attribution** | `src/pages/Revenue.tsx:1` → `import { revenueSeries, aiCosts } from "@/lib/analytics-mock"` | KPIs são constantes: R$184.2k, ROAS 4.8x |
 | **Attribution page** | `src/pages/Attribution.tsx:1` → `import { attributionTouches } from "@/lib/analytics-mock"` | Todos modelos de atribuição = mock |
-| **AI Providers (3)** | `src/ai/providers/index.ts` → todos usam `buildMockProvider()` | Respostas são keyword-matching e `"mock_value"` |
+| **AI Provider Anthropic** | `src/ai/providers/index.ts` → `buildMockProvider()` | Respostas são keyword-matching e `"mock_value"` |
+| **AI Provider Gemini** | `src/ai/providers/index.ts` → `buildMockProvider()` | Respostas são keyword-matching e `"mock_value"` |
 | **AI Builder geração** | `src/ai-builder/generator.ts` | `bot_name`/`summary` retornados pelo mock — demais via heurísticas locais |
 
 ---
@@ -139,11 +140,11 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 
 ## 4. Fases Em Execução
 
-### 27A — OpenAI Integration (Em planejamento, não iniciado)
+### 28A — OpenAI Integration ✅ CONCLUÍDO
 
 **O que é:** trocar `buildMockProvider()` por provider real OpenAI. Um arquivo novo, duas linhas alteradas.
 
-**Estado:** plano técnico completo em `docs/OPENAI-IMPLEMENTATION-PLAN.md`. Aguardando chave de API e decisão de execução.
+**Estado:** **IMPLEMENTADO** — `src/ai/providers/openai.ts` criado, `src/ai/providers/index.ts` atualizado. Build limpo. Zero erros TypeScript. Aguarda `VITE_OPENAI_API_KEY` para ativar em produção.
 
 **Arquivos a criar/modificar:**
 - `src/ai/providers/openai.ts` — novo (~140 linhas)
@@ -260,7 +261,7 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 
 | Dependência | Necessária para | Status | Risco |
 |---|---|---|---|
-| `VITE_OPENAI_API_KEY` | IA real em qualquer bloco | ❌ Não configurada | **CRÍTICO** — sem isso, tudo é mock |
+| `VITE_OPENAI_API_KEY` | IA real em qualquer bloco | ⚠️ Provider implementado (FASE 28A) — chave não configurada | **CRÍTICO** — sem a chave, cai no erro; com a chave, funciona |
 | `VITE_USE_SUPABASE=true` | Persistência real de dados | ❌ Não está no `.env` | **CRÍTICO** — sem isso, dados somem |
 | Aprovação Meta (WhatsApp Business API) | Canal WhatsApp real | ❌ Não iniciada | Gargalo de 1–4 semanas |
 | Meta Business Manager configurado | Submeter aprovação WhatsApp | ❌ Desconhecido | Pré-requisito para Sprint 3 |
@@ -480,7 +481,7 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 | P0 | Supabase migrations (`supabase db push`) | ❌ Pendente |
 | P0 | Deploy Edge Functions + secrets Meta | ❌ Pendente |
 | P0 | Conectar WhatsApp no app | ❌ Pendente (depende de P0 acima) |
-| P1 | OpenAI real (trocar mock) | ❌ Pendente (~2–3h) |
+| P1 | OpenAI real (trocar mock) | ✅ Concluído (FASE 28A) — requer `VITE_OPENAI_API_KEY` |
 | P1 | Bot @vemfarias criado e publicado | ❌ Pendente (~2–4h) |
 | P2 | Instagram DM + Messenger | ❌ Pendente (setup + aprovação Meta) |
 
@@ -504,7 +505,7 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 | CRM / Pipeline | ✅ Funciona hoje — Supabase ativo |
 | WhatsApp | ⚠️ Deploy pendente (40 min, manual) |
 | Instagram DM | ❌ Deploy + aprovação Meta (1–4 semanas) |
-| IA real (não mock) | ❌ Implementação OpenAI pendente (~2–3h) |
+| IA real (não mock) | ✅ OpenAI implementado (FASE 28A) — requer `VITE_OPENAI_API_KEY` |
 | Follow-up automático | ❌ Roadmap Sprint 3–4 |
 
 **Score esperado para lead qualificado:** ~80 pontos → 🔥 Quente
@@ -735,7 +736,7 @@ Se você é uma IA entrando neste projeto agora, leia isto:
 
 **O que não funciona hoje:**
 1. `VITE_USE_SUPABASE` não está setado → tudo em memória, dados somem no reload
-2. Todos AI providers são `buildMockProvider()` → zero LLM real
+2. Anthropic e Gemini providers são `buildMockProvider()` (OpenAI real — FASE 28A ✅)
 3. Revenue/Attribution/Conversations consomem dados hardcoded de `lib/analytics-mock` e `lib/mock`
 4. WhatsApp/Instagram/Messenger são stubs (`makeStub()`) — sem Meta API
 5. Follow-up não existe. Google Calendar / Google Meet não integrados.
@@ -746,10 +747,11 @@ Se você é uma IA entrando neste projeto agora, leia isto:
 3. Lead Intelligence score (7 fatores) é código real e funcionando
 4. Connectors HTTP (webhook, sheets, slack, telegram) fazem chamadas reais
 5. Compliance LGPD é real (Consent, Audit Logs, RLS)
+6. **OpenAI provider real** — `src/ai/providers/openai.ts` (FASE 28A) — requer `VITE_OPENAI_API_KEY`
 
 **O que fazer primeiro:**
 1. Setar `VITE_USE_SUPABASE=true` em `.env` (já tem URL e key — falta só essa linha)
-2. Criar `src/ai/providers/openai.ts` e trocar `buildMockProvider` no `providers/index.ts`
+2. Setar `VITE_OPENAI_API_KEY=sk-proj-...` (provider real já implementado — FASE 28A ✅)
 
 **Referências rápidas:**
 - Para entender o produto: `docs/PRODUCT-CONSTITUTION.md`

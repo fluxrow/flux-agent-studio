@@ -764,7 +764,32 @@ Detalhamento e evidências: [`docs/SUPABASE-REALITY.md`](./SUPABASE-REALITY.md) 
 
 ---
 
+---
+
+### 2026-06-08 — Google Calendar Reality Check (FASE 27I)
+
+**O que foi auditado:** estado real da integração Google Calendar via varredura estática (`src/**`, `supabase/functions/**`).
+
+**Resultado:** `ROADMAP` — não existe integração.
+
+| Capacidade | Status |
+|---|---|
+| OAuth Google (login Lovable Cloud) | ✅ REAL |
+| OAuth Google (scopes Calendar) | ❌ ROADMAP |
+| Criação de evento / leitura / freebusy | ❌ ROADMAP |
+| Google Meet auto-link | ❌ ROADMAP |
+| Webhook `events.watch` | ❌ ROADMAP |
+| Sync com CRM | ❌ ROADMAP (só copy "agendar reunião") |
+| Bloco "Agendar" no Builder | ⚠️ MOCK (template/copy sem execução) |
+
+**Caminho mínimo para `PARCIAL`:** connector manifest `google-calendar` + adapter via gateway `https://connector-gateway.lovable.dev/google_calendar/calendar/v3`, 2 blocos Builder (`create_event`, `check_availability`), tabela `public.calendar_events` com RLS+GRANT, CRM bridge.
+
+**Detalhe completo:** [`docs/GOOGLE-CALENDAR-REALITY.md`](./GOOGLE-CALENDAR-REALITY.md)
+
+---
+
 *Documento criado: 2026-06-04*  
 *Consolida: PRODUCT-CONSTITUTION.md · REALITY-CHECK-AUDIT.md · AI-BUILDER-REALITY.md · FLUXROW-GAP-ANALYSIS.md · VEMFARIAS-OPERATION.md · 30-DAY-EXECUTION-PLAN.md · OPENAI-IMPLEMENTATION-PLAN.md*  
 *Branch: `claude/sweet-meitner-bB77L`*
+
 

@@ -1,1 +1,4 @@
 project_id = "bgzczvsmfcnypwqveotx"
+
+[functions.lovable-ai]
+verify_jwt = false

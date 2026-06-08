@@ -6,6 +6,7 @@ import {
   Sparkles, Lock, Users, GitBranch, Clock, DollarSign,
   Building2, Briefcase, Megaphone,
 } from "lucide-react";
+import { Seo } from "@/components/seo/Seo";
 
 /* ─── Mockup animation ─── */
 interface MockupState {

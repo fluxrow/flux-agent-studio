@@ -1,140 +1,256 @@
-# SUPABASE DEPLOY CHECKLIST — FASE 27F
-
-**Auditoria executada em 2026-06-08 contra o projeto canônico `bgzczvsmfcnypwqveotx`.**
-Fontes: `supabase_migrations.schema_migrations`, `information_schema.tables`,
-`pg_publication_tables`, `pg_class.relrowsecurity`, `storage.buckets`,
-HTTP probes em `*.supabase.co/functions/v1/*`.
-
-## Status geral: **PARTIAL**
-
-O núcleo (workspaces, bots, leads, sessions, auth, RLS, realtime de `messages`/`sessions`)
-está **READY**. Toda a stack de **canais Meta** (WhatsApp/Instagram/Messenger) está
-**BLOCKED** — 2 migrations não aplicadas, 2 edge functions não deployadas, 2 secrets faltando.
+# Supabase Deploy Checklist
+**FASE 27F — Auditoria técnica executada em 2026-06-08**
 
 ---
 
-## 1. Migrations
+## STATUS GERAL: BLOCKED
 
-| # | Arquivo local | Versão na DB | Status |
-|---|---|---|---|
-| 1 | `20260602114630_…sql` (schema inicial + RLS + `handle_new_user`) | `20260602114628` | ✅ APLICADA |
-| 2 | `20260602114654_…sql` (revokes de segurança) | `20260602114652` | ✅ APLICADA |
-| 3 | `20260602120256_…sql` | `20260602120255` | ✅ APLICADA |
-| 4 | `20260602121119_…sql` | `20260602121117` | ✅ APLICADA |
-| 5 | `20260602122138_…sql` | `20260602122135` | ✅ APLICADA |
-| 6 | **`20260604000001_meta_channels.sql`** | — | ❌ **FALTANDO** |
-| 7 | **`20260604000002_meta_realtime.sql`** | — | ❌ **FALTANDO** |
-| 8 | `20260605162135_…sql` | `20260605162133` | ✅ APLICADA |
-| 9 | `20260608124344_…sql` (`slugify` hardening) | `20260608124341` | ✅ APLICADA |
+**Bloqueador raiz:** o projeto `bgzczvsmfcnypwqveotx` (Flux Agent Studio) é gerenciado pelo **Lovable Cloud** e **não aparece na conta MCP** disponível neste ambiente. O MCP tem acesso a 7 outros projetos da mesma organização, mas não a este.
 
-**Aplicadas: 7/9. Faltando: 2** (toda a stack Meta).
+Consequência: nenhuma operação de deploy remoto (migrations, edge functions, secrets, verificações de estado) pode ser executada automaticamente a partir deste ambiente.
 
-Evidência: as tabelas `meta_channel_connections`, `meta_conversations` e
-`meta_messages` **não existem** em `public` (confirmado via
-`information_schema.tables`).
+---
 
-## 2. Edge Functions
+## Projetos Supabase acessíveis via MCP (confirmado)
 
-| Função | Esperada | Probe HTTP | Status |
-|---|---|---|---|
-| `meta-webhook` | `GET ?hub.mode=subscribe…` → 200 challenge | **404** | ❌ NÃO DEPLOYADA |
-| `meta-send` | `POST {}` → 400/401 | **404** | ❌ NÃO DEPLOYADA |
+| Ref | Nome | Acessível |
+|-----|------|-----------|
+| `kdvyaxghassnvhggmdfm` | Orçamentos | ✅ |
+| `fngjxjrgovhxbdlkomvw` | Site Promotrip | ✅ |
+| `syqrgayomzhvhtwoilou` | CRM Macth Solutions | ✅ |
+| `zjelgobexwhhfoisuilm` | prevlegal-central | ✅ |
+| `lrqvvxmgimjlghpwavdb` | prevlegal-alexandrini | ✅ |
+| `espwkkaldnisriqhxyzt` | Fluxrow | ✅ |
+| `pgcoyjanmuksvbxnvnhm` | Lex Revison | ✅ |
+| **`bgzczvsmfcnypwqveotx`** | **Flux Agent Studio** | ❌ **403 — sem acesso** |
 
-Ambas existem em `supabase/functions/` mas nunca foram publicadas no projeto canônico.
+---
 
-## 3. Secrets (Edge runtime)
+## Respostas às 9 perguntas da auditoria
 
-| Secret | Necessário por | Status |
-|---|---|---|
-| `SUPABASE_URL` | meta-webhook, meta-send | ✅ presente |
-| `SUPABASE_SERVICE_ROLE_KEY` | meta-webhook, meta-send | ✅ presente |
-| `SUPABASE_PUBLISHABLE_KEY` | infra | ✅ presente |
-| `SUPABASE_DB_URL` | infra | ✅ presente |
-| `LOVABLE_API_KEY` | AI gateway | ✅ presente |
-| `GOOGLE_SEARCH_CONSOLE_API_KEY` | connector GSC | ✅ presente (managed) |
-| **`META_VERIFY_TOKEN`** | meta-webhook (verify handshake) | ❌ **FALTANDO** (cai em default `flux_meta_verify`) |
-| **`META_APP_SECRET`** | meta-webhook (HMAC verification — sem ele todos os webhooks são rejeitados) | ❌ **FALTANDO** |
+### 1. Migrations locais aplicadas?
 
-## 4. Realtime
+**DESCONHECIDO** — impossível verificar remotamente.
 
-Publicação `supabase_realtime` contém: `messages`, `sessions`. ✅ Suficiente para
-`useMetaConversations` enquanto o app lê de `messages`/`sessions`.
+Estado local (código, auditado):
 
-Tabelas Meta (`meta_channel_connections`, `meta_conversations`, `meta_messages`)
-**não estão na publicação** — bloqueado pelas migrations faltantes.
+| Migration | Arquivo | Conteúdo |
+|-----------|---------|---------|
+| `20260602114630` | `_41fe3de9...sql` | Schema base: workspaces, profiles, workspace_members, bots, leads, sessions, messages, RLS, helpers |
+| `20260602114654` | `_47f6d6cc...sql` | REVOKE execute em funções RLS (hardening) |
+| `20260602120256` | `_25d8a5f8...sql` | ALTER TABLE leads: company, owner_id, notes |
+| `20260602121119` | `_39539875...sql` | ALTER TABLE bots: slug, published_snapshot |
+| `20260602122138` | `_c3c7e0a2...sql` | visitor_profiles table + 10 políticas RLS |
+| `20260604000001` | `meta_channels.sql` | meta_channel_connections, meta_conversations, meta_messages + RPCs + 6 políticas RLS |
+| `20260604000002` | `meta_realtime.sql` | ALTER PUBLICATION supabase_realtime (3 tabelas) |
+| `20260605162135` | `_1d64b104...sql` | GRANT EXECUTE on is_workspace_member para authenticated/anon |
+| `20260608124344` | `_b11be011...sql` | CREATE FUNCTION slugify() |
 
-## 5. RLS
+**Total:** 9 migrations locais, todas prontas para `supabase db push`.
 
-Todas as 16 tabelas de `public` têm `rowsecurity = true` (verificado em
-`pg_class.relrowsecurity`). ✅ **READY.**
+---
 
-Funções `SECURITY DEFINER` (`has_workspace_role`, `is_workspace_member`,
-`get_public_bot`, `publish_bot`, `record_public_*`, `handle_new_user`,
-`attach_public_attribution_to_lead`) presentes e com `search_path = public`.
+### 2. Quais migrations faltam?
 
-## 6. Auth
+Sem acesso ao banco remoto é impossível confirmar quais já foram aplicadas. Baseado no histórico do projeto:
 
-- Provider e-mail/senha ativo (login funciona em produção).
-- Trigger `on_auth_user_created` → `handle_new_user` cria `profiles` +
-  `workspaces` + `workspace_members` por novo signup. ✅
-- `EXECUTE` em `handle_new_user` revogado de `PUBLIC/anon/authenticated`. ✅
-- Google OAuth: connector existe; provider ainda **não confirmado ativo** no
-  projeto canônico — testar em chat se for habilitar.
+- **Prováveis aplicadas** (Lovable aplica automaticamente migrations ao fazer deploy): `20260602114630` a `20260602122138` (as 5 primeiras — existem antes do bloqueio de acesso MCP).
+- **Prováveis pendentes** (criadas após o bloqueio MCP, nunca aplicadas remotamente):
+  - `20260604000001_meta_channels.sql` ← **crítica** — sem ela, WhatsApp/Meta não funciona
+  - `20260604000002_meta_realtime.sql` ← **crítica** — sem ela, Realtime não publica eventos
+  - `20260605162135_1d64b104...` — GRANT em is_workspace_member
+  - `20260608124344_b11be011...` — função slugify
 
-## 7. Storage
+**Ação:** `supabase db push` aplica apenas as pendentes (por timestamp).
 
-`storage.buckets` retorna **0 buckets**. Hoje o produto não usa storage —
-**N/A**, não bloqueia.
+---
 
-## 8. Comandos para destravar a stack Meta
+### 3. Edge Functions deployadas?
 
-Executar localmente, **com o repo linkado a `bgzczvsmfcnypwqveotx`**:
+**DESCONHECIDO** — MCP retorna 403 para `list_edge_functions` neste projeto.
+
+Estado local (código pronto):
+
+| Função | Arquivo | Deploy necessário |
+|--------|---------|-----------------|
+| `meta-webhook` | `supabase/functions/meta-webhook/index.ts` | `--no-verify-jwt` obrigatório |
+| `meta-send` | `supabase/functions/meta-send/index.ts` | deploy padrão |
+
+Se o Lovable nunca deployou Edge Functions automaticamente (comportamento padrão), **ambas estão pendentes**.
+
+---
+
+### 4. Quais secrets faltam?
+
+`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_ANON_KEY` são **auto-injetados** pelo runtime Supabase — não precisam ser configurados manualmente.
+
+Secrets que **precisam** ser configurados manualmente:
+
+| Secret | Usado por | Valor | Status |
+|--------|-----------|-------|--------|
+| `META_VERIFY_TOKEN` | `meta-webhook` | `flux_meta_verify` (ou customizado) | ❌ Pendente |
+| `META_APP_SECRET` | `meta-webhook` | Meta App → Settings → Basic → App Secret | ❌ Pendente |
+
+**Impacto se ausentes:**
+- Sem `META_APP_SECRET`: `meta-webhook` rejeita **todos** os POSTs com HTTP 401 (fail-closed — comportamento correto de segurança, mas bloqueia o fluxo).
+- Sem `META_VERIFY_TOKEN`: hub challenge do Meta falha → impossível registrar o webhook.
+
+---
+
+### 5. Realtime funcionando?
+
+**PROVAVELMENTE NÃO** — dependente da migration `20260604000002_meta_realtime.sql` ser aplicada.
+
+Estado do código:
+- `ALTER PUBLICATION supabase_realtime ADD TABLE public.meta_channel_connections` ✅ (na migration)
+- `ALTER PUBLICATION supabase_realtime ADD TABLE public.meta_conversations` ✅
+- `ALTER PUBLICATION supabase_realtime ADD TABLE public.meta_messages` ✅
+- Subscrições no frontend (`useMetaConversations.ts`, `useMetaLeadBridge.ts`) ✅ corretas
+
+**Bloqueio:** se a migration `20260604000002` não foi aplicada, as tabelas Meta não estão na publication e o Realtime não dispara eventos — mesmo com o código correto.
+
+---
+
+### 6. RLS funcionando?
+
+**PARCIALMENTE** — as políticas estão no código e prontas, mas dependem das migrations terem sido aplicadas.
+
+Contagem de políticas por migration:
+
+| Migration | Policies | Tabelas protegidas |
+|-----------|---------|------------------|
+| `20260602114630` | 53 | workspaces, profiles, workspace_members, bots, leads, sessions, messages, etc. |
+| `20260602122138` | 10 | visitor_profiles |
+| `20260604000001` | 6 | meta_channel_connections, meta_conversations, meta_messages |
+
+Funções RLS críticas:
+- `is_workspace_member(workspace_id, user_id)` — SECURITY DEFINER ✅
+- `has_workspace_role(workspace_id, user_id, roles[])` — SECURITY DEFINER ✅
+
+Se as migrations base (20260602) já foram aplicadas pelo Lovable, o RLS está funcionando para o core. O RLS das tabelas Meta depende da `20260604000001`.
+
+---
+
+### 7. Auth funcionando?
+
+**PROVAVELMENTE SIM** — o Supabase Auth é habilitado automaticamente em todo projeto novo. O código usa `supabase.auth.signInWithPassword`, `supabase.auth.signUp`, `supabase.auth.getUser` (arquivos `src/auth/AuthProvider.tsx`, `src/pages/Auth.tsx`). Nenhuma configuração especial de Auth foi identificada nas migrations.
+
+**Ressalva:** trigger `handle_new_user()` (cria perfil automaticamente no signup) está na migration base — funcionará se a migration foi aplicada.
+
+---
+
+### 8. Storage funcionando?
+
+**NÃO USADO** — nenhuma chamada a `supabase.storage` existe no código-fonte. Nenhuma migration cria buckets. Storage não faz parte do escopo atual do produto.
+
+---
+
+### 9. Comandos exatos para deploy completo
+
+Executar **na máquina local** onde há acesso de rede e Supabase CLI instalado:
 
 ```bash
-# 0. Conferir o link
+# Pré-requisito: Supabase CLI instalado
+# brew install supabase/tap/supabase  (macOS)
+# https://supabase.com/docs/guides/cli
+
+# 1. Linkar ao projeto correto
 supabase link --project-ref bgzczvsmfcnypwqveotx
-grep project_id supabase/config.toml  # deve imprimir bgzczvsmfcnypwqveotx
 
-# 1. Aplicar as duas migrations faltantes
+# 2. Verificar que está no projeto certo
+supabase status
+# Esperado: API URL = https://bgzczvsmfcnypwqveotx.supabase.co
+
+# 3. Aplicar migrations pendentes
 supabase db push
-# Deve aplicar:
-#   20260604000001_meta_channels.sql
-#   20260604000002_meta_realtime.sql
+# Aplica apenas as migrations não registradas em supabase_migrations (por timestamp)
 
-# 2. Gravar os secrets do Meta (obter no Meta App → Settings → Basic)
-supabase secrets set META_VERIFY_TOKEN=<string-arbitrária-usada-no-webhook-setup>
-supabase secrets set META_APP_SECRET=<App Secret do Meta App>
+# 4. Verificar tabelas Meta no banco
+# Abrir Supabase Dashboard → SQL Editor e rodar:
+# SELECT table_name FROM information_schema.tables
+# WHERE table_schema = 'public'
+# AND table_name IN ('meta_channel_connections','meta_conversations','meta_messages')
+# ORDER BY table_name;
+# Esperado: 3 linhas
 
-# 3. Deployar as edge functions
+# 5. Deploy Edge Functions
 supabase functions deploy meta-webhook --no-verify-jwt
 supabase functions deploy meta-send
 
-# 4. Verificar
-curl -i "https://bgzczvsmfcnypwqveotx.supabase.co/functions/v1/meta-webhook?hub.mode=subscribe&hub.verify_token=<META_VERIFY_TOKEN>&hub.challenge=ping"
-# Esperado: HTTP 200, corpo "ping"
-supabase functions logs meta-webhook
+# 6. Configurar secrets (2 obrigatórios)
+supabase secrets set META_VERIFY_TOKEN=flux_meta_verify
+supabase secrets set META_APP_SECRET=<seu_app_secret_do_meta>
+
+# 7. Verificar secrets configurados
+supabase secrets list
+
+# 8. Testar hub challenge
+curl "https://bgzczvsmfcnypwqveotx.supabase.co/functions/v1/meta-webhook\
+?hub.mode=subscribe\
+&hub.verify_token=flux_meta_verify\
+&hub.challenge=TESTE123"
+# Esperado: body = TESTE123, HTTP 200
+
+# 9. Testar HMAC inválido
+curl -X POST "https://bgzczvsmfcnypwqveotx.supabase.co/functions/v1/meta-webhook" \
+  -H "Content-Type: application/json" \
+  -H "x-hub-signature-256: sha256=invalido" \
+  -d '{"object":"test","entry":[]}'
+# Esperado: HTTP 401
 ```
 
-Depois de aplicar as migrations, refazer probe Realtime:
-```sql
-SELECT tablename FROM pg_publication_tables
- WHERE pubname='supabase_realtime' AND schemaname='public';
--- Deve incluir meta_channel_connections, meta_conversations, meta_messages.
-```
+---
 
-## 9. Classificação por subsistema
+## Checklist de Deploy
 
-| Subsistema | Status |
-|---|---|
-| Schema núcleo (workspaces/bots/leads/sessions/events/flows) | **READY** |
-| RLS em `public` | **READY** |
-| Auth e-mail + trigger de signup | **READY** |
-| Realtime de `messages`/`sessions` | **READY** |
-| Storage | N/A (não usado) |
-| Migrations Meta channels | **BLOCKED** |
-| Edge functions Meta (`meta-webhook`, `meta-send`) | **BLOCKED** |
-| Secrets Meta (`META_VERIFY_TOKEN`, `META_APP_SECRET`) | **BLOCKED** |
-| **Geral** | **PARTIAL** |
+| # | Item | Responsável | Status |
+|---|------|------------|--------|
+| 1 | `supabase link --project-ref bgzczvsmfcnypwqveotx` | Manual | ❌ Pendente |
+| 2 | `supabase db push` (9 migrations) | Manual | ❌ Pendente |
+| 3 | Verificar tabelas Meta no SQL Editor | Manual | ❌ Pendente |
+| 4 | `supabase functions deploy meta-webhook --no-verify-jwt` | Manual | ❌ Pendente |
+| 5 | `supabase functions deploy meta-send` | Manual | ❌ Pendente |
+| 6 | `supabase secrets set META_VERIFY_TOKEN=flux_meta_verify` | Manual | ❌ Pendente |
+| 7 | `supabase secrets set META_APP_SECRET=<valor>` | Manual | ❌ Pendente |
+| 8 | Testar hub challenge (GET) → HTTP 200 | Manual | ❌ Pendente |
+| 9 | Testar HMAC inválido (POST) → HTTP 401 | Manual | ❌ Pendente |
+| 10 | Registrar webhook no Meta App Dashboard | Manual | ❌ Pendente |
+| 11 | Enviar mensagem WhatsApp de teste | Manual | ❌ Pendente |
+| 12 | Confirmar lead no CRM automaticamente | Manual | ❌ Pendente |
 
-Sem nada da seção 8 executado, todo fluxo WhatsApp/Instagram/Messenger é mock-only;
-o resto do produto está operacional contra Supabase real.
+**Estimativa:** 40–60 minutos de execução manual com acesso ao Supabase CLI e ao Meta App Dashboard.
+
+---
+
+## Diagnóstico do Bloqueador
+
+| Camada | Status | Detalhes |
+|--------|--------|---------|
+| Código (migrations) | ✅ PRONTO | 9 migrations, TypeScript limpo, sem bugs conhecidos |
+| Código (edge functions) | ✅ PRONTO | HMAC fail-closed, conversation_id resolvido |
+| Código (frontend) | ✅ PRONTO | RLS, Realtime, CRM bridge, Lead bridge |
+| Projeto Supabase (remoto) | ⚠️ PARCIAL | Existe e está ativo — mas não acessível via MCP deste ambiente |
+| Deploy de migrations | ❌ BLOQUEADO | Requer Supabase CLI local ou acesso MCP ao projeto |
+| Deploy de edge functions | ❌ BLOQUEADO | Idem |
+| Secrets | ❌ BLOQUEADO | Idem |
+| Testes físicos | ❌ BLOQUEADO | Dependência cascata |
+
+---
+
+## Para desbloquear
+
+**Opção A (recomendada) — CLI local:**
+Executar os 9 comandos acima na máquina do usuário onde o Supabase CLI tem acesso ao projeto.
+
+**Opção B — MCP:**
+Transferir o projeto `bgzczvsmfcnypwqveotx` para a organização Supabase acessível via MCP (`ceslztoyqldgelabeqxp`), ou criar um projeto novo nessa organização e atualizar o `.env`.
+
+---
+
+## Referências
+
+- [DEPLOY-TARGET.md](./DEPLOY-TARGET.md) — projeto oficial e comandos canônicos
+- [SUPABASE-REALITY.md](./SUPABASE-REALITY.md) — auditoria de código
+- [META-PHYSICAL-SMOKE-TEST-REPORT.md](./META-PHYSICAL-SMOKE-TEST-REPORT.md) — relatório anterior de bloqueio
+- `supabase/migrations/` — 9 migrations prontas para aplicação
+- `supabase/functions/` — 2 edge functions prontas para deploy

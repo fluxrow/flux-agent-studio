@@ -578,6 +578,30 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 
 ---
 
+### 2026-06-08 — Meta Blockers (FASE 27G)
+
+**O que foi auditado:** 10 perguntas sobre infraestrutura Meta real.
+
+**Resultado:** 0/10 itens confirmados. Tudo é mock ou inexistente.
+
+| Bloqueador | Impacto | Tempo para resolver |
+|-----------|---------|-------------------|
+| App Meta não existe | Raiz de tudo | 20 min |
+| WABA não existe | Sem número WhatsApp | 10 min (sandbox) |
+| Tokens não existem | Sem envio de mensagens | 15 min |
+| Edge functions não deployadas | Sem webhook público | 10 min |
+| Migrations Meta não aplicadas | Sem tabelas no banco | 2 min |
+| OAuth é mock | Sem conexão por UI | Workaround: 5 min · Dev: 4–6h |
+| Página Facebook/Instagram não conectadas | Sem IG/Messenger | 15 min |
+
+**Tempo total para MVP WhatsApp funcionar:** ~65 minutos de execução manual.
+
+**O código está pronto. Só falta a operação.**
+
+**Documento completo:** `docs/META-BLOCKERS.md` — checklist operacional em 8 etapas.
+
+---
+
 ## 12. Timeline Visual
 
 ```

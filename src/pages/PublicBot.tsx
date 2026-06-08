@@ -18,6 +18,7 @@ import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/trac
 import { webChannel, webChannelHelpers } from "@/channels";
 import type { Flow } from "@/types";
 import { getRenderer, listRenderers, resolveVariant, type RendererId } from "@/renderers";
+import { Seo } from "@/components/seo/Seo";
 
 
 type LoadState =

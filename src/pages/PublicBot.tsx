@@ -262,6 +262,11 @@ function ModeSelector({ current, onChange }: { current: RendererId; onChange: (m
 function PublicShell({ slug, children }: { slug?: string; children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background relative overflow-hidden">
+      <Seo
+        title={slug ? `${slug} — Flux Agent Studio` : "Bot — Flux Agent Studio"}
+        description={`Converse com o agente ${slug ?? ""} no Flux Agent Studio — qualifique-se em segundos via chat.`}
+        path={slug ? `/bot/${slug}` : "/"}
+      />
       <div className="absolute inset-0 grid-bg opacity-20" />
       <div className="absolute inset-0" style={{ background: "var(--gradient-glow)" }} />
 

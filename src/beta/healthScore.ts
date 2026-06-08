@@ -95,7 +95,7 @@ async function compute(workspaceId: string): Promise<{ score: number; criteria: 
     { key: "has_tracking",       label: "Tracking ativo",           ok: hasTracking,
       recommendation: "Conecte Meta/Google para medir conversões.", ctaHref: "/tracking",   ctaLabel: "Configurar" },
     { key: "has_ai",             label: "IA configurada",           ok: hasAI,
-      recommendation: "Adicione um provedor de IA para qualificar leads.", ctaHref: "/settings", ctaLabel: "Adicionar provedor" },
+      recommendation: "Lovable AI ativo. Você pode adicionar uma chave própria se quiser.", ctaHref: "/settings", ctaLabel: "Gerenciar IA" },
     { key: "has_knowledge",      label: "Knowledge base",           ok: hasKnowledge,
       recommendation: "Suba documentos para alimentar respostas.",  ctaHref: "/knowledge",  ctaLabel: "Abrir Knowledge" },
     { key: "has_channel",        label: "Canal conectado",          ok: hasChannel || hasConnector,

@@ -42,7 +42,7 @@ export default function AppLayout() {
         <div className="flex flex-1 flex-col min-w-0">
           <BetaBanner />
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/70 px-4 backdrop-blur-xl">
-            <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+            <SidebarTrigger aria-label="Alternar menu lateral" className="text-muted-foreground hover:text-foreground" />
             <div className="hidden md:flex items-center gap-2 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-sm text-muted-foreground w-72">
               <Search className="h-3.5 w-3.5" />
               <span className="text-xs">Buscar bots, leads, conversas...</span>

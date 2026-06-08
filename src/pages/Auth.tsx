@@ -107,6 +107,7 @@ export default function Auth() {
         noindex
       />
       <div className="w-full max-w-md">
+        <h1 className="sr-only">Entrar ou criar conta no Flux Agent Studio</h1>
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <div className="h-9 w-9 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
             <Sparkles className="h-4 w-4 text-primary-foreground" />

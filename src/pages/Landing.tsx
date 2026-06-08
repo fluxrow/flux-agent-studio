@@ -6,6 +6,7 @@ import {
   Sparkles, Lock, Users, GitBranch, Clock, DollarSign,
   Building2, Briefcase, Megaphone,
 } from "lucide-react";
+import { Seo } from "@/components/seo/Seo";
 
 /* ─── Mockup animation ─── */
 interface MockupState {
@@ -402,6 +403,13 @@ export default function Landing() {
 
   return (
     <div className="lp-v2 min-h-screen overflow-x-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <Seo
+        title="Flux Agent Studio — Conversational Revenue OS"
+        description="Agente com IA que transforma conversas em receita: qualifica leads, atualiza seu CRM e atribui ROAS por campanha — WhatsApp, Web e Instagram."
+        path="/"
+        image="https://agent.studio.fluxrow.space/og-image.jpg"
+      />
+
 
       {/* ───────── NAV ───────── */}
       <nav

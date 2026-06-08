@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Hero Loop Recorder — Flux Agent Studio</title>
+<style>
+  :root {
+    --bg: #09090C;
+    --bg-elevated: #111118;
+    --bg-subtle: #16161F;
+    --border: rgba(255,255,255,0.08);
+    --border-mid: rgba(255,255,255,0.12);
+    --fg: #F8FAFC;
+    --fg-muted: #94A3B8;
+    --fg-subtle: #64748B;
+    --teal: #14B8A6;
+    --teal-dark: #0D9488;
+    --amber: #D97706;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    font-family: 'Inter', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    gap: 20px;
+    min-height: 100vh;
+  }
+
+  h1 { color: #fff; font-size: 18px; }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  button:disabled { opacity: 0.4; cursor: default; }
+  .btn-record { background: #ef4444; color: #fff; }
+  .btn-stop   { background: #6b7280; color: #fff; }
+  .btn-poster { background: #14B8A6; color: #fff; }
+
+  #status { color: #94A3B8; font-size: 13px; min-height: 18px; }
+
+  #canvas-wrap {
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  canvas { display: block; }
+
+  .downloads { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .downloads a {
+    color: #14B8A6;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .downloads a:hover { text-decoration: underline; }
+
+  .instructions {
+    background: #0f0f1a;
+    border: 1px solid #2a2a3a;
+    border-radius: 8px;
+    padding: 16px;
+    max-width: 640px;
+    color: #94A3B8;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .instructions strong { color: #fff; }
+  .instructions code {
+    background: #1a1a2e;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #14B8A6;
+    font-family: monospace;
+  }
+</style>
+</head>
+<body>
+
+<h1>Hero Loop Recorder — Flux Agent Studio</h1>
+
+<div class="controls">
+  <button class="btn-record" id="btnRecord">⏺ Gravar WEBM (10s)</button>
+  <button class="btn-stop" id="btnStop" disabled>⏹ Parar</button>
+  <button class="btn-poster" id="btnPoster">📸 Exportar Poster (JPG)</button>
+</div>
+
+<div id="status">Pronto para gravar.</div>
+
+<div id="canvas-wrap">
+  <canvas id="canvas" width="920" height="520"></canvas>
+</div>
+
+<div class="downloads" id="downloads"></div>
+
+<div class="instructions">
+  <strong>Como usar:</strong><br><br>
+  1. Clique em <strong>⏺ Gravar WEBM</strong> — a animação começa e é gravada por 10 segundos.<br>
+  2. Aguarde a gravação terminar (ou clique em ⏹ Parar antes).<br>
+  3. Um link de download <code>hero-loop.webm</code> aparecerá abaixo.<br>
+  4. Clique em <strong>📸 Exportar Poster</strong> para baixar <code>hero-loop-poster.jpg</code>.<br>
+  5. Para MP4: abra o WEBM no <strong>HandBrake</strong> (gratuito) ou use <code>ffmpeg -i hero-loop.webm hero-loop.mp4</code>.<br>
+  6. Copie os 3 arquivos para <code>public/</code> do projeto.<br><br>
+  <strong>Alternativa MP4 online:</strong> <a href="https://cloudconvert.com/webm-to-mp4" target="_blank" style="color:#14B8A6">cloudconvert.com/webm-to-mp4</a> (gratuito, sem conta)
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width;
+const H = canvas.height;
+
+// ─── Design tokens
+const colors = {
+  bg: '#09090C', bgElevated: '#111118', bgSubtle: '#16161F',
+  border: 'rgba(255,255,255,0.08)', borderMid: 'rgba(255,255,255,0.12)',
+  fg: '#F8FAFC', fgMuted: '#94A3B8', fgSubtle: '#64748B',
+  teal: '#14B8A6', tealDark: '#0D9488',
+  amber: '#D97706', amberLight: '#F59E0B',
+  green: '#4ade80',
+};
+
+// ─── Animation state
+let startTime = null;
+let animFrame = null;
+let phase = 0; // 0=idle, 1=animating
+
+// ─── Easing
+function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+function easeInOut(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2; }
+function clamp01(t) { return Math.max(0, Math.min(1, t)); }
+function progress(elapsed, start, duration) {
+  return clamp01((elapsed - start) / duration);
+}
+
+// ─── Draw helpers
+function roundRect(x, y, w, h, r, fill, stroke) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.stroke(); }
+}
+
+function text(str, x, y, opts = {}) {
+  ctx.font = `${opts.weight||400} ${opts.size||12}px ${opts.family||"'Inter', system-ui, sans-serif"}`;
+  ctx.fillStyle = opts.color || colors.fg;
+  ctx.textAlign = opts.align || 'left';
+  ctx.textBaseline = opts.baseline || 'alphabetic';
+  ctx.fillText(str, x, y);
+}
+
+function label(str, x, y) {
+  text(str.toUpperCase(), x, y, { size: 9, weight: 600, color: colors.fgSubtle });
+}
+
+// ─── Draw node
+function drawNode(x, y, w, type, lbl, highlight, alpha) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  const h = 44;
+  const fill = highlight ? 'rgba(13,148,136,0.1)' : colors.bgSubtle;
+  const stroke = highlight ? 'rgba(13,148,136,0.4)' : colors.border;
+  roundRect(x, y, w, h, 8, fill, stroke);
+
+  // type tag
+  const tagColor = highlight ? colors.teal : colors.fgSubtle;
+  ctx.font = '500 10px Inter, system-ui';
+  ctx.fillStyle = tagColor;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillText(type, x + 10, y + 15);
+
+  // label
+  ctx.font = `600 12px 'Inter', system-ui`;
+  ctx.fillStyle = highlight ? colors.teal : colors.fgMuted;
+  ctx.fillText(lbl, x + 10, y + 31);
+
+  // AI glow pulse
+  if (highlight) {
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
+    ctx.globalAlpha = alpha * pulse * 0.4;
+    roundRect(x - 2, y - 2, w + 4, h + 4, 10, null, colors.teal);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ─── Draw CRM node
+function drawCRMNode(x, y, alpha) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  const w = 160, h = 70;
+  roundRect(x, y, w, h, 8, colors.bgSubtle, 'rgba(217,119,6,0.35)');
+  ctx.font = '600 10px Inter, system-ui';
+  ctx.fillStyle = '#D97706';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillText('CRM', x + 10, y + 16);
+  ctx.font = '500 11px Inter, system-ui';
+  ctx.fillStyle = colors.fgMuted;
+  ctx.fillText('Lead criado', x + 10, y + 35);
+  ctx.fillStyle = colors.fgSubtle;
+  ctx.fillText('Score: 87 / Quente 🔥', x + 10, y + 52);
+  ctx.globalAlpha = 1;
+}
+
+// ─── Draw connection line (animated dash)
+function drawLine(x1, y1, x2, y2, progress, color, dashed) {
+  if (progress <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = 0.6;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  if (dashed) ctx.setLineDash([4, 3]);
+  else ctx.setLineDash([]);
+  const px = x1 + (x2 - x1) * progress;
+  const py = y1 + (y2 - y1) * progress;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(px, py);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ─── Chat bubble
+function drawBubble(x, y, w, msg, side, alpha) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  const h = 36;
+  const fill = side === 'bot' ? colors.bgSubtle : 'rgba(13,148,136,0.15)';
+  const stroke = side === 'bot' ? colors.border : 'rgba(13,148,136,0.3)';
+  roundRect(x, y, w, h, 10, fill, stroke);
+  ctx.font = '400 11px Inter, system-ui';
+  ctx.fillStyle = side === 'bot' ? colors.fgMuted : colors.fg;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  const maxW = w - 20;
+  let txt = msg;
+  while (ctx.measureText(txt).width > maxW && txt.length > 0) txt = txt.slice(0, -1);
+  ctx.fillText(txt.length < msg.length ? txt + '…' : txt, x + 10, y + h/2);
+  ctx.globalAlpha = 1;
+}
+
+// ─── Typing indicator
+function drawTyping(x, y, alpha) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  roundRect(x, y, 56, 28, 14, colors.bgSubtle, colors.border);
+  const t = Date.now() / 300;
+  for (let i = 0; i < 3; i++) {
+    const bounce = Math.sin(t - i * 0.8) * 3;
+    ctx.beginPath();
+    ctx.arc(x + 14 + i * 14, 14 + y + bounce, 3, 0, Math.PI*2);
+    ctx.fillStyle = colors.fgSubtle;
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ─── Score panel
+function drawScore(x, y, w, alpha) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  roundRect(x, y, w, 88, 10, colors.bgSubtle, colors.border);
+  // Score
+  ctx.font = "700 22px 'Space Grotesk', Inter, system-ui";
+  ctx.fillStyle = colors.teal;
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
+  ctx.fillText('87', x + 12, y + 12);
+  ctx.font = '400 11px Inter, system-ui';
+  ctx.fillStyle = colors.fgMuted;
+  ctx.fillText('/100', x + 44, y + 16);
+  ctx.font = '500 10px Inter, system-ui';
+  ctx.fillStyle = colors.green;
+  ctx.fillText('▲ Alto potencial', x + 44, y + 30);
+  // Separator
+  ctx.strokeStyle = colors.border;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 8, y + 52); ctx.lineTo(x + w - 8, y + 52);
+  ctx.stroke();
+  ctx.font = '400 11px Inter, system-ui';
+  ctx.fillStyle = colors.fgSubtle;
+  ctx.textBaseline = 'top';
+  ctx.fillText('📅 Fechar em ~18 dias', x + 12, y + 58);
+  ctx.fillStyle = colors.amber;
+  ctx.fillText('💰 R$ 4.200 estimados', x + 12, y + 72);
+  ctx.globalAlpha = 1;
+}
+
+// ─── Main draw
+function draw(elapsed) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = colors.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Chrome bar
+  roundRect(0, 0, W, 40, 0, 'rgba(255,255,255,0.02)', null);
+  ctx.strokeStyle = colors.border;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, 40); ctx.lineTo(W, 40); ctx.stroke();
+  // Traffic lights
+  const tlColors = ['rgba(255,255,255,0.14)', 'rgba(255,255,255,0.14)', 'rgba(255,255,255,0.14)'];
+  tlColors.forEach((c, i) => {
+    ctx.beginPath();
+    ctx.arc(16 + i * 18, 20, 5, 0, Math.PI*2);
+    ctx.fillStyle = c; ctx.fill();
+  });
+  // URL bar
+  roundRect(72, 10, 200, 20, 6, 'rgba(255,255,255,0.04)', colors.border);
+  ctx.font = "400 10px 'JetBrains Mono', monospace, sans-serif";
+  ctx.fillStyle = colors.fgSubtle;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillText('fluxagent.studio/builder/sdr', 82, 20);
+
+  // 3-panel layout
+  const top = 40;
+  const panelH = H - top;
+  const col1W = 140, col3W = 200;
+  const col2X = col1W;
+  const col2W = W - col1W - col3W;
+  const col3X = col1W + col2W;
+
+  // Panel 1 — Palette
+  roundRect(0, top, col1W, panelH, 0, 'rgba(255,255,255,0.005)', null);
+  ctx.strokeStyle = colors.border;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(col1W, top); ctx.lineTo(col1W, H); ctx.stroke();
+
+  label('Blocos', 12, top + 24);
+  const blocks = [
+    {l:'Mensagem', h:false}, {l:'Pergunta', h:false}, {l:'IA ✦', h:true},
+    {l:'CRM', h:false}, {l:'Score', h:false}, {l:'Webhook', h:false},
+  ];
+  blocks.forEach((b, i) => {
+    const by = top + 36 + i * 38;
+    const fill = b.h ? 'rgba(13,148,136,0.07)' : 'rgba(255,255,255,0.02)';
+    const stroke = b.h ? 'rgba(13,148,136,0.30)' : colors.border;
+    roundRect(8, by, col1W - 16, 30, 8, fill, stroke);
+    ctx.font = `${b.h?600:400} 12px Inter, system-ui`;
+    ctx.fillStyle = b.h ? colors.teal : colors.fgSubtle;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    ctx.fillText(b.l, 18, by + 15);
+  });
+
+  // Panel 3 — Chat
+  ctx.strokeStyle = colors.border;
+  ctx.beginPath(); ctx.moveTo(col3X, top); ctx.lineTo(col3X, H); ctx.stroke();
+  roundRect(col3X, top, col3W, panelH, 0, 'rgba(255,255,255,0.005)', null);
+  label('Preview ao vivo', col3X + 12, top + 24);
+
+  // Panel 2 — Canvas
+  ctx.clearRect(col2X + 1, top + 1, col2W - 2, panelH - 2);
+  ctx.fillStyle = colors.bg;
+  ctx.fillRect(col2X + 1, top + 1, col2W - 2, panelH - 2);
+
+  // ─── Animation timeline (ms)
+  const e = elapsed;
+  const n1a = easeOut(progress(e, 1200, 300));
+  const l1a = easeOut(progress(e, 1500, 400));
+  const n2a = easeOut(progress(e, 1750, 300));
+  const l2a = easeOut(progress(e, 2000, 400));
+  const n3a = easeOut(progress(e, 2300, 500));
+  const l3a = easeOut(progress(e, 2700, 400));
+  const n4a = easeOut(progress(e, 2950, 400));
+  const c1a = easeOut(progress(e, 1400, 300));
+  const t1a = easeOut(progress(e, 2200, 200)) * (1 - easeOut(progress(e, 2800, 200)));
+  const c2a = easeOut(progress(e, 2800, 300));
+  const t2a = easeOut(progress(e, 3400, 200)) * (1 - easeOut(progress(e, 3900, 200)));
+  const c3a = easeOut(progress(e, 3900, 300));
+  const scoreA = easeOut(progress(e, 3200, 500));
+
+  // Canvas nodes
+  const nx = col2X + 16, nw = 144;
+  drawNode(nx, top + 16, nw, 'Mensagem', 'Saudação', false, n1a);
+  drawNode(nx, top + 138, nw, 'Pergunta', 'Coleta dados', false, n2a);
+  drawNode(nx, top + 248, nw, 'IA ✦', 'Qualifica lead', true, n3a);
+  drawCRMNode(col2X + 296, top + 145, n4a);
+
+  // Connection lines
+  drawLine(nx + nw/2, top + 60, nx + nw/2, top + 138, l1a, 'rgba(13,148,136,0.5)', false);
+  drawLine(nx + nw/2, top + 182, nx + nw/2, top + 248, l2a, 'rgba(13,148,136,0.5)', false);
+  drawLine(nx + nw, top + 270, col2X + 296, top + 180, l3a, 'rgba(217,119,6,0.55)', true);
+
+  // Chat bubbles
+  const cx = col3X + 10, cw = col3W - 20;
+  drawBubble(cx, top + 36, cw, 'Olá! Sou a IA da Flux.', 'bot', c1a);
+  drawTyping(cx, top + 82, t1a);
+  drawBubble(cx, top + 82, cw, 'Tenho interesse no serviço.', 'user', c2a);
+  drawTyping(cx, top + 128, t2a);
+  drawBubble(cx, top + 128, cw, 'Perfeito! Qual seu nome e empresa?', 'bot', c3a);
+
+  // Score panel
+  if (scoreA > 0) {
+    ctx.strokeStyle = colors.border;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(col3X + 8, top + 178); ctx.lineTo(col3X + col3W - 8, top + 178); ctx.stroke();
+    drawScore(col3X + 8, top + 186, col3W - 16, scoreA);
+  }
+
+  // Lead Score label
+  if (scoreA > 0) {
+    ctx.globalAlpha = scoreA;
+    ctx.font = '500 9px Inter, system-ui';
+    ctx.fillStyle = colors.fgSubtle;
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillText('Lead Score', col3X + 12, top + 176);
+    ctx.globalAlpha = 1;
+  }
+}
+
+// ─── Animation loop
+function loop(ts) {
+  if (!startTime) startTime = ts;
+  const elapsed = ts - startTime;
+  draw(elapsed);
+  // Loop at 10s
+  if (elapsed > 10000) startTime = ts;
+  animFrame = requestAnimationFrame(loop);
+}
+
+// Start idle animation
+animFrame = requestAnimationFrame(loop);
+
+// ─── Recording
+let recorder = null;
+let chunks = [];
+
+document.getElementById('btnRecord').addEventListener('click', () => {
+  chunks = [];
+  startTime = null; // reset animation
+
+  const stream = canvas.captureStream(30);
+  const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+    ? 'video/webm;codecs=vp9'
+    : MediaRecorder.isTypeSupported('video/webm;codecs=vp8')
+    ? 'video/webm;codecs=vp8'
+    : 'video/webm';
+
+  recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 4_000_000 });
+
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hero-loop.webm';
+    a.textContent = '⬇ Baixar hero-loop.webm';
+    const d = document.getElementById('downloads');
+    d.innerHTML = '';
+    d.appendChild(a);
+    document.getElementById('status').textContent = 'WEBM pronto. Baixe e coloque em public/.';
+    document.getElementById('btnRecord').disabled = false;
+    document.getElementById('btnStop').disabled = true;
+  };
+
+  recorder.start(100);
+  document.getElementById('btnRecord').disabled = true;
+  document.getElementById('btnStop').disabled = false;
+  document.getElementById('status').textContent = 'Gravando 10 segundos...';
+
+  setTimeout(() => {
+    if (recorder && recorder.state === 'recording') recorder.stop();
+  }, 10000);
+});
+
+document.getElementById('btnStop').addEventListener('click', () => {
+  if (recorder && recorder.state === 'recording') recorder.stop();
+});
+
+document.getElementById('btnPoster').addEventListener('click', () => {
+  // Render frame at t=4000ms (score visible)
+  cancelAnimationFrame(animFrame);
+  draw(4000);
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hero-loop-poster.jpg';
+    a.click();
+    document.getElementById('status').textContent = 'Poster baixado. Coloque em public/.';
+    animFrame = requestAnimationFrame(ts => { startTime = null; loop(ts); });
+  }, 'image/jpeg', 0.92);
+});
+</script>
+</body>
+</html>

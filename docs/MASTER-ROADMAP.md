@@ -78,6 +78,7 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 | **Analytics** | Contagem de leads/bots reais com Supabase | Série temporal e funil detalhado = hardcoded |
 | **Automações/Connectors** | Adapters HTTP reais (webhook, sheets, slack) | Não conectados ao Builder canvas como bloco executável |
 | **Autenticação** | Supabase Auth real, RLS, AdminRoute | Sem UI de gestão de membros/convite |
+| **Google Calendar** | OAuth per-user, criar/atualizar/cancelar evento, Google Meet, freeBusy, push+pull sync, bridge CRM, 3 Builder blocks, 3 migrations, 4 edge functions (FASE 28C ✅) | Requer `VITE_GCAL_CLIENT_ID` + OAuth Client criado no Google Cloud Console + `supabase db push` + deploy 4 edge functions |
 
 ---
 
@@ -102,7 +103,7 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 | Módulo | Evidência |
 |---|---|
 | **Follow-up / Drip sequences** | Mencionado em `src/lib/mock.ts` como item de lista fictícia. Zero código real. |
-| **Agendamento / Calendar** | `src/connectors/types.ts` lista `"calendar"` como tipo. Zero adapter. |
+| **Agendamento / Calendar** | ~~Zero adapter~~ → ver PARCIAL abaixo (FASE 28C ✅) |
 | **White-label (produto)** | Arquitetura multi-tenant pronta. Painel de gestão de clientes, customização de marca = não existe. |
 | **Billing / Planos** | Stripe aparece como destino de connector, não como sistema de billing da plataforma. |
 | **Templates marketplace** | `src/connectors/builtins.ts` — comentário: "mocked". |
@@ -739,7 +740,7 @@ Se você é uma IA entrando neste projeto agora, leia isto:
 2. Anthropic e Gemini providers são `buildMockProvider()` (OpenAI real — FASE 28A ✅)
 3. Revenue/Attribution/Conversations consomem dados hardcoded de `lib/analytics-mock` e `lib/mock`
 4. WhatsApp/Instagram/Messenger são stubs (`makeStub()`) — sem Meta API
-5. Follow-up não existe. Google Calendar / Google Meet não integrados.
+5. Follow-up não existe.
 
 **O que funciona hoje:**
 1. Web Widget conversa de verdade e pode publicar bots via link
@@ -748,10 +749,12 @@ Se você é uma IA entrando neste projeto agora, leia isto:
 4. Connectors HTTP (webhook, sheets, slack, telegram) fazem chamadas reais
 5. Compliance LGPD é real (Consent, Audit Logs, RLS)
 6. **OpenAI provider real** — `src/ai/providers/openai.ts` (FASE 28A) — requer `VITE_OPENAI_API_KEY`
+7. **Google Calendar real** — `src/calendar/` (FASE 28C) — OAuth, eventos, Meet, freeBusy, sync, bridge CRM. Requer `VITE_GCAL_CLIENT_ID` + deploy migrations + edge functions
 
 **O que fazer primeiro:**
 1. Setar `VITE_USE_SUPABASE=true` em `.env` (já tem URL e key — falta só essa linha)
 2. Setar `VITE_OPENAI_API_KEY=sk-proj-...` (provider real já implementado — FASE 28A ✅)
+3. Criar OAuth Client no Google Cloud Console + setar `VITE_GCAL_CLIENT_ID` (FASE 28C ✅)
 
 **Referências rápidas:**
 - Para entender o produto: `docs/PRODUCT-CONSTITUTION.md`

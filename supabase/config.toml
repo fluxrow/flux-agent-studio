@@ -1,4 +1,33 @@
 project_id = "bgzczvsmfcnypwqveotx"
 
+# ---- Edge Functions ------------------------------------------------
+# Lovable AI function (managed by Lovable Cloud)
 [functions.lovable-ai]
+verify_jwt = false
+
+# meta-webhook: no JWT verification — Meta does not send a Supabase JWT;
+# authentication is via X-Hub-Signature-256 HMAC (fail-closed in code).
+[functions.meta-webhook]
+verify_jwt = false
+
+# meta-send: authenticated users only (Supabase JWT required)
+[functions.meta-send]
+verify_jwt = true
+
+# google-oauth-callback: public GET (OAuth redirect from Google),
+# POST is called by frontend token manager.
+[functions."google-oauth-callback"]
+verify_jwt = false
+
+# calendar-webhook: Google push notifications, no Supabase JWT.
+# Authentication via X-Goog-Channel-Token HMAC.
+[functions."calendar-webhook"]
+verify_jwt = false
+
+# calendar-sync: cron every 5 minutes + direct invocation from calendar-webhook
+[functions."calendar-sync"]
+verify_jwt = false
+
+# calendar-watch-refresh: cron daily at 03:00 UTC
+[functions."calendar-watch-refresh"]
 verify_jwt = false

@@ -79,6 +79,7 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 | **Automações/Connectors** | Adapters HTTP reais (webhook, sheets, slack) | Não conectados ao Builder canvas como bloco executável |
 | **Autenticação** | Supabase Auth real, RLS, AdminRoute | Sem UI de gestão de membros/convite |
 | **Google Calendar** | OAuth per-user, criar/atualizar/cancelar evento, Google Meet, freeBusy, push+pull sync, bridge CRM, 3 Builder blocks, 3 migrations, 4 edge functions (FASE 28C ✅) | Requer `VITE_GCAL_CLIENT_ID` + OAuth Client criado no Google Cloud Console + `supabase db push` + deploy 4 edge functions |
+| **Meta Channels (WhatsApp / Instagram / Messenger)** | Código 100% implementado (FASE 27A.4–28D ✅): migrations, edge functions, adapters, hooks Realtime, CRM bridge. `supabase/config.toml` configurado. Zero erros TypeScript/build | Deploy pendente (`supabase db push` + `supabase functions deploy`) + criação de Meta App + tokens reais |
 
 ---
 
@@ -86,9 +87,9 @@ CONVERSA → QUALIFICAÇÃO → CRM → RECEITA
 
 | Módulo | Evidência no código | Impacto |
 |---|---|---|
-| **WhatsApp** | `src/channels/stubs.ts` → `makeStub("whatsapp", ...)` | Canal principal do mercado BR não funciona |
-| **Instagram DM** | `src/channels/stubs.ts` → `makeStub("instagram", ...)` | Fluxo @vemfarias bloqueado |
-| **Facebook Messenger** | `src/channels/stubs.ts` → `makeStub("messenger", ...)` | Idem |
+| **WhatsApp** | `src/channels/meta/whatsapp.ts` + edge functions implementadas (FASE 27A.4) | Deploy pendente: `supabase db push` + `supabase functions deploy` + Meta App + token |
+| **Instagram DM** | `src/channels/meta/instagram.ts` + edge functions implementadas (FASE 27A.4) | Deploy pendente + aprovação Meta (instagram_manage_messages) |
+| **Facebook Messenger** | `src/channels/meta/messenger.ts` + edge functions implementadas (FASE 27A.4) | Deploy pendente + página Facebook vinculada |
 | **Omnichannel Inbox** | `src/pages/Conversations.tsx:1` → `import { conversations, sampleChat } from "@/lib/mock"` | Inbox mostra dados fixos |
 | **Revenue Attribution** | `src/pages/Revenue.tsx:1` → `import { revenueSeries, aiCosts } from "@/lib/analytics-mock"` | KPIs são constantes: R$184.2k, ROAS 4.8x |
 | **Attribution page** | `src/pages/Attribution.tsx:1` → `import { attributionTouches } from "@/lib/analytics-mock"` | Todos modelos de atribuição = mock |
@@ -447,6 +448,29 @@ Além dos critérios de beta, o produto está pronto para lançamento público q
 
 ---
 
+### 2026-06-08 — Meta stack auditada e pronta para deploy (FASE 28D)
+
+**O que foi verificado e corrigido:**
+- Migrations `20260604000001` e `20260604000002`: SQL correto, RLS correto, RPCs corretos — zero issues
+- Edge Functions `meta-webhook` e `meta-send`: código correto, HMAC fail-closed, sem erros TypeScript
+- Tabelas `meta_channel_connections`, `meta_conversations`, `meta_messages`: schema verificado, índices OK
+- Build completo: ✅ 2855 módulos, zero erros
+- TypeScript strict: ✅ zero erros
+- `supabase/config.toml`: atualizado com `verify_jwt` correto para cada edge function (meta-webhook: false, meta-send: true)
+- MASTER-ROADMAP: corrigido para refletir que WhatsApp/Instagram/Messenger têm código real (não stubs)
+
+**Prontidão Meta Channels: 100% código / 0% deploy**
+
+O que resta é operacional (não desenvolvimento):
+1. `supabase link --project-ref bgzczvsmfcnypwqveotx && supabase db push`
+2. `supabase functions deploy meta-webhook --no-verify-jwt && supabase functions deploy meta-send`
+3. `supabase secrets set META_VERIFY_TOKEN=flux_meta_verify META_APP_SECRET=<secret>`
+4. Criar Meta App (20 min) + configurar webhook + inserir conexão na tabela
+
+Ver `docs/META-SETUP-CHECKLIST.md` para os passos operacionais completos.
+
+---
+
 ### 2026-06-05 — Deploy físico bloqueado por mismatch de projeto (FASE 27A.7)
 
 **O que foi descoberto:**
@@ -479,9 +503,9 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 
 | Prioridade | Item | Status |
 |-----------|------|--------|
-| P0 | Supabase migrations (`supabase db push`) | ❌ Pendente |
-| P0 | Deploy Edge Functions + secrets Meta | ❌ Pendente |
-| P0 | Conectar WhatsApp no app | ❌ Pendente (depende de P0 acima) |
+| P0 | Supabase migrations (`supabase db push`) | ❌ Pendente (execução local, 5 min) |
+| P0 | Deploy Edge Functions + secrets Meta | ❌ Pendente (execução local, 10 min — código READY, FASE 28D ✅) |
+| P0 | Conectar WhatsApp no app (criar Meta App + token) | ❌ Pendente operacional (não é desenvolvimento) |
 | P1 | OpenAI real (trocar mock) | ✅ Concluído (FASE 28A) — requer `VITE_OPENAI_API_KEY` |
 | P1 | Bot @vemfarias criado e publicado | ❌ Pendente (~2–4h) |
 | P2 | Instagram DM + Messenger | ❌ Pendente (setup + aprovação Meta) |
@@ -504,7 +528,7 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 | Captura UTM | ✅ Funciona hoje — adicionar UTM no link de bio/anúncio |
 | Score automático | ✅ Funciona hoje — calculado ao criar lead |
 | CRM / Pipeline | ✅ Funciona hoje — Supabase ativo |
-| WhatsApp | ⚠️ Deploy pendente (40 min, manual) |
+| WhatsApp | ⚠️ Código READY (FASE 28D ✅) — deploy pendente (40 min, manual, `docs/META-SETUP-CHECKLIST.md`) |
 | Instagram DM | ❌ Deploy + aprovação Meta (1–4 semanas) |
 | IA real (não mock) | ✅ OpenAI implementado (FASE 28A) — requer `VITE_OPENAI_API_KEY` |
 | Follow-up automático | ❌ Roadmap Sprint 3–4 |

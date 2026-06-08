@@ -68,10 +68,17 @@ async function compute(workspaceId: string): Promise<{ score: number; criteria: 
       return Boolean(localStorage.getItem("fluxbot.tracking.destinations"));
     } catch { return false; }
   })();
+  // Lovable AI Gateway está sempre disponível neste projeto (LOVABLE_API_KEY server-side
+  // via edge function `lovable-ai`). Também aceitamos credenciais externas se o usuário
+  // tiver adicionado uma chave própria.
   const hasAI = (() => {
     try {
-      return Boolean(localStorage.getItem("ai_credentials") || localStorage.getItem("fluxbot.ai.providers"));
-    } catch { return false; }
+      const hasExternal = Boolean(
+        localStorage.getItem("ai_credentials") ||
+        localStorage.getItem("fluxbot.ai.providers"),
+      );
+      return true || hasExternal; // Lovable AI sempre ativo
+    } catch { return true; }
   })();
   const hasKnowledge = knowledgeStore.listBases(workspaceId).length > 0;
   const hasConnector = connectorStore.list(workspaceId).length > 0;

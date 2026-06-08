@@ -598,6 +598,28 @@ Ver passos completos em: `docs/META-PHYSICAL-SMOKE-TEST-REPORT.md`
 
 **O código está pronto. Só falta a operação.**
 
+---
+
+### 2026-06-08 — Google Calendar Foundation (FASE 28B)
+
+**O que foi entregue:** plano de implementação real do Google Calendar, sem UI e sem mock.
+
+**Resultado:** `PLAN READY` — arquitetura definida, pronta para execução.
+
+| Camada | Definida |
+|--------|----------|
+| OAuth per-user (scopes `calendar.events` + `calendar.readonly`) | ✅ |
+| Tabelas (`user_calendar_tokens`, `calendar_events`, `calendar_watch_channels`) | ✅ |
+| Edge functions (`google-oauth-callback`, `calendar-webhook`, `calendar-sync`, `calendar-watch-refresh`) | ✅ |
+| Blocks Builder (`check_availability`, `create_event`, `cancel_event`) | ✅ |
+| Google Meet via `conferenceData.createRequest` | ✅ |
+| Sync push (`events.watch`) + pull (`syncToken`) + renew | ✅ |
+| Bridge CRM (`runtimeEventBus` → leads + tracking) | ✅ |
+| Secrets pendentes: `GCAL_CLIENT_ID/SECRET/REDIRECT_URI/STATE_SECRET/WEBHOOK_TOKEN_SECRET` | ⏳ |
+
+**Documento completo:** `docs/GOOGLE-CALENDAR-IMPLEMENTATION-PLAN.md`
+
+
 **Documento completo:** `docs/META-BLOCKERS.md` — checklist operacional em 8 etapas.
 
 ---

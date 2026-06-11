@@ -102,23 +102,23 @@
 
 /* ─── Landing Page V2 — scoped tokens + keyframes ─── */
 .lp-v2 {
-  --lp-bg:           #09090C;
-  --lp-bg-elevated:  #0F0F14;
-  --lp-bg-subtle:    #141419;
-  --lp-primary:      #0D9488;
-  --lp-primary-dark: #0F766E;
-  --lp-primary-glow: #14B8A6;
-  --lp-accent:       #D97706;
-  --lp-accent-light: #F59E0B;
-  --lp-accent-glow:  rgba(217,119,6,0.20);
+  --lp-bg:           #000000;
+  --lp-bg-elevated:  #0A0A0A;
+  --lp-bg-subtle:    #111111;
+  --lp-primary:      #34E0A1;
+  --lp-primary-dark: #1FB87E;
+  --lp-primary-glow: #5CEAB6;
+  --lp-accent:       #34E0A1;
+  --lp-accent-light: #5CEAB6;
+  --lp-accent-glow:  rgba(52,224,161,0.20);
   --lp-fg:           #F8FAFC;
   --lp-fg-muted:     #94A3B8;
   --lp-fg-subtle:    #475569;
   --lp-border:       rgba(255,255,255,0.07);
   --lp-border-mid:   rgba(255,255,255,0.12);
-  --lp-teal-5:       rgba(13,148,136,0.05);
-  --lp-teal-10:      rgba(13,148,136,0.10);
-  --lp-teal-20:      rgba(13,148,136,0.20);
+  --lp-teal-5:       rgba(52,224,161,0.05);
+  --lp-teal-10:      rgba(52,224,161,0.10);
+  --lp-teal-20:      rgba(52,224,161,0.20);
   background-color: var(--lp-bg);
   color: var(--lp-fg);
 }

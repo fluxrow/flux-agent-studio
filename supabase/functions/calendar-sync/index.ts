@@ -20,16 +20,47 @@ const GCAL          = "https://www.googleapis.com/calendar/v3";
 const db = createClient(SUPABASE_URL, SERVICE_KEY);
 
 Deno.serve(async (req: Request) => {
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  const bearer = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
+  const internalCall = bearer === SERVICE_KEY;
+  let authenticatedUserId: string | null = null;
+
+  if (!internalCall && bearer) {
+    const { data, error } = await db.auth.getUser(bearer);
+    if (!error) authenticatedUserId = data.user?.id ?? null;
+  }
+  if (!internalCall && !authenticatedUserId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   let targetUserId: string | null = null;
   let targetCalendarId = "primary";
 
-  if (req.method === "POST") {
-    const body = await req.json().catch(() => ({})) as {
-      userId?: string;
-      calendarId?: string;
-    };
-    targetUserId = body.userId ?? null;
-    targetCalendarId = body.calendarId ?? "primary";
+  const body = await req.json().catch(() => ({})) as {
+    userId?: string;
+    workspaceId?: string;
+    calendarId?: string;
+  };
+  targetUserId = internalCall ? body.userId ?? null : authenticatedUserId;
+  targetCalendarId = body.calendarId ?? "primary";
+
+  if (!internalCall && body.userId && body.userId !== authenticatedUserId) {
+    return new Response("Forbidden", { status: 403 });
+  }
+  if (!internalCall && !body.workspaceId) {
+    return new Response("Workspace required", { status: 400 });
+  }
+  if (!internalCall && body.workspaceId) {
+    const { data: membership } = await db
+      .from("workspace_members")
+      .select("workspace_id")
+      .eq("workspace_id", body.workspaceId)
+      .eq("user_id", authenticatedUserId)
+      .maybeSingle();
+    if (!membership) return new Response("Forbidden", { status: 403 });
   }
 
   // Fetch users to sync
@@ -40,6 +71,9 @@ Deno.serve(async (req: Request) => {
 
   if (targetUserId) {
     query = query.eq("user_id", targetUserId);
+  }
+  if (body.workspaceId) {
+    query = query.eq("workspace_id", body.workspaceId);
   }
 
   const { data: users, error } = await query;
@@ -55,7 +89,11 @@ Deno.serve(async (req: Request) => {
       // Refresh token if expired
       let accessToken = user.access_token;
       if (new Date(user.expires_at).getTime() - Date.now() < 5 * 60 * 1000) {
-        const refreshed = await refreshAccessToken(user.user_id, user.refresh_token);
+        const refreshed = await refreshAccessToken(
+          user.user_id,
+          user.workspace_id,
+          user.refresh_token,
+        );
         accessToken = refreshed;
       }
 
@@ -63,6 +101,7 @@ Deno.serve(async (req: Request) => {
         .from("calendar_watch_channels")
         .select("sync_token")
         .eq("user_id", user.user_id)
+        .eq("workspace_id", user.workspace_id)
         .eq("calendar_id", targetCalendarId)
         .single();
 
@@ -79,6 +118,7 @@ Deno.serve(async (req: Request) => {
           .from("calendar_watch_channels")
           .update({ sync_token: newSyncToken, updated_at: new Date().toISOString() })
           .eq("user_id", user.user_id)
+          .eq("workspace_id", user.workspace_id)
           .eq("calendar_id", targetCalendarId);
       }
 
@@ -94,7 +134,11 @@ Deno.serve(async (req: Request) => {
   });
 });
 
-async function refreshAccessToken(userId: string, refreshToken: string): Promise<string> {
+async function refreshAccessToken(
+  userId: string,
+  workspaceId: string,
+  refreshToken: string,
+): Promise<string> {
   const CLIENT_ID     = Deno.env.get("GCAL_CLIENT_ID")!;
   const CLIENT_SECRET = Deno.env.get("GCAL_CLIENT_SECRET")!;
 
@@ -112,10 +156,12 @@ async function refreshAccessToken(userId: string, refreshToken: string): Promise
   if (!res.ok || !data.access_token) throw new Error(`refresh failed: ${data.error}`);
 
   const expiresAt = new Date(Date.now() + (data.expires_in ?? 3600) * 1000).toISOString();
-  await db
+  const { error: updateError } = await db
     .from("user_calendar_tokens")
     .update({ access_token: data.access_token, expires_at: expiresAt, updated_at: new Date().toISOString() })
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .eq("workspace_id", workspaceId);
+  if (updateError) throw updateError;
 
   return data.access_token;
 }
@@ -127,77 +173,93 @@ async function pullEvents(
   userId: string,
   workspaceId: string
 ): Promise<{ upserted: number; deleted: number; newSyncToken?: string }> {
-  const params = new URLSearchParams({
+  const baseParams = new URLSearchParams({
     singleEvents: "true",
     maxResults: "250",
     showDeleted: "true",
   });
 
   if (syncToken) {
-    params.set("syncToken", syncToken);
+    baseParams.set("syncToken", syncToken);
   } else {
     const timeMin = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    params.set("timeMin", timeMin);
+    baseParams.set("timeMin", timeMin);
   }
-
-  const res = await fetch(
-    `${GCAL}/calendars/${encodeURIComponent(calendarId)}/events?${params}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  );
-
-  // syncToken expired — full resync
-  if (res.status === 410) {
-    return pullEvents(accessToken, calendarId, undefined, userId, workspaceId);
-  }
-
-  if (!res.ok) throw new Error(`Google Events list error ${res.status}`);
-
-  const data = await res.json() as {
-    items?: Array<Record<string, unknown>>;
-    nextSyncToken?: string;
-  };
 
   let upserted = 0;
   let deleted = 0;
+  let pageToken: string | undefined;
+  let nextSyncToken: string | undefined;
 
-  for (const item of data.items ?? []) {
-    if ((item.status as string) === "cancelled") {
-      await db
-        .from("calendar_events")
-        .update({ status: "cancelled", updated_at: new Date().toISOString() })
-        .eq("external_event_id", item.id as string)
-        .eq("user_id", userId);
-      deleted++;
-    } else {
-      const start = item.start as { dateTime?: string; date?: string } | undefined;
-      const end   = item.end as { dateTime?: string; date?: string } | undefined;
-      const conf  = item.conferenceData as { entryPoints?: Array<{ entryPointType?: string; uri?: string }> } | undefined;
-      const meetLink = conf?.entryPoints?.find((e) => e.entryPointType === "video")?.uri ?? null;
+  do {
+    const params = new URLSearchParams(baseParams);
+    if (pageToken) params.set("pageToken", pageToken);
 
-      await db.from("calendar_events").upsert(
-        {
-          workspace_id: workspaceId,
-          user_id: userId,
-          external_event_id: item.id as string,
-          calendar_id: calendarId,
-          summary: (item.summary as string) ?? "",
-          description: (item.description as string | null) ?? null,
-          start_at: start?.dateTime ?? start?.date ?? null,
-          end_at:   end?.dateTime ?? end?.date ?? null,
-          timezone: (start as { timeZone?: string } | undefined)?.timeZone ?? "UTC",
-          attendees: JSON.stringify(item.attendees ?? []),
-          meet_link: meetLink,
-          status: "confirmed",
-          etag: (item.etag as string | null) ?? null,
-          sequence: (item.sequence as number | null) ?? null,
-          google_updated_at: (item.updated as string | null) ?? null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,external_event_id" }
-      );
-      upserted++;
+    const res = await fetch(
+      `${GCAL}/calendars/${encodeURIComponent(calendarId)}/events?${params}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    if (res.status === 410) {
+      return pullEvents(accessToken, calendarId, undefined, userId, workspaceId);
     }
-  }
+    if (!res.ok) throw new Error(`Google Events list error ${res.status}`);
 
-  return { upserted, deleted, newSyncToken: data.nextSyncToken };
+    const data = await res.json() as {
+      items?: Array<Record<string, unknown>>;
+      nextPageToken?: string;
+      nextSyncToken?: string;
+    };
+
+    for (const item of data.items ?? []) {
+      if ((item.status as string) === "cancelled") {
+        const { error: cancelError } = await db
+          .from("calendar_events")
+          .update({ status: "cancelled", updated_at: new Date().toISOString() })
+          .eq("external_event_id", item.id as string)
+          .eq("user_id", userId)
+          .eq("workspace_id", workspaceId);
+        if (cancelError) throw cancelError;
+        deleted++;
+      } else {
+        const start = item.start as { dateTime?: string; date?: string } | undefined;
+        const end = item.end as { dateTime?: string; date?: string } | undefined;
+        const conf = item.conferenceData as {
+          entryPoints?: Array<{ entryPointType?: string; uri?: string }>;
+        } | undefined;
+        const meetLink =
+          conf?.entryPoints?.find((entry) => entry.entryPointType === "video")
+            ?.uri ?? null;
+
+        const { error: upsertError } = await db.from("calendar_events").upsert(
+          {
+            workspace_id: workspaceId,
+            user_id: userId,
+            external_event_id: item.id as string,
+            calendar_id: calendarId,
+            summary: (item.summary as string) ?? "",
+            description: (item.description as string | null) ?? null,
+            start_at: start?.dateTime ?? start?.date ?? null,
+            end_at: end?.dateTime ?? end?.date ?? null,
+            timezone: start?.timeZone ?? "UTC",
+            attendees: item.attendees ?? [],
+            meet_link: meetLink,
+            status: "confirmed",
+            etag: (item.etag as string | null) ?? null,
+            sequence: (item.sequence as number | null) ?? null,
+            google_updated_at: (item.updated as string | null) ?? null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,workspace_id,external_event_id" }
+        );
+        if (upsertError) throw upsertError;
+        upserted++;
+      }
+    }
+
+    pageToken = data.nextPageToken;
+    nextSyncToken = data.nextSyncToken ?? nextSyncToken;
+  } while (pageToken);
+
+  return { upserted, deleted, newSyncToken: nextSyncToken };
 }

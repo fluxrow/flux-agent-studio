@@ -23,15 +23,20 @@ export async function checkAvailability(
   const slotMin = input.slotMinutes ?? 30;
   const wh = input.workingHours ?? DEFAULT_WORKING_HOURS;
 
-  const res = await calendarFetch<FreeBusyResponse>(input.userId, "/freeBusy", {
-    method: "POST",
-    body: JSON.stringify({
-      timeMin: input.from,
-      timeMax: input.to,
-      timeZone: wh.timezone,
-      items: [{ id: calendarId }],
-    }),
-  });
+  const res = await calendarFetch<FreeBusyResponse>(
+    input.userId,
+    input.workspaceId,
+    "/freeBusy",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        timeMin: input.from,
+        timeMax: input.to,
+        timeZone: wh.timezone,
+        items: [{ id: calendarId }],
+      }),
+    },
+  );
 
   const busy: FreeBusyWindow[] = (res.calendars[calendarId]?.busy ?? []).map(
     (b) => ({ start: b.start, end: b.end })

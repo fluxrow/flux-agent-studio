@@ -36,7 +36,7 @@ export async function pullIncremental(
   workspaceId: string
 ): Promise<SyncResult> {
   const GCAL = "https://www.googleapis.com/calendar/v3";
-  let result: SyncResult = { upserted: 0, deleted: 0 };
+  const result: SyncResult = { upserted: 0, deleted: 0 };
 
   const params = new URLSearchParams({
     singleEvents: "true",

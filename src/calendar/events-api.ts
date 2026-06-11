@@ -30,7 +30,7 @@ function endTime(startAt: string, durationMinutes: number): string {
 }
 
 export async function createEvent(input: CreateEventInput): Promise<CalendarEvent> {
-  const token = await getValidToken(input.userId);
+  const token = await getValidToken(input.userId, input.workspaceId);
   const calId = input.calendarId ?? token.defaultCalendarId;
   const tz = input.timezone ?? "America/Sao_Paulo";
   const end = endTime(input.startAt, input.durationMinutes);
@@ -52,6 +52,7 @@ export async function createEvent(input: CreateEventInput): Promise<CalendarEven
   const qs = input.withMeet ? "?conferenceDataVersion=1&sendUpdates=all" : "?sendUpdates=all";
   const raw = await calendarFetch<Record<string, unknown>>(
     input.userId,
+    input.workspaceId,
     `/calendars/${encodeURIComponent(calId)}/events${qs}`,
     { method: "POST", body: JSON.stringify(body) }
   );
@@ -81,7 +82,7 @@ export async function createEvent(input: CreateEventInput): Promise<CalendarEven
 }
 
 export async function updateEvent(input: UpdateEventInput): Promise<CalendarEvent> {
-  const token = await getValidToken(input.userId);
+  const token = await getValidToken(input.userId, input.workspaceId);
   const calId = input.calendarId ?? token.defaultCalendarId;
 
   const patch: Record<string, unknown> = {};
@@ -98,6 +99,7 @@ export async function updateEvent(input: UpdateEventInput): Promise<CalendarEven
 
   const raw = await calendarFetch<Record<string, unknown>>(
     input.userId,
+    input.workspaceId,
     `/calendars/${encodeURIComponent(calId)}/events/${encodeURIComponent(input.externalEventId)}?sendUpdates=all`,
     { method: "PATCH", body: JSON.stringify(patch) }
   );
@@ -111,11 +113,12 @@ export async function updateEvent(input: UpdateEventInput): Promise<CalendarEven
 }
 
 export async function cancelEvent(input: CancelEventInput): Promise<void> {
-  const token = await getValidToken(input.userId);
+  const token = await getValidToken(input.userId, input.workspaceId);
   const calId = input.calendarId ?? token.defaultCalendarId;
 
   await calendarFetch(
     input.userId,
+    input.workspaceId,
     `/calendars/${encodeURIComponent(calId)}/events/${encodeURIComponent(input.externalEventId)}?sendUpdates=all`,
     { method: "DELETE" }
   );

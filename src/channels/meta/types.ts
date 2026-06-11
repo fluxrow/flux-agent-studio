@@ -10,8 +10,6 @@ export interface MetaChannelConnection {
   phoneNumberId?: string;
   pageId?:        string;
   igUserId?:      string;
-  /** Never exposed to UI — write-only via server */
-  accessToken:    string;
   webhookVerified: boolean;
   status:         "active" | "inactive" | "error";
   errorMessage?:  string;

@@ -6,6 +6,7 @@
  * renewWatch     — called by calendar-watch-refresh cron when expiry <48h
  */
 import { calendarFetch } from "../client";
+import { getValidToken } from "../oauth/tokens";
 import { createClient } from "@supabase/supabase-js";
 import type { ID } from "@/types/common";
 
@@ -37,6 +38,7 @@ export async function registerWatch(
 
   const res = await calendarFetch<WatchResponse>(
     userId,
+    workspaceId,
     `/calendars/${encodeURIComponent(calendarId)}/events/watch`,
     {
       method: "POST",
@@ -54,6 +56,7 @@ export async function registerWatch(
   await db.from("calendar_watch_channels").upsert(
     {
       user_id: userId,
+      workspace_id: workspaceId,
       calendar_id: calendarId,
       channel_id: channelId,
       resource_id: res.resourceId,
@@ -61,22 +64,27 @@ export async function registerWatch(
       expires_at: new Date(Number(res.expiration)).toISOString(),
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "user_id,calendar_id" }
+    { onConflict: "user_id,workspace_id,calendar_id" }
   );
 }
 
-export async function unregisterWatch(userId: ID, calendarId = "primary"): Promise<void> {
+export async function unregisterWatch(
+  userId: ID,
+  workspaceId: ID,
+  calendarId = "primary",
+): Promise<void> {
   const db = supabase();
   const { data } = await db
     .from("calendar_watch_channels")
     .select("channel_id, resource_id")
     .eq("user_id", userId)
+    .eq("workspace_id", workspaceId)
     .eq("calendar_id", calendarId)
     .single();
 
   if (!data) return;
 
-  await calendarFetch(userId, "/channels/stop", {
+  await calendarFetch(userId, workspaceId, "/channels/stop", {
     method: "POST",
     body: JSON.stringify({ id: data.channel_id, resourceId: data.resource_id }),
   });
@@ -85,19 +93,16 @@ export async function unregisterWatch(userId: ID, calendarId = "primary"): Promi
     .from("calendar_watch_channels")
     .delete()
     .eq("user_id", userId)
+    .eq("workspace_id", workspaceId)
     .eq("calendar_id", calendarId);
 }
 
-export async function renewWatch(userId: ID, calendarId = "primary"): Promise<void> {
-  await unregisterWatch(userId, calendarId);
-  // workspaceId not needed for renew — derive from token table
-  const db = supabase();
-  const { data } = await db
-    .from("user_calendar_tokens")
-    .select("workspace_id")
-    .eq("user_id", userId)
-    .single();
-  if (data) {
-    await registerWatch(userId, data.workspace_id, calendarId);
-  }
+export async function renewWatch(
+  userId: ID,
+  workspaceId: ID,
+  calendarId = "primary",
+): Promise<void> {
+  await unregisterWatch(userId, workspaceId, calendarId);
+  await getValidToken(userId, workspaceId);
+  await registerWatch(userId, workspaceId, calendarId);
 }

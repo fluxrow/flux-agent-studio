@@ -38,7 +38,7 @@ Deno.serve(async (req: Request) => {
   // Validate channel token
   const { data: channel, error } = await db
     .from("calendar_watch_channels")
-    .select("user_id, calendar_id, sync_token, channel_token")
+    .select("user_id, workspace_id, calendar_id, sync_token, channel_token")
     .eq("channel_id", channelId)
     .single();
 
@@ -59,6 +59,7 @@ Deno.serve(async (req: Request) => {
     },
     body: JSON.stringify({
       userId: channel.user_id,
+      workspaceId: channel.workspace_id,
       calendarId: channel.calendar_id,
     }),
   });

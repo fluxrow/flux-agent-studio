@@ -19,7 +19,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL            = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY    = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const META_VERIFY_TOKEN       = Deno.env.get("META_VERIFY_TOKEN") ?? "flux_meta_verify";
+const META_VERIFY_TOKEN       = Deno.env.get("META_VERIFY_TOKEN") ?? "";
 const META_APP_SECRET         = Deno.env.get("META_APP_SECRET") ?? "";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
@@ -27,8 +27,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 // ---- HMAC-SHA256 verification --------------------------------
 async function verifySignature(body: string, sigHeader: string | null): Promise<boolean> {
   if (!META_APP_SECRET || !sigHeader) return false;
-  const [algo, hex] = sigHeader.split("=");
-  if (algo !== "sha256" || !hex) return false;
+  const signatureMatch = /^sha256=([0-9a-fA-F]{64})$/.exec(sigHeader);
+  if (!signatureMatch) return false;
+  const hex = signatureMatch[1];
   const key  = await crypto.subtle.importKey(
     "raw", new TextEncoder().encode(META_APP_SECRET),
     { name: "HMAC", hash: "SHA-256" }, false, ["verify"]
@@ -52,14 +53,57 @@ interface NormalizedMessage {
   pageId?:              string;
 }
 
-function extractWhatsApp(entry: any): NormalizedMessage[] {
+interface WhatsAppMessage {
+  from?: string;
+  id?: string;
+  timestamp?: string;
+  type?: string;
+  text?: { body?: string };
+}
+
+interface WhatsAppContact {
+  wa_id?: string;
+  profile?: { name?: string };
+}
+
+interface WhatsAppChange {
+  value?: {
+    metadata?: { phone_number_id?: string };
+    messages?: WhatsAppMessage[];
+    contacts?: WhatsAppContact[];
+  };
+}
+
+interface MetaMessagingEvent {
+  sender?: { id?: string; name?: string };
+  message?: {
+    mid?: string;
+    text?: string;
+    attachments?: unknown[];
+  };
+  timestamp?: number;
+}
+
+interface MetaWebhookEntry {
+  id?: string;
+  changes?: WhatsAppChange[];
+  messaging?: MetaMessagingEvent[];
+}
+
+interface MetaWebhookBody {
+  object?: "whatsapp_business_account" | "instagram" | "page" | string;
+  entry?: MetaWebhookEntry[];
+}
+
+function extractWhatsApp(entry: MetaWebhookEntry): NormalizedMessage[] {
   const msgs: NormalizedMessage[] = [];
-  for (const change of entry.changes ?? []) {
+  for (const change of Array.isArray(entry.changes) ? entry.changes : []) {
     const val = change.value;
     if (!val?.messages) continue;
     const phoneNumberId = val.metadata?.phone_number_id ?? "";
     for (const msg of val.messages) {
-      const contact = val.contacts?.find((c: any) => c.wa_id === msg.from);
+      if (!msg.from || !msg.id) continue;
+      const contact = val.contacts?.find((candidate) => candidate.wa_id === msg.from);
       msgs.push({
         platform:          "whatsapp",
         externalConvoId:   msg.from,
@@ -68,7 +112,9 @@ function extractWhatsApp(entry: any): NormalizedMessage[] {
         contactName:       contact?.profile?.name ?? msg.from,
         messageText:       msg.text?.body ?? msg.type,
         messageType:       msg.type ?? "text",
-        sentAt:            new Date(Number(msg.timestamp) * 1000),
+        sentAt:            new Date(
+          Number(msg.timestamp ?? Math.floor(Date.now() / 1000)) * 1000,
+        ),
         phoneNumberId,
       });
     }
@@ -76,10 +122,10 @@ function extractWhatsApp(entry: any): NormalizedMessage[] {
   return msgs;
 }
 
-function extractInstagram(entry: any): NormalizedMessage[] {
+function extractInstagram(entry: MetaWebhookEntry): NormalizedMessage[] {
   const msgs: NormalizedMessage[] = [];
-  for (const msg of entry.messaging ?? []) {
-    if (!msg.message) continue;
+  for (const msg of Array.isArray(entry.messaging) ? entry.messaging : []) {
+    if (!msg.message?.mid || !msg.sender?.id) continue;
     msgs.push({
       platform:          "instagram",
       externalConvoId:   msg.sender.id,
@@ -88,17 +134,17 @@ function extractInstagram(entry: any): NormalizedMessage[] {
       contactName:       msg.sender.name ?? msg.sender.id,
       messageText:       msg.message.text ?? "",
       messageType:       msg.message.attachments ? "attachment" : "text",
-      sentAt:            new Date(msg.timestamp),
+      sentAt:            new Date(msg.timestamp ?? Date.now()),
       pageId:            entry.id,
     });
   }
   return msgs;
 }
 
-function extractMessenger(entry: any): NormalizedMessage[] {
+function extractMessenger(entry: MetaWebhookEntry): NormalizedMessage[] {
   const msgs: NormalizedMessage[] = [];
-  for (const msg of entry.messaging ?? []) {
-    if (!msg.message) continue;
+  for (const msg of Array.isArray(entry.messaging) ? entry.messaging : []) {
+    if (!msg.message?.mid || !msg.sender?.id) continue;
     msgs.push({
       platform:          "messenger",
       externalConvoId:   msg.sender.id,
@@ -107,7 +153,7 @@ function extractMessenger(entry: any): NormalizedMessage[] {
       contactName:       msg.sender.name ?? msg.sender.id,
       messageText:       msg.message.text ?? "",
       messageType:       msg.message.attachments ? "attachment" : "text",
-      sentAt:            new Date(msg.timestamp),
+      sentAt:            new Date(msg.timestamp ?? Date.now()),
       pageId:            entry.id,
     });
   }
@@ -122,7 +168,12 @@ async function routeAndStore(msg: NormalizedMessage): Promise<void> {
     _page_id:         msg.pageId ?? null,
   });
 
-  if (error || !conn || conn.length === 0) {
+  if (error) {
+    console.error("[meta-webhook] find_meta_connection failed", error);
+    throw new Error(`find_meta_connection failed: ${error.message}`);
+  }
+
+  if (!conn || conn.length === 0) {
     console.warn("[meta-webhook] no active connection for", msg.platform, msg.phoneNumberId ?? msg.pageId);
     return;
   }
@@ -142,7 +193,10 @@ async function routeAndStore(msg: NormalizedMessage): Promise<void> {
     _raw_payload:         {},
   });
 
-  if (rpcErr) console.error("[meta-webhook] store_meta_inbound failed", rpcErr);
+  if (rpcErr) {
+    console.error("[meta-webhook] store_meta_inbound failed", rpcErr);
+    throw new Error(`store_meta_inbound failed: ${rpcErr.message}`);
+  }
 }
 
 // ---- Main handler -------------------------------------------
@@ -154,7 +208,12 @@ Deno.serve(async (req: Request) => {
     const token  = url.searchParams.get("hub.verify_token");
     const challenge = url.searchParams.get("hub.challenge");
 
-    if (mode === "subscribe" && token === META_VERIFY_TOKEN && challenge) {
+    if (
+      META_VERIFY_TOKEN &&
+      mode === "subscribe" &&
+      token === META_VERIFY_TOKEN &&
+      challenge
+    ) {
       return new Response(challenge, { status: 200 });
     }
     return new Response("Forbidden", { status: 403 });
@@ -173,14 +232,19 @@ Deno.serve(async (req: Request) => {
     const valid = await verifySignature(rawBody, sig);
     if (!valid) return new Response("Invalid signature", { status: 401 });
 
-    let body: any;
-    try { body = JSON.parse(rawBody); } catch {
+    let body: MetaWebhookBody;
+    try {
+      const parsed = JSON.parse(rawBody) as unknown;
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        return new Response("Bad JSON", { status: 400 });
+      }
+      body = parsed as MetaWebhookBody;
+    } catch {
       return new Response("Bad JSON", { status: 400 });
     }
 
-    // Respond 200 immediately — process async
-    const process = async () => {
-      for (const entry of body.entry ?? []) {
+    try {
+      for (const entry of Array.isArray(body.entry) ? body.entry : []) {
         let messages: NormalizedMessage[] = [];
 
         if (body.object === "whatsapp_business_account") {
@@ -195,10 +259,10 @@ Deno.serve(async (req: Request) => {
           await routeAndStore(msg);
         }
       }
-    };
-
-    // Fire and forget (Edge Function must respond within timeout)
-    process().catch(e => console.error("[meta-webhook] process error", e));
+    } catch (error) {
+      console.error("[meta-webhook] process error", error);
+      return new Response("Processing failed", { status: 500 });
+    }
 
     return new Response("EVENT_RECEIVED", { status: 200 });
   }

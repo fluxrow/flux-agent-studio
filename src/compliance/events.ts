@@ -22,7 +22,7 @@ export function emitComplianceEvent(
 ): void {
   const event: ExecutionEvent = {
     id: `compl_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-    type: type as ExecutionEvent["type"],
+    type,
     sessionId: "compliance",
     flowId: "compliance",
     at: new Date().toISOString(),

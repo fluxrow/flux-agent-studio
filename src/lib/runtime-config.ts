@@ -5,13 +5,10 @@
  * layer between mock (in-memory) and Supabase-backed adapters without
  * touching any page or component code.
  *
- * Defaults to MOCK so the app keeps working exactly as before. Flip to
- * Supabase by setting `VITE_USE_SUPABASE=true` in `.env` (or runtime).
+ * Supabase is the default. Set `VITE_USE_SUPABASE=false` only for the explicit
+ * local mock runtime. Demo data is a separate read overlay controlled by
+ * `isDemoMode()` and does not change this persistence selection.
  */
-// Phase 22A — default flipped to Supabase mode. The `.env` file is managed
-// by Lovable Cloud and does not expose VITE_USE_SUPABASE, so we treat the
-// real persistence layer as the default and only fall back to mock when
-// the flag is explicitly set to "false".
 export const USE_SUPABASE: boolean =
   String(import.meta.env.VITE_USE_SUPABASE ?? "true").toLowerCase() === "true";
 

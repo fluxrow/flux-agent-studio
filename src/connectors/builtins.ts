@@ -1,9 +1,9 @@
 /**
- * Built-in connector manifests (mocked).
+ * Built-in connector manifests.
  *
- * These are intentionally inert — no real API calls happen. They demonstrate
- * the manifest contract every future connector (real or community-built) must
- * follow, and seed the Connector Center with browsable entries.
+ * Manifests describe catalog capabilities. Runtime support varies by adapter,
+ * so installation status must come from the adapter registry rather than this
+ * static catalog.
  */
 import type { ConnectorManifest } from "./types";
 

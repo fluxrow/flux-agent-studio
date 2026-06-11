@@ -1,121 +1,57 @@
 /**
- * Token management for Google Calendar OAuth.
+ * Authenticated Google Calendar token broker.
  *
- * getValidToken() is the single entry point for all API callers.
- * It reads the token from Supabase, refreshes if needed, and returns
- * a fresh access token. All callers should use this — never read
- * tokens from storage directly.
- *
- * Tokens are stored in `user_calendar_tokens` (server-side via edge
- * function). Frontend only holds the access_token temporarily in memory
- * for the duration of the tab session.
+ * Refresh tokens and token-table rows stay server-side. The browser receives
+ * only the short-lived access token required by the existing calendar client.
  */
-import { createClient } from "@supabase/supabase-js";
-import { GOOGLE_TOKEN_URL } from "./config";
+import { supabase } from "@/integrations/supabase/client";
 import type { OAuthToken } from "../types";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-
-function supabase() {
-  return createClient(SUPABASE_URL, SUPABASE_KEY);
-}
-
-const REFRESH_BUFFER_MS = 5 * 60 * 1000; // refresh 5min before expiry
-
-/** In-memory cache to avoid hammering Supabase on every API call. */
+const REFRESH_BUFFER_MS = 5 * 60 * 1000;
 const tokenCache = new Map<string, OAuthToken>();
 
-export async function getValidToken(userId: string): Promise<OAuthToken> {
-  const cached = tokenCache.get(userId);
+function cacheKey(userId: string, workspaceId: string): string {
+  return `${workspaceId}:${userId}`;
+}
+
+export async function getValidToken(
+  userId: string,
+  workspaceId: string,
+): Promise<OAuthToken> {
+  const key = cacheKey(userId, workspaceId);
+  const cached = tokenCache.get(key);
   if (cached && new Date(cached.expiresAt).getTime() - Date.now() > REFRESH_BUFFER_MS) {
     return cached;
   }
 
-  const db = supabase();
-  const { data, error } = await db
-    .from("user_calendar_tokens")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
-
-  if (error || !data) {
-    throw new Error(`Usuário ${userId} não tem Google Calendar conectado.`);
+  const { data, error } = await supabase.functions.invoke("google-oauth-callback", {
+    body: { action: "get_token", workspaceId },
+  });
+  if (error || !data?.access_token) {
+    throw new Error(data?.error ?? "Google Calendar não conectado.");
+  }
+  if (data.user_id !== userId) {
+    throw new Error("A sessão atual não corresponde ao calendário solicitado.");
+  }
+  if (data.workspace_id !== workspaceId) {
+    throw new Error("O calendário não pertence ao workspace solicitado.");
   }
 
-  const token = rowToToken(data);
-
-  if (new Date(token.expiresAt).getTime() - Date.now() <= REFRESH_BUFFER_MS) {
-    return refreshToken(userId, token, db);
-  }
-
-  tokenCache.set(userId, token);
+  const token: OAuthToken = {
+    userId: data.user_id,
+    workspaceId: data.workspace_id,
+    googleSub: data.google_sub,
+    email: data.email,
+    accessToken: data.access_token,
+    refreshToken: "",
+    expiresAt: data.expires_at,
+    scopes: data.scopes ?? [],
+    defaultCalendarId: data.default_calendar_id ?? "primary",
+  };
+  tokenCache.set(key, token);
   return token;
 }
 
-async function refreshToken(
-  userId: string,
-  current: OAuthToken,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  db: ReturnType<typeof supabase>
-): Promise<OAuthToken> {
-  const gcalClientId = import.meta.env.VITE_GCAL_CLIENT_ID as string;
-
-  // Refresh must go through the edge function to keep client_secret server-side.
-  const res = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-oauth-callback`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "refresh", userId }),
-    }
-  );
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({})) as { error?: string };
-    if (body.error === "invalid_grant") {
-      await db
-        .from("user_calendar_tokens")
-        .update({ status: "disconnected" } as Record<string, unknown>)
-        .eq("user_id", userId);
-      tokenCache.delete(userId);
-      throw new Error("Google Calendar desconectado — refresh token revogado. Reconecte.");
-    }
-    throw new Error(`Falha ao renovar token: ${body.error ?? res.statusText}`);
-  }
-
-  const { access_token, expires_in } = await res.json() as {
-    access_token: string;
-    expires_in: number;
-  };
-
-  const expiresAt = new Date(Date.now() + expires_in * 1000).toISOString();
-
-  await db
-    .from("user_calendar_tokens")
-    .update({ access_token, expires_at: expiresAt, updated_at: new Date().toISOString() })
-    .eq("user_id", userId);
-
-  const refreshed: OAuthToken = { ...current, accessToken: access_token, expiresAt };
-  tokenCache.set(userId, refreshed);
-  return refreshed;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function rowToToken(row: Record<string, any>): OAuthToken {
-  return {
-    userId: row.user_id,
-    workspaceId: row.workspace_id,
-    googleSub: row.google_sub,
-    email: row.email,
-    accessToken: row.access_token,
-    refreshToken: row.refresh_token,
-    expiresAt: row.expires_at,
-    scopes: row.scopes ?? [],
-    defaultCalendarId: row.default_calendar_id ?? "primary",
-  };
-}
-
-export function clearTokenCache(userId: string): void {
-  tokenCache.delete(userId);
+export function clearTokenCache(userId: string, workspaceId: string): void {
+  tokenCache.delete(cacheKey(userId, workspaceId));
 }

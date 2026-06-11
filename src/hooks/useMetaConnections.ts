@@ -23,10 +23,14 @@ export function useMetaConnections() {
   useEffect(() => { load(); }, [load]);
 
   const create = useCallback(async (input: CreateMetaConnectionInput) => {
-    const conn = await metaConnectionService.create(input);
-    setConnections(prev => [...prev, conn]);
-    return conn;
-  }, []);
+    try {
+      const conn = await metaConnectionService.create(input);
+      setConnections(prev => [...prev.filter(item => item.id !== conn.id), conn]);
+      return conn;
+    } finally {
+      await load();
+    }
+  }, [load]);
 
   const remove = useCallback(async (id: string) => {
     await metaConnectionService.remove(id);

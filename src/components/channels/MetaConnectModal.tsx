@@ -68,8 +68,8 @@ export function MetaConnectModal({ open, onClose }: MetaConnectModalProps) {
       });
       setSaved(true);
       setTimeout(() => { setSaved(false); setForm(EMPTY); onClose(); }, 1500);
-    } catch (e: any) {
-      setErr(e.message ?? "Erro ao salvar conexão.");
+    } catch (error: unknown) {
+      setErr(error instanceof Error ? error.message : "Erro ao salvar conexão.");
     } finally {
       setSaving(false);
     }
@@ -112,7 +112,7 @@ export function MetaConnectModal({ open, onClose }: MetaConnectModalProps) {
                   </Button>
                 </div>
                 <div className="text-[10px] text-muted-foreground">
-                  Verify token: <code className="bg-background px-1 rounded">flux_meta_verify</code>
+                  O verify token é configurado e compartilhado pelo operador no ambiente seguro.
                 </div>
               </div>
 
@@ -171,7 +171,7 @@ export function MetaConnectModal({ open, onClose }: MetaConnectModalProps) {
         {saved && (
           <div className="flex items-center gap-2 text-sm text-success bg-success/10 rounded-lg px-3 py-2">
             <CheckCircle2 className="h-4 w-4" />
-            Conexão salva! O webhook estará ativo após verificação pela Meta.
+            Conexão verificada e ativada. Configure o webhook na Meta para receber mensagens.
           </div>
         )}
 

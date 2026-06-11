@@ -10,7 +10,9 @@ const MAX = 100;
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
-const notify = () => listeners.forEach((l) => { try { l(); } catch {} });
+const notify = () => listeners.forEach((l) => {
+  try { l(); } catch { /* subscribers are isolated */ }
+});
 
 function read(): AIRunRecord[] {
   try {
@@ -19,7 +21,7 @@ function read(): AIRunRecord[] {
   } catch { return []; }
 }
 function write(items: AIRunRecord[]) {
-  try { localStorage.setItem(KEY, JSON.stringify(items.slice(-MAX))); } catch {}
+  try { localStorage.setItem(KEY, JSON.stringify(items.slice(-MAX))); } catch { /* storage unavailable */ }
 }
 
 export const aiInspector = {

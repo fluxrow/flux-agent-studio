@@ -9,8 +9,12 @@
  */
 import { getAIProvider, DEFAULT_PROVIDER } from "@/ai/registry";
 import type { AIProviderId } from "@/ai/types";
-import { repositories } from "@/domain";
-import type { Block, Connection, Flow } from "@/types";
+import {
+  persistence,
+  type BotRepository,
+  type FlowRepository,
+} from "@/domain/persistence";
+import type { Block, BlockConfig, Connection, Flow } from "@/types";
 import type {
   AIBuilderPromptInput, AIBuilderObjective,
   BotBlueprint, FlowBlueprint, LeadModelBlueprint,
@@ -253,7 +257,7 @@ export function blueprintToFlow(botId: string, bp: BotBlueprint): Flow {
       type: s.type,
       label: s.label,
       position: { x: xStart + i * spacing, y: yMain },
-      config: config as any,
+      config: config as BlockConfig,
       createdAt: now(),
       updatedAt: now(),
     });
@@ -294,15 +298,23 @@ export interface MaterializeResult {
   flow: Flow;
 }
 
-export async function materializeBlueprint(bp: BotBlueprint): Promise<MaterializeResult> {
-  const bot = await repositories.bots.create({
+export interface AIBuilderPersistencePorts {
+  bots: Pick<BotRepository, "create">;
+  flows: Pick<FlowRepository, "saveBlocks" | "saveConnections">;
+}
+
+export async function materializeBlueprint(
+  bp: BotBlueprint,
+  ports: AIBuilderPersistencePorts = persistence,
+): Promise<MaterializeResult> {
+  const bot = await ports.bots.create({
     name: bp.bot.name,
     description: bp.bot.description,
     channel: bp.bot.channel,
   });
   const flow = blueprintToFlow(bot.id, bp);
-  await repositories.flows.saveBlocks(bot.id, flow.blocks);
-  await repositories.flows.saveConnections(bot.id, flow.connections);
+  await ports.flows.saveBlocks(bot.id, flow.blocks);
+  await ports.flows.saveConnections(bot.id, flow.connections);
 
   emitAIBuilderEvent("ai_bot_materialized", {
     botId: bot.id,

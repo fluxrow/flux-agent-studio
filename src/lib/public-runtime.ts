@@ -15,6 +15,10 @@ import { USE_SUPABASE } from "@/lib/runtime-config";
 import { persistence } from "@/domain/persistence";
 import { isDemoMode } from "@/beta/demoMode";
 import { DEMO_BOTS, DEMO_FLOW } from "@/beta/demoDataset";
+import {
+  getPublicAiRuntimeContext,
+  setPublicAiRuntimeContext,
+} from "@/ai/publicRuntimeContext";
 import type { Flow, Bot } from "@/types";
 
 export interface PublicBot {
@@ -25,6 +29,17 @@ export interface PublicBot {
   channel?: string;
   workspaceId: string;
   snapshot: Flow;
+  publishedAt?: string | null;
+}
+
+interface PublicBotRow {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string;
+  channel?: string;
+  workspaceId: string;
+  snapshot?: Flow;
   publishedAt?: string | null;
 }
 
@@ -74,10 +89,10 @@ export async function loadPublicBot(slug: string): Promise<PublicBot | null> {
       publishedAt: bot.publishedAt ?? null,
     };
   }
-  const { data, error } = await supabase.rpc("get_public_bot" as any, { _slug: slug });
+  const { data, error } = await supabase.rpc("get_public_bot", { _slug: slug });
   if (error) throw error;
   if (!data) return null;
-  const row = data as any;
+  const row = data as unknown as PublicBotRow;
   if (!row.snapshot) return null;
   return {
     id: row.id,
@@ -104,16 +119,39 @@ export async function startPublicSession(slug: string, botId: string, _workspace
       status: "ativa",
       variables: {},
       startedAt: new Date().toISOString(),
-    } as any);
+    });
     return session.id;
   }
-  const { data, error } = await supabase.rpc("record_public_session" as any, {
-    _slug: slug,
-    _visitor_id: visitorId,
-    _variables: {},
-  });
+  const { data, error } = await supabase.rpc(
+    "record_public_session_with_ai_token" as never,
+    {
+      _slug: slug,
+      _visitor_id: visitorId,
+      _variables: {},
+    } as never,
+  );
   if (error) throw error;
-  return data as string;
+  const result = data as unknown;
+  const row = (Array.isArray(result) ? result[0] : result) as {
+    session_id?: string;
+    ai_token?: string;
+  } | null;
+  if (!row?.session_id || !row.ai_token) {
+    throw new Error("Public session token was not issued.");
+  }
+  setPublicAiRuntimeContext({
+    sessionId: row.session_id,
+    token: row.ai_token,
+  });
+  return row.session_id;
+}
+
+function getSessionToken(sessionId: string): string {
+  const context = getPublicAiRuntimeContext();
+  if (!context || context.sessionId !== sessionId) {
+    throw new Error("Public session token is unavailable.");
+  }
+  return context.token;
 }
 
 export async function recordPublicEvent(sessionId: string, type: string, payload: Record<string, unknown> = {}, blockKey?: string | null) {
@@ -122,24 +160,32 @@ export async function recordPublicEvent(sessionId: string, type: string, payload
     // Mock mode: rely on runtimeEventBus + mock event repository (auto-wired by engine)
     return;
   }
-  const { error } = await supabase.rpc("record_public_event" as any, {
-    _session_id: sessionId,
-    _type: type,
-    _payload: payload as any,
-    _block_key: blockKey ?? null,
-  });
+  const { error } = await supabase.rpc(
+    "record_public_event" as never,
+    {
+      _session_id: sessionId,
+      _session_token: getSessionToken(sessionId),
+      _type: type,
+      _payload: payload,
+      _block_key: blockKey ?? null,
+    } as never,
+  );
   if (error) console.warn("[publicRuntime] event failed:", error.message);
 }
 
 export async function recordPublicMessage(sessionId: string, role: "bot" | "user" | "system", text: string, blockKey?: string | null) {
   if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
-  const { error } = await supabase.rpc("record_public_message" as any, {
-    _session_id: sessionId,
-    _role: role,
-    _text: text,
-    _block_key: blockKey ?? null,
-  });
+  const { error } = await supabase.rpc(
+    "record_public_message" as never,
+    {
+      _session_id: sessionId,
+      _session_token: getSessionToken(sessionId),
+      _role: role,
+      _text: text,
+      _block_key: blockKey ?? null,
+    } as never,
+  );
   if (error) console.warn("[publicRuntime] message failed:", error.message);
 }
 
@@ -168,15 +214,19 @@ export async function recordPublicLead(sessionId: string, botId: string, workspa
     try { await persistence.sessions.update(sessionId, { leadId: created.id }); } catch { /* mock */ }
     return created.id;
   }
-  const { data, error } = await supabase.rpc("record_public_lead" as any, {
-    _session_id: sessionId,
-    _name: lead.name,
-    _email: lead.email ?? null,
-    _phone: lead.phone ?? null,
-    _company: lead.company ?? null,
-    _tags: lead.tags ?? null,
-    _score: lead.score ?? 0,
-  });
+  const { data, error } = await supabase.rpc(
+    "record_public_lead" as never,
+    {
+      _session_id: sessionId,
+      _session_token: getSessionToken(sessionId),
+      _name: lead.name,
+      _email: lead.email ?? null,
+      _phone: lead.phone ?? null,
+      _company: lead.company ?? null,
+      _tags: lead.tags ?? null,
+      _score: lead.score ?? 0,
+    } as never,
+  );
   if (error) {
     console.error("[publicRuntime] lead failed:", error.message);
     return null;
@@ -197,21 +247,29 @@ export interface PublicVisitorProfileInput {
   userAgent?: string;
 }
 
-export async function recordPublicVisitorProfile(slug: string, visitorId: string, profile: PublicVisitorProfileInput) {
+export async function recordPublicVisitorProfile(
+  sessionId: string,
+  visitorId: string,
+  profile: PublicVisitorProfileInput,
+) {
   if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
-  const { error } = await supabase.rpc("record_public_visitor_profile" as any, {
-    _slug: slug,
-    _visitor_id: visitorId,
-    _browser: profile.browser ?? null,
-    _os: profile.os ?? null,
-    _device_type: profile.deviceType ?? null,
-    _language: profile.language ?? null,
-    _timezone: profile.timezone ?? null,
-    _referrer: profile.referrer ?? null,
-    _landing_page: profile.landingPage ?? null,
-    _user_agent: profile.userAgent ?? null,
-  });
+  const { error } = await supabase.rpc(
+    "record_public_visitor_profile" as never,
+    {
+      _session_id: sessionId,
+      _session_token: getSessionToken(sessionId),
+      _visitor_id: visitorId,
+      _browser: profile.browser ?? null,
+      _os: profile.os ?? null,
+      _device_type: profile.deviceType ?? null,
+      _language: profile.language ?? null,
+      _timezone: profile.timezone ?? null,
+      _referrer: profile.referrer ?? null,
+      _landing_page: profile.landingPage ?? null,
+      _user_agent: profile.userAgent ?? null,
+    } as never,
+  );
   if (error) console.warn("[publicRuntime] visitor failed:", error.message);
 }
 
@@ -229,38 +287,44 @@ export interface PublicAttributionInput {
   landingPage?: string;
 }
 
-export async function recordPublicAttribution(slug: string, visitorId: string, sessionId: string | null, attr: PublicAttributionInput) {
+export async function recordPublicAttribution(_slug: string, visitorId: string, sessionId: string | null, attr: PublicAttributionInput) {
   if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
   const hasAny = Object.values(attr).some((v) => v != null && v !== "");
-  if (!hasAny) return;
-  const { error } = await supabase.rpc("record_public_attribution" as any, {
-    _slug: slug,
-    _visitor_id: visitorId,
-    _session_id: sessionId,
-    _utm_source: attr.utmSource ?? null,
-    _utm_medium: attr.utmMedium ?? null,
-    _utm_campaign: attr.utmCampaign ?? null,
-    _utm_content: attr.utmContent ?? null,
-    _utm_term: attr.utmTerm ?? null,
-    _fbclid: attr.fbclid ?? null,
-    _gclid: attr.gclid ?? null,
-    _ttclid: attr.ttclid ?? null,
-    _msclkid: attr.msclkid ?? null,
-    _referrer: attr.referrer ?? null,
-    _landing_page: attr.landingPage ?? null,
-  });
+  if (!hasAny || !sessionId) return;
+  const { error } = await supabase.rpc(
+    "record_public_attribution" as never,
+    {
+      _session_id: sessionId,
+      _session_token: getSessionToken(sessionId),
+      _visitor_id: visitorId,
+      _utm_source: attr.utmSource ?? null,
+      _utm_medium: attr.utmMedium ?? null,
+      _utm_campaign: attr.utmCampaign ?? null,
+      _utm_content: attr.utmContent ?? null,
+      _utm_term: attr.utmTerm ?? null,
+      _fbclid: attr.fbclid ?? null,
+      _gclid: attr.gclid ?? null,
+      _ttclid: attr.ttclid ?? null,
+      _msclkid: attr.msclkid ?? null,
+      _referrer: attr.referrer ?? null,
+      _landing_page: attr.landingPage ?? null,
+    } as never,
+  );
   if (error) console.warn("[publicRuntime] attribution failed:", error.message);
 }
 
 export async function attachAttributionToLead(sessionId: string, leadId: string, visitorId: string) {
   if (isDemoMode()) return;
   if (!USE_SUPABASE) return;
-  const { error } = await supabase.rpc("attach_public_attribution_to_lead" as any, {
-    _session_id: sessionId,
-    _lead_id: leadId,
-    _visitor_id: visitorId,
-  });
+  const { error } = await supabase.rpc(
+    "attach_public_attribution_to_lead" as never,
+    {
+      _session_id: sessionId,
+      _session_token: getSessionToken(sessionId),
+      _lead_id: leadId,
+      _visitor_id: visitorId,
+    } as never,
+  );
   if (error) console.warn("[publicRuntime] attach attribution failed:", error.message);
 }
-

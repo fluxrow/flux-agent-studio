@@ -18,10 +18,10 @@ export function emitAIBuilderEvent(
 ) {
   runtimeEventBus.emit({
     id: `aib_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
-    type: type as any,
+    type,
     sessionId: "",
     flowId: "",
     at: new Date().toISOString(),
     payload,
-  } as any);
+  });
 }

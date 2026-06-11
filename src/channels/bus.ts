@@ -4,6 +4,7 @@
  */
 import { runtimeEventBus } from "@/runtime/events/bus";
 import type { ChannelEvent, ChannelEventListener } from "./types";
+import type { ExecutionEventType } from "@/types/event";
 
 const listeners = new Set<ChannelEventListener>();
 const history: ChannelEvent[] = [];
@@ -20,9 +21,10 @@ export const channelBus = {
     });
 
     // Mirror to the runtime EventBus so Tracking / Inspector see it.
+    const mirroredType: ExecutionEventType = `channel:${event.type}`;
     runtimeEventBus.emit({
       id: event.id,
-      type: ("channel:" + event.type) as any,
+      type: mirroredType,
       sessionId: event.sessionId ?? "",
       flowId: "",
       at: event.at,

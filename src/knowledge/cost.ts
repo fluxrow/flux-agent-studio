@@ -9,7 +9,9 @@ const MAX = 200;
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
-const notify = () => listeners.forEach((l) => { try { l(); } catch {} });
+const notify = () => listeners.forEach((l) => {
+  try { l(); } catch { /* subscribers are isolated */ }
+});
 
 function read(): KnowledgeUsageRecord[] {
   try {
@@ -18,7 +20,7 @@ function read(): KnowledgeUsageRecord[] {
   } catch { return []; }
 }
 function write(items: KnowledgeUsageRecord[]) {
-  try { localStorage.setItem(KEY, JSON.stringify(items.slice(-MAX))); } catch {}
+  try { localStorage.setItem(KEY, JSON.stringify(items.slice(-MAX))); } catch { /* storage unavailable */ }
 }
 
 export const knowledgeCost = {

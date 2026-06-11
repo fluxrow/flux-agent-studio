@@ -10,6 +10,10 @@ import type {
 } from "../types";
 import { validateSchema, safeParseJSON } from "../schema";
 import { supabase } from "@/integrations/supabase/client";
+import { getPublicAiRuntimeContext } from "@/ai/publicRuntimeContext";
+import { buildMockProvider } from "./_mock";
+import { isDemoMode } from "@/beta/demoMode";
+import { USE_SUPABASE } from "@/lib/runtime-config";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 2;
@@ -22,6 +26,14 @@ const MODELS: AIModelInfo[] = [
   { id: "openai/gpt-5-mini",             label: "GPT-5 mini",                  inputCostPer1k: 0, outputCostPer1k: 0 },
   { id: "openai/gpt-5",                  label: "GPT-5",                       inputCostPer1k: 0, outputCostPer1k: 0 },
 ];
+
+const localOpenaiProvider = buildMockProvider({
+  id: "openai",
+  label: "Lovable AI",
+  description: "Local deterministic fallback for demo and mock runtime.",
+  models: MODELS,
+  defaultModel: "google/gemini-3-flash-preview",
+});
 
 function interpolate(s: string, vars?: Record<string, unknown>): string {
   if (!vars) return s;
@@ -46,12 +58,19 @@ async function callGateway(body: Record<string, unknown>, attempt = 0): Promise<
 
   let res: Response;
   try {
+    const publicContext = getPublicAiRuntimeContext();
     const invoke = await supabase.functions.invoke("lovable-ai", {
       body,
+      headers: publicContext
+        ? {
+            "x-public-ai-session": publicContext.sessionId,
+            "x-public-ai-token": publicContext.token,
+          }
+        : undefined,
     });
     if (invoke.error) {
-      // Retry transient errors
-      if (attempt < MAX_RETRIES) {
+      // Public calls are not retried because each attempt consumes quota.
+      if (attempt < MAX_RETRIES && !publicContext) {
         await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
         return callGateway(body, attempt + 1);
       }
@@ -125,6 +144,9 @@ export const openaiProvider: AIProvider = {
   defaultModel: "google/gemini-3-flash-preview",
 
   async generate(input: AIGenerateInput): Promise<AIResponse<string>> {
+    if (isDemoMode() || !USE_SUPABASE) {
+      return localOpenaiProvider.generate(input);
+    }
     const t0 = performance.now();
     const model = pickModel(input.model);
     const userPrompt = interpolate(input.prompt, input.variables);
@@ -147,6 +169,9 @@ export const openaiProvider: AIProvider = {
   async extract<S extends AIOutputSchema>(
     input: AIExtractInput<S>,
   ): Promise<AIResponse<Record<string, unknown>>> {
+    if (isDemoMode() || !USE_SUPABASE) {
+      return localOpenaiProvider.extract(input);
+    }
     const t0 = performance.now();
     const model = pickModel(input.model);
     const userPrompt = interpolate(input.prompt, input.variables);
@@ -174,6 +199,9 @@ export const openaiProvider: AIProvider = {
   },
 
   async classify(input: AIClassifyInput): Promise<AIResponse<string>> {
+    if (isDemoMode() || !USE_SUPABASE) {
+      return localOpenaiProvider.classify(input);
+    }
     const t0 = performance.now();
     const model = pickModel(input.model);
     const userPrompt = interpolate(input.prompt, input.variables);

@@ -18,11 +18,11 @@ export function emitConnectorEvent(
   };
   runtimeEventBus.emit({
     id: event.id,
-    type: type as any,
+    type,
     sessionId: "",
     flowId: "",
     at: event.at,
     payload: { connectorId: event.connectorId, manifestId: event.manifestId, ...event.payload },
-  } as any);
+  });
   return event;
 }

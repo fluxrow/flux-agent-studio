@@ -21,9 +21,35 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL         = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const GRAPH_API_BASE = "https://graph.facebook.com/v19.0";
+const GRAPH_API_VERSION = Deno.env.get("META_GRAPH_API_VERSION");
+const GRAPH_API_BASE = GRAPH_API_VERSION
+  ? `https://graph.facebook.com/${GRAPH_API_VERSION}`
+  : "https://graph.facebook.com";
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+function response(body: BodyInit | null, status = 200, json = false): Response {
+  return new Response(body, {
+    status,
+    headers: {
+      ...CORS,
+      ...(json ? { "Content-Type": "application/json" } : {}),
+    },
+  });
+}
+
+async function authenticate(req: Request): Promise<string | null> {
+  const token = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
+  if (!token) return null;
+
+  const { data, error } = await serviceClient.auth.getUser(token);
+  return error ? null : data.user?.id ?? null;
+}
 
 interface SendRequest {
   connection_id: string;
@@ -32,7 +58,20 @@ interface SendRequest {
   message_type?: "text";
 }
 
-async function sendWhatsApp(conn: any, recipientId: string, text: string): Promise<Response> {
+interface MetaConnection {
+  id: string;
+  workspace_id: string;
+  platform: "whatsapp" | "instagram" | "messenger";
+  access_token: string;
+  phone_number_id: string | null;
+}
+
+interface MetaApiResponse {
+  messages?: Array<{ id?: string }>;
+  [key: string]: unknown;
+}
+
+async function sendWhatsApp(conn: MetaConnection, recipientId: string, text: string): Promise<Response> {
   const url = `${GRAPH_API_BASE}/${conn.phone_number_id}/messages`;
   return fetch(url, {
     method: "POST",
@@ -50,7 +89,7 @@ async function sendWhatsApp(conn: any, recipientId: string, text: string): Promi
   });
 }
 
-async function sendInstagram(conn: any, recipientId: string, text: string): Promise<Response> {
+async function sendInstagram(conn: MetaConnection, recipientId: string, text: string): Promise<Response> {
   const url = `${GRAPH_API_BASE}/me/messages`;
   return fetch(url, {
     method: "POST",
@@ -65,27 +104,29 @@ async function sendInstagram(conn: any, recipientId: string, text: string): Prom
   });
 }
 
-async function sendMessenger(conn: any, recipientId: string, text: string): Promise<Response> {
+async function sendMessenger(conn: MetaConnection, recipientId: string, text: string): Promise<Response> {
   return sendInstagram(conn, recipientId, text);
 }
 
 Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return response(null, 204);
+  }
   if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+    return response("Method Not Allowed", 405);
   }
 
-  // Authenticate caller
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader) return new Response("Unauthorized", { status: 401 });
+  const userId = await authenticate(req);
+  if (!userId) return response("Unauthorized", 401);
 
   let body: SendRequest;
   try { body = await req.json(); } catch {
-    return new Response("Bad JSON", { status: 400 });
+    return response("Bad JSON", 400);
   }
 
   const { connection_id, recipient_id, message_text } = body;
   if (!connection_id || !recipient_id || !message_text) {
-    return new Response("Missing fields", { status: 400 });
+    return response("Missing fields", 400);
   }
 
   // Load connection (service_role bypasses RLS — auth check is via JWT above)
@@ -97,7 +138,18 @@ Deno.serve(async (req: Request) => {
     .single();
 
   if (connErr || !conn) {
-    return new Response("Connection not found", { status: 404 });
+    return response("Connection not found", 404);
+  }
+
+  const { data: membership, error: membershipError } = await serviceClient
+    .from("workspace_members")
+    .select("workspace_id")
+    .eq("workspace_id", conn.workspace_id)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (membershipError || !membership) {
+    return response("Forbidden", 403);
   }
 
   let metaRes: Response;
@@ -109,60 +161,100 @@ Deno.serve(async (req: Request) => {
     } else {
       metaRes = await sendMessenger(conn, recipient_id, message_text);
     }
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 502 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Meta request failed";
+    return response(JSON.stringify({ error: message }), 502, true);
   }
 
-  const metaBody = await metaRes.json().catch(() => ({}));
+  const metaBody = await metaRes.json().catch(() => ({})) as MetaApiResponse;
 
   if (!metaRes.ok) {
     console.error("[meta-send] Graph API error", metaRes.status, metaBody);
-    return new Response(JSON.stringify({ error: "Meta API error", detail: metaBody }), {
-      status: metaRes.status,
-      headers: { "Content-Type": "application/json" },
-    });
+    return response(
+      JSON.stringify({ error: "Meta API error", detail: metaBody }),
+      metaRes.status,
+      true,
+    );
   }
 
   // Resolve conversation_id — upsert conversation for this recipient so the
   // outbound message satisfies the NOT NULL FK constraint.
   const externalConvoId = recipient_id;
-  const { data: convRow, error: convErr } = await serviceClient
-    .from("meta_conversations")
-    .upsert({
-      workspace_id:            conn.workspace_id,
-      connection_id:           connection_id,
-      platform:                conn.platform,
-      external_conversation_id: externalConvoId,
-      contact_external_id:     recipient_id,
-      contact_name:            recipient_id,   // best name we have at send time
-      preview:                 message_text.slice(0, 120),
-      last_message_at:         new Date().toISOString(),
-    }, { onConflict: "connection_id,external_conversation_id", ignoreDuplicates: false })
-    .select("id")
-    .single();
+  const { data: existingConversation, error: existingConversationError } =
+    await serviceClient
+      .from("meta_conversations")
+      .select("id")
+      .eq("connection_id", connection_id)
+      .eq("external_conversation_id", externalConvoId)
+      .maybeSingle();
 
+  if (existingConversationError) {
+    console.error("[meta-send] failed to load conversation", existingConversationError);
+  }
+
+  const conversationResult = existingConversation
+    ? await serviceClient
+        .from("meta_conversations")
+        .update({
+          preview: message_text.slice(0, 120),
+          last_message_at: new Date().toISOString(),
+        })
+        .eq("id", existingConversation.id)
+        .select("id")
+        .single()
+    : await serviceClient
+        .from("meta_conversations")
+        .insert({
+          workspace_id:             conn.workspace_id,
+          connection_id,
+          platform:                 conn.platform,
+          external_conversation_id: externalConvoId,
+          contact_external_id:      recipient_id,
+          contact_name:             recipient_id,
+          preview:                  message_text.slice(0, 120),
+          last_message_at:          new Date().toISOString(),
+        })
+        .select("id")
+        .single();
+
+  const { data: convRow, error: convErr } = conversationResult;
   if (convErr || !convRow) {
     console.error("[meta-send] failed to upsert conversation", convErr);
-    return new Response(JSON.stringify({ error: "Failed to resolve conversation" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return response(
+      JSON.stringify({
+        ok: true,
+        persisted: false,
+        warning: "Message delivered but conversation persistence failed",
+        meta: metaBody,
+      }),
+      200,
+      true,
+    );
   }
 
   // Store outbound message
-  await serviceClient.from("meta_messages").insert({
+  const { error: messageInsertError } = await serviceClient.from("meta_messages").insert({
     workspace_id:        conn.workspace_id,
     conversation_id:     convRow.id,
-    external_message_id: (metaBody as any).messages?.[0]?.id ?? crypto.randomUUID(),
+    external_message_id: metaBody.messages?.[0]?.id ?? crypto.randomUUID(),
     direction:           "outbound",
     message_type:        "text",
     message_text,
     contact_external_id: recipient_id,
     sent_at:             new Date().toISOString(),
-  }).maybeSingle();
-
-  return new Response(JSON.stringify({ ok: true, meta: metaBody }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
   });
+
+  if (messageInsertError) {
+    console.error("[meta-send] message delivered but persistence failed", messageInsertError);
+  }
+
+  return response(
+    JSON.stringify({
+      ok: true,
+      persisted: !messageInsertError,
+      meta: metaBody,
+    }),
+    200,
+    true,
+  );
 });

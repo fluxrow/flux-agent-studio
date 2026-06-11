@@ -4,7 +4,6 @@ import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
 import { useEngine } from "@/hooks/useEngine";
 import {
   loadPublicBot,
-  startPublicSession,
   recordPublicEvent,
   recordPublicMessage,
   recordPublicLead,
@@ -14,6 +13,11 @@ import {
   getOrCreateVisitorId,
   type PublicBot as PublicBotType,
 } from "@/lib/public-runtime";
+import { startPublicRuntimeSession } from "@/lib/public-ai-session";
+import {
+  clearPublicAiRuntimeContext,
+  setPublicAiRuntimeContext,
+} from "@/ai/publicRuntimeContext";
 import { detectBrowser, captureAttributionFromUrl, trackingEngine } from "@/tracking";
 import { webChannel, webChannelHelpers } from "@/channels";
 import type { Flow } from "@/types";
@@ -105,20 +109,32 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         const visitorId = getOrCreateVisitorId(bot.slug);
         const profile = detectBrowser();
         const attribution = captureAttributionFromUrl();
-        recordPublicVisitorProfile(bot.slug, visitorId, {
-          browser: profile.browser,
-          os: profile.os,
-          deviceType: profile.deviceType,
-          language: profile.language,
-          timezone: profile.timezone,
-          referrer: profile.referrer,
-          landingPage: profile.landingPage,
-          userAgent: profile.userAgent,
-        }).catch(() => undefined);
 
-        const sid = await startPublicSession(bot.slug, bot.id, bot.workspaceId, visitorId);
+        const runtimeSession = await startPublicRuntimeSession(
+          bot.slug,
+          bot.id,
+          bot.workspaceId,
+          visitorId,
+        );
         if (cancelled) return;
+        const sid = runtimeSession.sessionId;
         sessionIdRef.current = sid;
+        if (runtimeSession.aiToken) {
+          setPublicAiRuntimeContext({
+            sessionId: sid,
+            token: runtimeSession.aiToken,
+          });
+          recordPublicVisitorProfile(sid, visitorId, {
+            browser: profile.browser,
+            os: profile.os,
+            deviceType: profile.deviceType,
+            language: profile.language,
+            timezone: profile.timezone,
+            referrer: profile.referrer,
+            landingPage: profile.landingPage,
+            userAgent: profile.userAgent,
+          }).catch(() => undefined);
+        }
         const channelSession = await webChannelHelpers.openWebSession({
           visitorId, runtimeSessionId: sid, botId: bot.id, workspaceId: bot.workspaceId,
         });
@@ -135,7 +151,12 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         console.error("[publicBot] failed to start session", err);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      if (sessionIdRef.current) {
+        clearPublicAiRuntimeContext(sessionIdRef.current);
+      }
+    };
   }, [engine, bot.id, bot.slug, bot.workspaceId, mode]);
 
   // Mirror engine events to backend + accumulate lead.* vars
@@ -172,7 +193,7 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
         recordPublicEvent(sid, "conversation_completed", {});
       }
     });
-  }, [engine, bot.id, bot.workspaceId, mode]);
+  }, [engine, bot.id, bot.slug, bot.workspaceId, mode]);
 
   // Capture lead-flavoured variables
   useEffect(() => {
@@ -185,7 +206,7 @@ function PublicChat({ bot }: { bot: PublicBotType }) {
       draftLeadRef.current[stripped] = String(v);
       draftLeadRef.current[lower] = String(v);
     });
-  }, [state?.context.variables]);
+  }, [state]);
 
   const variant = useMemo(() => resolveVariant(mode, getOrCreateVisitorId(bot.slug)), [mode, bot.slug]);
   const renderer = getRenderer(mode, variant);

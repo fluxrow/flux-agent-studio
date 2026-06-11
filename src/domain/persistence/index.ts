@@ -43,7 +43,7 @@ import {
   supabaseTemplateRepository,
   supabaseVariableRepository,
   supabaseVersionRepository,
-} from "./supabase/notImplemented";
+} from "./supabase/operationalRepositories";
 
 export type RepoMode = "mock" | "supabase" | "stub";
 export type DomainKey = keyof Persistence;
@@ -75,6 +75,9 @@ const supabasePersistence: Persistence = {
 const STUB_DOMAINS: DomainKey[] = USE_SUPABASE ? ["templates"] : [];
 
 const chosen: Persistence = USE_SUPABASE ? supabasePersistence : mockPersistence;
+type DemoOverlay = Partial<{
+  [K in DomainKey]: Partial<Persistence[K]>;
+}>;
 
 /**
  * Wrap a domain repository with the Demo Runtime overlay. At call time,
@@ -85,7 +88,7 @@ function withDemoOverlay<T extends object>(domain: DomainKey, real: T): T {
   return new Proxy(real, {
     get(target, prop, receiver) {
       if (isDemoMode()) {
-        const overlay = (demoPersistence as Record<string, any>)[domain as string];
+        const overlay = (demoPersistence as DemoOverlay)[domain];
         const fn = overlay?.[prop as string];
         if (typeof fn === "function") return fn.bind(overlay);
       }

@@ -25,7 +25,9 @@ if (typeof localStorage !== "undefined") {
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
-const notify = () => listeners.forEach((l) => { try { l(); } catch {} });
+const notify = () => listeners.forEach((l) => {
+  try { l(); } catch { /* subscribers are isolated */ }
+});
 
 function read<T>(key: string): T[] {
   try {
@@ -34,7 +36,7 @@ function read<T>(key: string): T[] {
   } catch { return []; }
 }
 function write<T>(key: string, value: T[]) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ }
 }
 
 function uid(prefix: string) {

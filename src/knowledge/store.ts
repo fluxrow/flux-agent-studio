@@ -15,7 +15,9 @@ const KEY_CHUNKS = "fluxbot.knowledge.chunks.v1";
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
-const notify = () => listeners.forEach((l) => { try { l(); } catch {} });
+const notify = () => listeners.forEach((l) => {
+  try { l(); } catch { /* subscribers are isolated */ }
+});
 
 function read<T>(key: string): T[] {
   try {
@@ -24,7 +26,7 @@ function read<T>(key: string): T[] {
   } catch { return []; }
 }
 function write<T>(key: string, items: T[]) {
-  try { localStorage.setItem(key, JSON.stringify(items)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(items)); } catch { /* storage unavailable */ }
 }
 
 export const knowledgeStore = {

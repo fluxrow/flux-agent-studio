@@ -40,6 +40,10 @@ function makeId() {
   return `ai_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
+function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export async function runAiBlock(input: RunAiBlockInput): Promise<RunAiBlockOutput> {
   const cfg = input.config ?? {};
   const providerId: AIProviderId = cfg.provider ?? DEFAULT_PROVIDER;
@@ -84,7 +88,7 @@ export async function runAiBlock(input: RunAiBlockInput): Promise<RunAiBlockOutp
         blockId: input.blockId,
         payload: { results: results.length },
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Knowledge retrieval failures should not block the AI call.
       console.warn("[runAiBlock] knowledge retrieval failed", err);
     }
@@ -144,7 +148,7 @@ export async function runAiBlock(input: RunAiBlockInput): Promise<RunAiBlockOutp
 
     runtimeEventBus.emit({
       id: record.id,
-      type: "ai_block_executed" as any,
+      type: "ai_block_executed",
       sessionId: input.sessionId ?? "",
       flowId: input.flowId ?? "",
       blockId: input.blockId,
@@ -162,8 +166,8 @@ export async function runAiBlock(input: RunAiBlockInput): Promise<RunAiBlockOutp
     });
 
     return { ok: true, response, variableUpdates, knowledgeResults };
-  } catch (err: any) {
-    const message = err?.message ?? "Falha ao executar bloco IA.";
+  } catch (err: unknown) {
+    const message = errorMessage(err, "Falha ao executar bloco IA.");
     aiInspector.record({
       id: makeId(),
       at: new Date().toISOString(),

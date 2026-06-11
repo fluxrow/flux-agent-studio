@@ -11,9 +11,9 @@
  *   - `flows.variables` is a JSONB column we use both for the variable
  *     declarations and as the source for `variables.listByBot`.
  *
- * Templates and workspace-scoped variables have no schema yet — they return
- * empty data and are marked `stub` by the persistence facade so the debug
- * panel is honest about it.
+ * Templates and workspace-scoped variables still have no dedicated schema.
+ * Those two methods remain explicit stubs; the flow, version, conversation,
+ * session and bot-scoped variable repositories in this module are operational.
  */
 import { supabase } from "@/integrations/supabase/client";
 import type {
@@ -24,9 +24,11 @@ import type {
   FlowVariableDecl,
   ID,
   Message,
+  Conversation,
   Session,
   Variable,
 } from "@/types";
+import type { Database, Json } from "@/integrations/supabase/types";
 import type {
   ConversationRepository,
   FlowRepository,
@@ -36,6 +38,14 @@ import type {
   VersionRepository,
 } from "../contracts";
 import { getCurrentWorkspaceId } from "../workspaceContext";
+
+type FlowBlockRow = Database["public"]["Tables"]["flow_blocks"]["Row"];
+type FlowBlockInsert = Database["public"]["Tables"]["flow_blocks"]["Insert"];
+type FlowConnectionRow = Database["public"]["Tables"]["flow_connections"]["Row"];
+type BotVersionRow = Database["public"]["Tables"]["bot_versions"]["Row"];
+type ConversationRow = Database["public"]["Tables"]["conversations"]["Row"];
+type SessionRow = Database["public"]["Tables"]["sessions"]["Row"];
+type MessageRow = Database["public"]["Tables"]["messages"]["Row"];
 
 /* ─────────────── Flow helpers ─────────────── */
 
@@ -72,18 +82,18 @@ async function ensureFlowRow(botId: ID): Promise<{ id: string; workspaceId: stri
 
 const nowIso = () => new Date().toISOString();
 
-const mapBlock = (botId: ID, r: any): Block => ({
+const mapBlock = (botId: ID, r: FlowBlockRow): Block => ({
   id: r.block_key,
   botId,
-  type: r.type,
+  type: r.type as Block["type"],
   label: r.label ?? "",
-  position: r.position ?? { x: 0, y: 0 },
-  config: r.config ?? {},
+  position: (r.position as unknown as Block["position"]) ?? { x: 0, y: 0 },
+  config: (r.config as unknown as Block["config"]) ?? {},
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 });
 
-const mapConnection = (botId: ID, r: any): Connection => ({
+const mapConnection = (botId: ID, r: FlowConnectionRow): Connection => ({
   id: r.connection_key,
   botId,
   fromBlockId: r.from_block_key,
@@ -146,18 +156,18 @@ export const supabaseFlowRepository: FlowRepository = {
       .not("block_key", "in", `(${keepKeys.map((k) => `"${k}"`).join(",") || '""'})`);
     if (del.error) throw del.error;
     if (blocks.length === 0) return;
-    const rows = blocks.map((b) => ({
+    const rows: FlowBlockInsert[] = blocks.map((b) => ({
       flow_id: flow.id,
       workspace_id: flow.workspaceId,
       block_key: b.id,
       type: b.type,
       label: b.label,
-      position: b.position,
-      config: b.config,
+      position: b.position as unknown as Json,
+      config: b.config as unknown as Json,
     }));
     const upsert = await supabase
       .from("flow_blocks")
-      .upsert(rows as any, { onConflict: "flow_id,block_key" });
+      .upsert(rows, { onConflict: "flow_id,block_key" });
     if (upsert.error) throw upsert.error;
   },
 
@@ -185,12 +195,12 @@ export const supabaseFlowRepository: FlowRepository = {
 
 /* ─────────────── Versions ─────────────── */
 
-const mapVersion = (r: any): FlowVersion => ({
+const mapVersion = (r: BotVersionRow): FlowVersion => ({
   id: r.id,
   botId: r.bot_id,
   version: r.version,
   status: r.status,
-  snapshot: r.snapshot as Flow,
+  snapshot: r.snapshot as unknown as Flow,
   createdAt: r.created_at,
   createdBy: r.created_by ?? undefined,
   note: r.note ?? undefined,
@@ -218,9 +228,9 @@ export const supabaseVersionRepository: VersionRepository = {
     return data ? mapVersion(data) : null;
   },
   async publish(botId, snapshot, note) {
-    const { data, error } = await supabase.rpc("publish_bot" as any, {
+    const { data, error } = await supabase.rpc("publish_bot", {
       _bot_id: botId,
-      _snapshot: snapshot as any,
+      _snapshot: snapshot as unknown as Json,
       _slug: null,
       _note: note ?? null,
     });
@@ -254,7 +264,7 @@ export const supabaseVersionRepository: VersionRepository = {
 
 /* ─────────────── Conversations ─────────────── */
 
-const mapConversation = (r: any) => ({
+const mapConversation = (r: ConversationRow): Conversation => ({
   id: r.id,
   sessionId: r.session_id,
   leadName: r.lead_name,
@@ -267,7 +277,7 @@ const mapConversation = (r: any) => ({
   updatedAt: r.updated_at,
 });
 
-const mapSession = (r: any): Session => ({
+const mapSession = (r: SessionRow): Session => ({
   id: r.id,
   botId: r.bot_id,
   leadId: r.lead_id ?? undefined,
@@ -276,13 +286,13 @@ const mapSession = (r: any): Session => ({
   status: r.status,
   startedAt: r.started_at,
   endedAt: r.ended_at ?? undefined,
-  variables: r.variables ?? {},
+  variables: (r.variables as Record<string, unknown>) ?? {},
   currentBlockId: r.current_block_key ?? undefined,
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 });
 
-const mapMessage = (r: any): Message => ({
+const mapMessage = (r: MessageRow): Message => ({
   id: r.id,
   sessionId: r.session_id,
   role: r.role,

@@ -21,11 +21,12 @@ export class CalendarApiError extends Error {
 
 export async function calendarFetch<T = unknown>(
   userId: string,
+  workspaceId: string,
   path: string,
   init: RequestInit = {},
   retried = false
 ): Promise<T> {
-  const token = await getValidToken(userId);
+  const token = await getValidToken(userId, workspaceId);
 
   const res = await fetch(`${GOOGLE_CALENDAR_API}${path}`, {
     ...init,
@@ -37,8 +38,8 @@ export async function calendarFetch<T = unknown>(
   });
 
   if (res.status === 401 && !retried) {
-    clearTokenCache(userId);
-    return calendarFetch<T>(userId, path, init, true);
+    clearTokenCache(userId, workspaceId);
+    return calendarFetch<T>(userId, workspaceId, path, init, true);
   }
 
   if (!res.ok) {

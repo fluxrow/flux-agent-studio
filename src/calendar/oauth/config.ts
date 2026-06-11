@@ -1,9 +1,12 @@
 export const GCAL_CLIENT_ID =
   (import.meta.env.VITE_GCAL_CLIENT_ID as string | undefined) ?? "";
 
+const SUPABASE_URL =
+  (import.meta.env.VITE_SUPABASE_URL as string | undefined) ?? "";
+
 export const GCAL_REDIRECT_URI =
   (import.meta.env.VITE_GCAL_REDIRECT_URI as string | undefined) ??
-  `${window.location.origin}/api/oauth/google/callback`;
+  `${SUPABASE_URL}/functions/v1/google-oauth-callback`;
 
 export const GCAL_SCOPES = [
   "openid",

@@ -2,7 +2,7 @@
  * Google Calendar integration — public entry point.
  */
 
-export { initiateAuth, validateState } from "./oauth/flow";
+export { initiateAuth } from "./oauth/flow";
 export { getValidToken, clearTokenCache } from "./oauth/tokens";
 export { checkAvailability } from "./freebusy";
 export { createEvent, updateEvent, cancelEvent } from "./events-api";

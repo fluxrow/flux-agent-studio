@@ -19,6 +19,7 @@ export const BLOCK_TYPE = "calendar_check_availability" as const;
 
 export interface CheckAvailabilityBlockConfig extends BlockConfig {
   userId?: string;
+  workspaceId?: string;
   calendarId?: string;
   fromVariable?: string;
   toVariable?: string;
@@ -35,6 +36,12 @@ export async function executeCheckAvailability(
     : undefined) ?? (variables["auth.userId"] as string | undefined);
 
   if (!userId) throw new Error("calendar.check_availability: userId não encontrado nas variáveis.");
+  const workspaceId = (config.workspaceId
+    ? (variables[config.workspaceId] as string)
+    : undefined) ?? (variables["auth.workspaceId"] as string | undefined);
+  if (!workspaceId) {
+    throw new Error("calendar.check_availability: workspaceId não encontrado nas variáveis.");
+  }
 
   const from = (config.fromVariable ? variables[config.fromVariable] as string : null)
     ?? new Date().toISOString();
@@ -43,6 +50,7 @@ export async function executeCheckAvailability(
 
   const slots = await checkAvailability({
     userId,
+    workspaceId,
     calendarId: config.calendarId,
     from,
     to,

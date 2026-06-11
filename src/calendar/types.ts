@@ -96,6 +96,7 @@ export interface CancelEventInput {
 
 export interface CheckAvailabilityInput {
   userId: ID;
+  workspaceId: ID;
   calendarId?: string;
   from: ISODate;
   to: ISODate;

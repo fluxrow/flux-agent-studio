@@ -11,16 +11,23 @@ import { oauthStore } from "./store";
 import { allProviders } from "./providers";
 import type { OAuthProvider } from "./types";
 
+type OAuthEventType =
+  | "account_connected"
+  | "account_disconnected"
+  | "account_reconnected"
+  | "channel_bound"
+  | "channel_unbound";
+
 function getProvider(id: OAuthProviderId): OAuthProvider {
   const p = allProviders.find((x) => x.id === id);
   if (!p) throw new Error(`Unknown OAuth provider: ${id}`);
   return p;
 }
 
-function emit(type: string, payload: Record<string, unknown>) {
+function emit(type: OAuthEventType, payload: Record<string, unknown>) {
   runtimeEventBus.emit({
     id: `oauth_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
-    type: type as any,
+    type,
     sessionId: "",
     flowId: "",
     at: new Date().toISOString(),

@@ -28,7 +28,7 @@ export function emitKnowledgeEvent(input: {
   const at: ISODate = new Date().toISOString();
   runtimeEventBus.emit({
     id: makeId(),
-    type: input.type as any,
+    type: input.type,
     sessionId: input.sessionId ?? "",
     flowId: input.flowId ?? "",
     workspaceId: input.workspaceId,

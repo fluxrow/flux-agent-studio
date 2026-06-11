@@ -19,7 +19,7 @@ export function emitIntelligenceEvent(
 ): void {
   const event: ExecutionEvent = {
     id: `intel_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-    type: type as ExecutionEvent["type"],
+    type,
     sessionId: "intelligence",
     flowId: "intelligence",
     at: new Date().toISOString(),

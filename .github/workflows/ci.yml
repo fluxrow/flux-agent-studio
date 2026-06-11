@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -31,6 +33,21 @@ jobs:
 
       - name: Run blocking quality gates
         run: npm run ci
+
+  backend-audit:
+    name: Supabase files audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify migrations and Edge Functions are versioned
+        run: |
+          test -d supabase/migrations
+          test -d supabase/functions
+          find supabase/migrations -maxdepth 1 -type f -name '*.sql' -print
+          find supabase/functions -mindepth 2 -maxdepth 2 -type f -name 'index.ts' -print
 
   lint-audit:
     name: Lint audit (non-blocking)

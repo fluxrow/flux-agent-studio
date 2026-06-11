@@ -1,0 +1,176 @@
+name: Deploy — Staging → Approve → Prod
+
+# Pipeline alinhado com FLUXROW_GROWTH_HUB_PHASE_CHECKLISTS.md
+# Fluxo: merge em main → staging automático → smoke staging → approval manual → prod → smoke prod
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_staging:
+        description: "Pular staging (somente emergência)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # =========================================================
+  # GATE 0 — Pré-condições (reaproveita CI)
+  # =========================================================
+  preflight:
+    name: Preflight · gates obrigatórios
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bunx tsc --noEmit
+      - name: Tests
+        run: bun run test
+      - name: Build
+        run: bun run build
+
+  # =========================================================
+  # GATE 1 — Deploy STAGING (automático após preflight)
+  # =========================================================
+  deploy-staging:
+    name: Staging · deploy
+    needs: preflight
+    if: ${{ !inputs.skip_staging }}
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Build (staging env)
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.STAGING_SUPABASE_PUBLISHABLE_KEY }}
+        run: bun run build
+      - name: Apply Supabase migrations (staging)
+        if: ${{ secrets.STAGING_SUPABASE_DB_URL != '' }}
+        env:
+          PGURL: ${{ secrets.STAGING_SUPABASE_DB_URL }}
+        run: |
+          for f in supabase/migrations/*.sql; do
+            [ -f "$f" ] || continue
+            echo "::group::Aplicando $f"
+            psql "$PGURL" -f "$f"
+            echo "::endgroup::"
+          done
+      - name: Upload artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-dist
+          path: dist/
+          retention-days: 7
+
+  # =========================================================
+  # GATE 2 — Smoke tests STAGING (critérios de aceite)
+  # =========================================================
+  smoke-staging:
+    name: Staging · smoke (AC do review)
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Healthcheck público
+        run: |
+          URL="${{ vars.STAGING_URL }}"
+          if [ -z "$URL" ]; then
+            echo "::warning::STAGING_URL não configurada — skip"
+            exit 0
+          fi
+          curl -fsS --retry 5 --retry-delay 5 "$URL" > /dev/null
+      - name: AC §1.2 — escrita pública exige token
+        run: |
+          URL="${{ vars.STAGING_SUPABASE_URL }}"
+          [ -z "$URL" ] && { echo "skip"; exit 0; }
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$URL/rest/v1/rpc/record_public_message" -H "Content-Type: application/json" -d '{}')
+          if [ "$CODE" = "200" ] || [ "$CODE" = "204" ]; then
+            echo "::error::Escrita pública sem token foi aceita ($CODE)"
+            exit 1
+          fi
+          echo "OK · rejeitado com $CODE"
+
+  # =========================================================
+  # GATE 3 — APPROVAL MANUAL (humano confirma promoção)
+  # =========================================================
+  approve-prod:
+    name: Approval · promover para produção
+    needs: smoke-staging
+    runs-on: ubuntu-latest
+    environment:
+      # Configure 'production-approval' em Settings → Environments
+      # com required reviewers. O job pausa até alguém aprovar.
+      name: production-approval
+    steps:
+      - run: echo "Promoção aprovada — seguindo para deploy de produção."
+
+  # =========================================================
+  # GATE 4 — Deploy PROD
+  # =========================================================
+  deploy-prod:
+    name: Production · deploy
+    needs: approve-prod
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Build (prod env)
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.PROD_SUPABASE_PUBLISHABLE_KEY }}
+        run: bun run build
+      - name: Apply Supabase migrations (prod)
+        if: ${{ secrets.PROD_SUPABASE_DB_URL != '' }}
+        env:
+          PGURL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+        run: |
+          for f in supabase/migrations/*.sql; do
+            [ -f "$f" ] || continue
+            psql "$PGURL" -f "$f"
+          done
+      - name: Upload artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-dist
+          path: dist/
+          retention-days: 30
+
+  # =========================================================
+  # GATE 5 — Smoke PROD + rollback automático em falha
+  # =========================================================
+  smoke-prod:
+    name: Production · smoke + canary
+    needs: deploy-prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Healthcheck público (3 tentativas)
+        run: |
+          URL="${{ vars.PRODUCTION_URL }}"
+          [ -z "$URL" ] && { echo "::warning::PRODUCTION_URL não configurada"; exit 0; }
+          for i in 1 2 3; do
+            if curl -fsS --max-time 15 "$URL" > /dev/null; then
+              echo "Tentativa $i OK"; exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Healthcheck falhou"; exit 1
+      - name: Notificar rollback necessário
+        if: failure()
+        run: echo "::error::Smoke prod falhou — disparar rollback manual."

@@ -10,13 +10,16 @@ Deploy the Phase 1 security hardening in this order:
    - `CALENDAR_INTERNAL_SECRET` with at least 32 random characters
    - `META_VERIFY_TOKEN` with at least 32 random characters
    - `META_APP_SECRET`
+   - optional `META_GRAPH_API_VERSION`, matching the version configured for
+     the Meta app
    - `APP_URL`
    - `LOVABLE_API_KEY`
    - frontend `VITE_GCAL_REDIRECT_URI`, with the exact same Edge Function URL
      configured in `GCAL_REDIRECT_URI` and Google Console
 2. Apply `20260610000001_security_hardening.sql`.
 3. Deploy `google-oauth-callback`, `calendar-sync`,
-   `calendar-watch-refresh`, `meta-webhook`, `meta-send`, and `lovable-ai`.
+   `calendar-watch-refresh`, `meta-webhook`, `meta-send`,
+   `meta-verify-connection`, and `lovable-ai`.
 4. Deploy the frontend.
 
 The migration removes browser access to Meta and Google credential rows.
@@ -61,10 +64,10 @@ partial channel-renewal failure produces a non-success response.
 missing. Inbound storage is idempotent by Meta message ID, and only the service
 role may execute the routing and persistence RPCs.
 
-New Meta connections remain inactive. Only the service role may mark a
-connection verified and active after server-side ownership validation. Active
-WhatsApp phone IDs and Meta page IDs are globally unique to prevent ambiguous
-cross-workspace routing.
+New Meta connections remain inactive until `meta-verify-connection` validates
+the supplied token and platform identifier against the Graph API. Only then
+does the service role activate the connection. Active WhatsApp phone IDs and
+Meta page IDs are globally unique to prevent ambiguous cross-workspace routing.
 
 Google Calendar credentials, watches, and mirrored events are keyed by both
 user and workspace. The OAuth redirect must be the deployed

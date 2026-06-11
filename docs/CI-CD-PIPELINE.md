@@ -1,61 +1,47 @@
-# CI/CD — Pipeline com Gates por Fase
+# CI/CD e sincronização com Lovable
 
 Pipeline alinhado com [`FLUXROW_GROWTH_HUB_PHASE_CHECKLISTS.md`](./FLUXROW_GROWTH_HUB_PHASE_CHECKLISTS.md).
 
 ## Visão geral
 
-```
-PR  ─►  ci.yml          (static · tests · backend-checks · pr-gate)
-                            │
-                            ▼  merge em main
-        deploy.yml      preflight ─► deploy-staging ─► smoke-staging
-                            ▲                              │
-                            │                              ▼
-                            └──── approve-prod (humano) ◄──┘
-                                          │
-                                          ▼
-                                   deploy-prod ─► smoke-prod
-```
+O repositório usa duas responsabilidades separadas:
+
+1. `.github/workflows/ci.yml` valida typecheck, testes, build e a presença dos
+   arquivos Supabase.
+2. A integração GitHub do Lovable sincroniza para o projeto as mudanças
+   enviadas à branch ativa, normalmente `main`.
+
+O GitHub Actions não publica o frontend no Lovable.
 
 ## Workflows
 
-### `.github/workflows/ci.yml` — toda PR
+### `.github/workflows/ci.yml`
 | Job | Bloqueante | AC mapeado |
 |---|---|---|
-| `static` | ✅ | §1.3 typecheck + build |
-| `tests` | ✅ | §1.3 ≥ 13 testes |
-| `backend-checks` | informativo | §1.4 migrations + edge functions |
-| `pr-gate` | ✅ | consolida required checks |
+| `quality` | sim | typecheck + 13 testes + build |
+| `backend-audit` | sim | migrations e Edge Functions versionadas |
+| `lint-audit` | não | dívida histórica de lint |
 
-Habilite **branch protection** em `main` exigindo `pr-gate`.
+Habilite branch protection em `main` exigindo o job `quality`.
 
-### `.github/workflows/deploy.yml` — push em main
-| Gate | Tipo | AC mapeado |
-|---|---|---|
-| Preflight | automático | §1.3 reexecuta typecheck/test/build |
-| Deploy staging | automático | §1.4 staging operacional |
-| Smoke staging | automático | §1.2 escrita pública exige token + healthcheck |
-| **Approve prod** | **humano** | gate de saída da fase |
-| Deploy prod | automático após approval | — |
-| Smoke prod | automático | healthcheck + flag de rollback |
+## Publicação atual
 
-## Configuração necessária no GitHub
+- Frontend: push para a branch ativa do Lovable.
+- Supabase migrations: aplicação controlada após revisão do SQL.
+- Edge Functions: deploy controlado após configuração dos secrets.
 
-### Environments (Settings → Environments)
-1. **`staging`** — sem reviewers, deploy automático
-2. **`production-approval`** — **required reviewers = 1+** (este é o gate humano)
-3. **`production`** — opcional: deployment branches = `main` only
+Não existe staging Supabase validado neste momento. Por isso o repositório não
+deve executar automaticamente todos os SQLs históricos a cada push. Quando o
+staging existir, a automação deve usar o histórico de migrations da Supabase,
+sem loops de `psql` sobre todos os arquivos.
 
-### Variables (Settings → Variables → Actions)
-- `STAGING_URL` — ex.: `https://staging.fluxrow.app`
-- `STAGING_SUPABASE_URL` — URL pública do projeto staging
-- `PRODUCTION_URL` — ex.: `https://agent.studio.fluxrow.space`
+## Configuração necessária
 
-### Secrets (Settings → Secrets → Actions)
-- `STAGING_SUPABASE_URL`, `STAGING_SUPABASE_PUBLISHABLE_KEY`, `STAGING_SUPABASE_DB_URL`
-- `PROD_SUPABASE_URL`, `PROD_SUPABASE_PUBLISHABLE_KEY`, `PROD_SUPABASE_DB_URL`
-
-> Os secrets de `*_DB_URL` só são necessários enquanto migrations forem aplicadas via `psql`. Quando o ambiente staging Supabase existir (AC §1.4), trocar para `supabase db push`.
+- No Lovable, confirmar que o repositório está conectado e `main` é a branch
+  ativa.
+- No GitHub, manter o app do Lovable com acesso ao repositório.
+- No Supabase, configurar os secrets descritos em
+  `PHASE-1-SECURITY-DEPLOY.md`.
 
 ## Gates por fase do roadmap
 
@@ -72,12 +58,13 @@ Cada fase do checklist adiciona um job ao pipeline conforme amadurece:
 
 ## Validação local executada em 11/jun/2026
 
-- ✅ `tsc --noEmit` — sem erros
-- ✅ `bun run test` — 13 testes verdes
-- ✅ `bun run build` — bundle gerado
-- ⚠️ `bun run lint` — 71 erros + 23 warnings históricos (não bloqueante via warning no CI)
+- `npm run typecheck` — sem erros
+- `npm test` — 13 testes verdes
+- `npm run build` — bundle gerado
+- `npm audit --omit=dev` — zero vulnerabilidades de produção
+- lint global ainda possui dívida histórica e permanece não bloqueante
 
 ## Rollback
 
-- Frontend: republicar artefato anterior (`actions/download-artifact` versão anterior).
-- Migrations: cada migration deve ter `-- DOWN` documentado quando reversível; caso contrário, exigir aprovação extra no PR.
+- Frontend: reverter o commit na branch ativa do Lovable.
+- Migrations: exigir plano de reversão e backup antes da aplicação.

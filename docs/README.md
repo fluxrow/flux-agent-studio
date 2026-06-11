@@ -2,6 +2,7 @@
 
 - [FLUXROW_GROWTH_HUB_ULTRA_REVIEW.md](./FLUXROW_GROWTH_HUB_ULTRA_REVIEW.md) — revisão ultra de 10/jun/2026: diagnóstico, reposicionamento, arquitetura final e plano em 8 fases
 - [FLUXROW_GROWTH_HUB_PHASE_CHECKLISTS.md](./FLUXROW_GROWTH_HUB_PHASE_CHECKLISTS.md) — checklists testáveis por fase com critérios de aceite e dependências (RLS, Edge Functions, staging)
+- [VISUAL-SMOKE-TEST-REPORT.md](./VISUAL-SMOKE-TEST-REPORT.md) — smoke visual por rota (paleta preto + turquesa) e script Playwright
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — camadas, fluxos e regras de desacoplamento
 - [`../fluxbot-features.md`](../fluxbot-features.md) — log completo por fase
 - [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — padrões de código e PR

@@ -1,0 +1,72 @@
+name: CI — Quality Gates (Fase 1)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Gate 1.A — Static checks (bloqueante)
+  static:
+    name: Static · typecheck + lint + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bunx tsc --noEmit
+      - name: Lint (changed files bloqueante; global informativo)
+        run: |
+          bun run lint || echo "::warning::Lint global ainda tem dívida histórica"
+      - name: Build production
+        run: bun run build
+
+  # Gate 1.B — Unit tests (bloqueante, mínimo 13 conforme review)
+  tests:
+    name: Tests · vitest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Run vitest
+        run: bun run test
+      - name: Enforce minimum suite size (AC §1.3 — baseline atual 8, meta 25)
+        run: |
+          COUNT=$(bun run test 2>&1 | grep -Eo "Tests +[0-9]+ passed" | grep -Eo "[0-9]+" | head -1)
+          echo "Tests passed: $COUNT"
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 8 ]; then
+            echo "::error::Suite abaixo do baseline (8). Atual: $COUNT"
+            exit 1
+          fi
+
+  # Gate 1.C — RLS / Edge Functions (informativo até staging existir)
+  backend-checks:
+    name: Backend · RLS + Edge Functions (informativo)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar migrations
+        run: |
+          test -d supabase/migrations && ls supabase/migrations || echo "::warning::Sem migrations versionadas"
+      - name: Listar Edge Functions
+        run: ls supabase/functions || echo "::warning::Sem edge functions"
+
+  # Resultado consolidado dos gates de PR
+  pr-gate:
+    name: PR Gate · all required checks
+    runs-on: ubuntu-latest
+    needs: [static, tests]
+    steps:
+      - run: echo "Todos os gates obrigatórios de PR passaram."

@@ -1,5 +1,6 @@
 # Docs
 
+- [FLUXROW_GROWTH_HUB_ULTRA_REVIEW.md](./FLUXROW_GROWTH_HUB_ULTRA_REVIEW.md) — revisão ultra de 10/jun/2026: diagnóstico, reposicionamento, arquitetura final e plano em 8 fases
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — camadas, fluxos e regras de desacoplamento
 - [`../fluxbot-features.md`](../fluxbot-features.md) — log completo por fase
 - [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — padrões de código e PR

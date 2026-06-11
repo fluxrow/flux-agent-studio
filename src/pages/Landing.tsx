@@ -77,14 +77,14 @@ const JOURNEY_STEPS = [
   },
   {
     icon: <Database size={22} />,
-    color: "#D97706",
+    color: "#34E0A1",
     tag: "CRM",
     title: "Entra no CRM pronto",
     text: "O lead é criado automaticamente no pipeline com todos os dados coletados na conversa. Sem digitação. Sem cópia do WhatsApp para planilha.",
   },
   {
     icon: <BarChart3 size={22} />,
-    color: "#D97706",
+    color: "#34E0A1",
     tag: "Receita",
     title: "Atribuição de campanha",
     text: "Revenue Attribution fecha o loop: UTM da campanha → lead qualificado → fechamento → receita. Você sabe de qual anúncio veio cada venda.",
@@ -113,7 +113,7 @@ const DIFFERENTIALS = [
   },
   {
     icon: <BarChart3 size={20} />,
-    color: "#D97706",
+    color: "#34E0A1",
     tag: "Único",
     title: "Revenue Attribution",
     text: "Fecha o loop que exige 3 ferramentas nos concorrentes: UTM → lead → receita. Meta CAPI incluso — o algoritmo da Meta otimiza por venda, não por clique.",
@@ -122,7 +122,7 @@ const DIFFERENTIALS = [
   },
   {
     icon: <TrendingUp size={20} />,
-    color: "#D97706",
+    color: "#34E0A1",
     tag: "Moat",
     title: "Data Flywheel",
     text: "Cada lead calibra o Score. Score calibrado melhora o Forecast. Forecast preciso afina a Attribution. Attribution melhor traz leads de maior qualidade. O ciclo se fecha.",
@@ -187,7 +187,7 @@ function BtnPrimary({ children, className = "" }: { children: React.ReactNode; c
       style={{
         height: 48,
         padding: "0 28px",
-        background: "linear-gradient(135deg, #D97706 0%, #F59E0B 100%)",
+        background: "linear-gradient(135deg, #34E0A1 0%, #5CEAB6 100%)",
         color: "#fff",
         fontWeight: 600,
         fontSize: 15,
@@ -533,7 +533,7 @@ export default function Landing() {
                   <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
                     <path ref={line1Ref} className="lp-connection-line" d="M 96 78 C 96 104, 96 104, 96 138" stroke="rgba(52,224,161,0.5)" strokeWidth="1.5" fill="none" />
                     <path ref={line2Ref} className="lp-connection-line" d="M 96 188 C 96 214, 96 214, 96 248" stroke="rgba(52,224,161,0.5)" strokeWidth="1.5" fill="none" />
-                    <path ref={line3Ref} className="lp-connection-line" d="M 176 280 C 240 280, 240 170, 296 170" stroke="rgba(217,119,6,0.55)" strokeWidth="1.5" fill="none" strokeDasharray="4 3" />
+                    <path ref={line3Ref} className="lp-connection-line" d="M 176 280 C 240 280, 240 170, 296 170" stroke="rgba(52,224,161,0.55)" strokeWidth="1.5" fill="none" strokeDasharray="4 3" />
                   </svg>
                   <div className={`lp-node absolute ${mock.node1 ? "lp-node-show" : ""}`} style={{ top: 16, left: 16, width: 144 }}>
                     <CanvasNode type="Mensagem" label="Saudação" />
@@ -571,7 +571,7 @@ export default function Landing() {
                       </div>
                       <div style={{ marginTop: 8, fontSize: 11, color: "var(--lp-fg-subtle)", borderTop: "1px solid var(--lp-border)", paddingTop: 8 }}>
                         📅 Fechar em ~18 dias<br />
-                        <span style={{ color: "#D97706" }}>💰 R$ 4.200 estimados</span>
+                        <span style={{ color: "#34E0A1" }}>💰 R$ 4.200 estimados</span>
                       </div>
                     </div>
                   )}
@@ -953,10 +953,10 @@ function CanvasNode({ type, label, highlight = false }: { type: string; label: s
 
 function CanvasNodeCRM() {
   return (
-    <div style={{ borderRadius: 10, border: "1px solid rgba(217,119,6,0.30)", background: "rgba(217,119,6,0.05)", padding: "12px 14px" }}>
+    <div style={{ borderRadius: 10, border: "1px solid rgba(52,224,161,0.30)", background: "rgba(52,224,161,0.05)", padding: "12px 14px" }}>
       <div className="flex items-center gap-1.5 mb-2">
-        <Database size={11} style={{ color: "#D97706" }} />
-        <span style={{ fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "#D97706" }}>CRM · Pipeline</span>
+        <Database size={11} style={{ color: "#34E0A1" }} />
+        <span style={{ fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "#34E0A1" }}>CRM · Pipeline</span>
       </div>
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--lp-fg)", marginBottom: 8 }}>Lead criado automaticamente</div>
       <div className="flex flex-col gap-1.5">

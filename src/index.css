@@ -151,8 +151,8 @@
   40%           { transform: translateY(-4px); opacity: 1; }
 }
 @keyframes lpAiGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(13,148,136,0); }
-  50%      { box-shadow: 0 0 20px 4px rgba(13,148,136,0.28); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52,224,161,0); }
+  50%      { box-shadow: 0 0 20px 4px rgba(52,224,161,0.28); }
 }
 @keyframes lpHeroGlow {
   0%, 100% { opacity: 0.15; transform: scale(1); }
@@ -242,8 +242,8 @@
   transition: border-color 200ms ease, background 200ms ease;
 }
 .lp-journey-step:hover {
-  border-color: rgba(13,148,136,0.25);
-  background: rgba(13,148,136,0.03);
+  border-color: rgba(52,224,161,0.25);
+  background: rgba(52,224,161,0.03);
 }
 .lp-journey-arrow {
   flex-shrink: 0;
@@ -280,7 +280,7 @@
   transition: border-color 200ms ease, transform 200ms ease;
 }
 .lp-diff-card:hover {
-  border-color: rgba(13,148,136,0.25);
+  border-color: rgba(52,224,161,0.25);
   transform: translateY(-2px);
 }
 @media (max-width: 1024px) {

@@ -56,21 +56,21 @@ const FAQ_ITEMS = [
 const JOURNEY_STEPS = [
   {
     icon: <MessageSquare size={22} />,
-    color: "#14B8A6",
+    color: "#34E0A1",
     tag: "Canal",
     title: "Conversa chega",
     text: "WhatsApp, Instagram, site ou Telegram. O lead entra a qualquer hora — 24/7 — sem ninguém do seu time precisar estar presente.",
   },
   {
     icon: <Sparkles size={22} />,
-    color: "#14B8A6",
+    color: "#34E0A1",
     tag: "IA",
     title: "IA responde e qualifica",
     text: "O agente atende, coleta dados, responde dúvidas com base no seu Knowledge Base e pontua o lead de 0 a 100 em 7 fatores — em segundos.",
   },
   {
     icon: <Brain size={22} />,
-    color: "#14B8A6",
+    color: "#34E0A1",
     tag: "Intelligence",
     title: "Score + próxima ação",
     text: "Cada lead chega com resumo em linguagem natural, temperatura (frio/morno/quente) e recomendação de ação. Ex: \"Ligar hoje às 14h — probabilidade de fechar 72%.\"",
@@ -95,7 +95,7 @@ const JOURNEY_STEPS = [
 const DIFFERENTIALS = [
   {
     icon: <Sparkles size={20} />,
-    color: "#14B8A6",
+    color: "#34E0A1",
     tag: "Único",
     title: "AI Builder",
     text: "Descreva o bot que você quer em um parágrafo. A IA monta o fluxo completo, configura o CRM e adiciona o knowledge — pronto para publicar em minutos.",
@@ -104,7 +104,7 @@ const DIFFERENTIALS = [
   },
   {
     icon: <Target size={20} />,
-    color: "#14B8A6",
+    color: "#34E0A1",
     tag: "Único",
     title: "Lead Intelligence",
     text: "Score 0–100 com 7 fatores, resumo gerado por IA, forecast de receita individual e próxima ação recomendada. Seu time foca só nos leads quentes.",
@@ -164,12 +164,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     <div
       className="inline-flex items-center gap-1.5 rounded-full mb-5"
       style={{
-        border: "1px solid rgba(13,148,136,0.28)",
-        background: "rgba(13,148,136,0.06)",
+        border: "1px solid rgba(52,224,161,0.28)",
+        background: "rgba(52,224,161,0.06)",
         padding: "4px 14px",
         fontSize: 11,
         fontWeight: 600,
-        color: "#14B8A6",
+        color: "#34E0A1",
         letterSpacing: "0.07em",
         textTransform: "uppercase",
       }}
@@ -305,7 +305,7 @@ function HeroVideo({ fallback }: HeroVideoProps) {
 
   return (
     <div className="lp-enter-mock relative mx-auto mt-16" style={{ maxWidth: 920 }}>
-      <div className="absolute pointer-events-none" style={{ inset: "-20px -40px", background: "radial-gradient(ellipse 70% 40% at 50% 110%, rgba(13,148,136,0.12) 0%, transparent 70%)", zIndex: 0 }} />
+      <div className="absolute pointer-events-none" style={{ inset: "-20px -40px", background: "radial-gradient(ellipse 70% 40% at 50% 110%, rgba(52,224,161,0.12) 0%, transparent 70%)", zIndex: 0 }} />
       <div
         className="relative rounded-2xl overflow-hidden"
         style={{ border: "1px solid var(--lp-border-mid)", background: "var(--lp-bg-elevated)", boxShadow: "0 24px 64px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset", zIndex: 1 }}
@@ -347,7 +347,7 @@ function HeroVideo({ fallback }: HeroVideoProps) {
                   background: "rgba(0,0,0,0.45)", border: "none", cursor: "pointer",
                 }}
               >
-                <span style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(13,148,136,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(52,224,161,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Play size={22} fill="white" color="white" />
                 </span>
               </button>
@@ -426,7 +426,7 @@ export default function Landing() {
           <div className="flex items-center gap-2.5">
             <div
               className="flex items-center justify-center rounded-xl flex-shrink-0"
-              style={{ width: 36, height: 36, background: "linear-gradient(135deg, #0D9488 0%, #0F766E 100%)" }}
+              style={{ width: 36, height: 36, background: "linear-gradient(135deg, #34E0A1 0%, #1FB87E 100%)" }}
             >
               <Zap className="h-4 w-4 text-white" strokeWidth={2.5} />
             </div>
@@ -453,7 +453,7 @@ export default function Landing() {
       <section className="relative" style={{ paddingTop: 160, paddingBottom: 120 }} aria-label="Hero">
         <div
           className="lp-hero-glow-bg absolute pointer-events-none"
-          style={{ inset: 0, background: "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(13,148,136,0.18) 0%, transparent 70%)", zIndex: 0 }}
+          style={{ inset: 0, background: "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(52,224,161,0.18) 0%, transparent 70%)", zIndex: 0 }}
         />
         <div className="relative mx-auto px-5 md:px-8" style={{ maxWidth: 1200, zIndex: 1 }}>
 
@@ -461,9 +461,9 @@ export default function Landing() {
           <div className="mx-auto text-center" style={{ maxWidth: 760 }}>
             <div
               className="lp-enter-1 inline-flex items-center gap-1.5 rounded-full mb-7"
-              style={{ border: "1px solid rgba(13,148,136,0.30)", background: "rgba(13,148,136,0.06)", padding: "4px 14px", fontSize: 11, fontWeight: 600, color: "#14B8A6", letterSpacing: "0.07em", textTransform: "uppercase" }}
+              style={{ border: "1px solid rgba(52,224,161,0.30)", background: "rgba(52,224,161,0.06)", padding: "4px 14px", fontSize: 11, fontWeight: 600, color: "#34E0A1", letterSpacing: "0.07em", textTransform: "uppercase" }}
             >
-              <Zap size={10} style={{ color: "#14B8A6" }} />
+              <Zap size={10} style={{ color: "#34E0A1" }} />
               Conversational Revenue OS
             </div>
 
@@ -473,7 +473,7 @@ export default function Landing() {
               <span className="lp-enter-2 block">Seu próximo cliente está</span>
               <span className="lp-enter-3 block">
                 esperando resposta.{" "}
-                <span style={{ color: "#14B8A6" }}>O Flux já deu.</span>
+                <span style={{ color: "#34E0A1" }}>O Flux já deu.</span>
               </span>
             </h1>
 
@@ -496,7 +496,7 @@ export default function Landing() {
             <div className="lp-fade-6 flex items-center justify-center flex-wrap" style={{ gap: "6px 20px", marginTop: 24, fontSize: 12, color: "var(--lp-fg-subtle)" }}>
               {["Sem cartão de crédito", "14 dias grátis", "LGPD compliant", "Cancele quando quiser"].map(t => (
                 <span key={t} className="flex items-center gap-1.5">
-                  <CheckCircle2 size={12} style={{ color: "#0D9488" }} /> {t}
+                  <CheckCircle2 size={12} style={{ color: "#34E0A1" }} /> {t}
                 </span>
               ))}
             </div>
@@ -522,7 +522,7 @@ export default function Landing() {
                     { label: "Score", highlight: false },
                     { label: "Webhook", highlight: false },
                   ].map(b => (
-                    <div key={b.label} style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 6, fontSize: 12, fontWeight: b.highlight ? 600 : 400, color: b.highlight ? "#14B8A6" : "var(--lp-fg-subtle)", border: b.highlight ? "1px solid rgba(13,148,136,0.30)" : "1px solid var(--lp-border)", background: b.highlight ? "rgba(13,148,136,0.07)" : "rgba(255,255,255,0.02)" }}>
+                    <div key={b.label} style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 6, fontSize: 12, fontWeight: b.highlight ? 600 : 400, color: b.highlight ? "#34E0A1" : "var(--lp-fg-subtle)", border: b.highlight ? "1px solid rgba(52,224,161,0.30)" : "1px solid var(--lp-border)", background: b.highlight ? "rgba(52,224,161,0.07)" : "rgba(255,255,255,0.02)" }}>
                       {b.label}
                     </div>
                   ))}
@@ -531,8 +531,8 @@ export default function Landing() {
                 {/* Panel 2 — Canvas */}
                 <div className="relative" style={{ padding: 24, overflow: "hidden", minHeight: 380 }}>
                   <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
-                    <path ref={line1Ref} className="lp-connection-line" d="M 96 78 C 96 104, 96 104, 96 138" stroke="rgba(13,148,136,0.5)" strokeWidth="1.5" fill="none" />
-                    <path ref={line2Ref} className="lp-connection-line" d="M 96 188 C 96 214, 96 214, 96 248" stroke="rgba(13,148,136,0.5)" strokeWidth="1.5" fill="none" />
+                    <path ref={line1Ref} className="lp-connection-line" d="M 96 78 C 96 104, 96 104, 96 138" stroke="rgba(52,224,161,0.5)" strokeWidth="1.5" fill="none" />
+                    <path ref={line2Ref} className="lp-connection-line" d="M 96 188 C 96 214, 96 214, 96 248" stroke="rgba(52,224,161,0.5)" strokeWidth="1.5" fill="none" />
                     <path ref={line3Ref} className="lp-connection-line" d="M 176 280 C 240 280, 240 170, 296 170" stroke="rgba(217,119,6,0.55)" strokeWidth="1.5" fill="none" strokeDasharray="4 3" />
                   </svg>
                   <div className={`lp-node absolute ${mock.node1 ? "lp-node-show" : ""}`} style={{ top: 16, left: 16, width: 144 }}>
@@ -563,7 +563,7 @@ export default function Landing() {
                     <div className="lp-bubble lp-bubble-show mt-auto pt-3" style={{ borderTop: "1px solid var(--lp-border)" }}>
                       <div style={{ fontSize: 10, color: "var(--lp-fg-subtle)", marginBottom: 6 }}>Lead Score</div>
                       <div className="flex items-center gap-2">
-                        <span style={{ fontSize: 22, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: "#14B8A6" }}>87</span>
+                        <span style={{ fontSize: 22, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: "#34E0A1" }}>87</span>
                         <div style={{ fontSize: 11, color: "var(--lp-fg-muted)" }}>
                           /100<br />
                           <span style={{ color: "#4ade80", fontSize: 10 }}>▲ Alto potencial</span>
@@ -642,10 +642,10 @@ export default function Landing() {
           {/* Bottom highlight */}
           <div
             className="mt-12 rounded-2xl p-6 text-center"
-            style={{ background: "rgba(13,148,136,0.05)", border: "1px solid rgba(13,148,136,0.15)" }}
+            style={{ background: "rgba(52,224,161,0.05)", border: "1px solid rgba(52,224,161,0.15)" }}
           >
             <p style={{ fontSize: 15, color: "var(--lp-fg-muted)", margin: 0 }}>
-              <span style={{ color: "#14B8A6", fontWeight: 600 }}>Resultado:</span>{" "}
+              <span style={{ color: "#34E0A1", fontWeight: 600 }}>Resultado:</span>{" "}
               lead respondido em segundos, qualificado com score, no CRM com contexto, receita atribuída à campanha de origem.{" "}
               <span style={{ color: "var(--lp-fg)" }}>Automático. 24/7.</span>
             </p>
@@ -706,7 +706,7 @@ export default function Landing() {
               <div className="text-center" style={{ fontSize: 13, color: "var(--lp-fg-subtle)" }}>Typebot</div>
               <div className="text-center" style={{ fontSize: 13, color: "var(--lp-fg-subtle)" }}>ManyChat</div>
               <div className="text-center" style={{ fontSize: 13, color: "var(--lp-fg-subtle)" }}>HubSpot</div>
-              <div className="text-center" style={{ fontSize: 13, fontWeight: 700, color: "#14B8A6" }}>Flux</div>
+              <div className="text-center" style={{ fontSize: 13, fontWeight: 700, color: "#34E0A1" }}>Flux</div>
             </div>
             {[
               ["Builder visual", "✓", "✓", "—", "✓"],
@@ -720,7 +720,7 @@ export default function Landing() {
               <div key={i} className="lp-compare-row">
                 <div style={{ fontSize: 13, color: "var(--lp-fg-muted)" }}>{feat}</div>
                 {vals.map((v, j) => (
-                  <div key={j} className="text-center" style={{ fontSize: 13, color: j === 3 ? "#14B8A6" : v === "—" ? "var(--lp-fg-subtle)" : "var(--lp-fg-muted)", fontWeight: j === 3 ? 600 : 400 }}>
+                  <div key={j} className="text-center" style={{ fontSize: 13, color: j === 3 ? "#34E0A1" : v === "—" ? "var(--lp-fg-subtle)" : "var(--lp-fg-muted)", fontWeight: j === 3 ? 600 : 400 }}>
                     {v}
                   </div>
                 ))}
@@ -809,7 +809,7 @@ export default function Landing() {
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div style={{ color: "#14B8A6" }}>{item.icon}</div>
+                  <div style={{ color: "#34E0A1" }}>{item.icon}</div>
                   <span style={{ fontSize: 14, fontWeight: 600, color: "var(--lp-fg)" }}>{item.title}</span>
                 </div>
                 <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--lp-fg-subtle)", margin: 0 }}>{item.text}</p>
@@ -828,16 +828,16 @@ export default function Landing() {
         >
           <div
             className="rounded-3xl text-center p-10 md:p-16 relative overflow-hidden"
-            style={{ background: "var(--lp-bg-elevated)", border: "1px solid rgba(13,148,136,0.20)", boxShadow: "0 0 80px -20px rgba(13,148,136,0.12)" }}
+            style={{ background: "var(--lp-bg-elevated)", border: "1px solid rgba(52,224,161,0.20)", boxShadow: "0 0 80px -20px rgba(52,224,161,0.12)" }}
           >
             {/* Glow */}
-            <div className="absolute pointer-events-none" style={{ inset: 0, background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(13,148,136,0.12) 0%, transparent 70%)", zIndex: 0 }} />
+            <div className="absolute pointer-events-none" style={{ inset: 0, background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(52,224,161,0.12) 0%, transparent 70%)", zIndex: 0 }} />
             <div className="relative" style={{ zIndex: 1 }}>
               <div
                 className="inline-flex items-center gap-1.5 rounded-full mb-6"
-                style={{ border: "1px solid rgba(13,148,136,0.30)", background: "rgba(13,148,136,0.06)", padding: "4px 14px", fontSize: 11, fontWeight: 600, color: "#14B8A6", letterSpacing: "0.07em", textTransform: "uppercase" }}
+                style={{ border: "1px solid rgba(52,224,161,0.30)", background: "rgba(52,224,161,0.06)", padding: "4px 14px", fontSize: 11, fontWeight: 600, color: "#34E0A1", letterSpacing: "0.07em", textTransform: "uppercase" }}
               >
-                <Zap size={10} style={{ color: "#14B8A6" }} />
+                <Zap size={10} style={{ color: "#34E0A1" }} />
                 14 dias grátis
               </div>
 
@@ -865,7 +865,7 @@ export default function Landing() {
               <div className="flex items-center justify-center flex-wrap mt-6" style={{ gap: "6px 20px", fontSize: 12, color: "var(--lp-fg-subtle)" }}>
                 {["Sem cartão de crédito", "14 dias grátis", "LGPD compliant"].map(t => (
                   <span key={t} className="flex items-center gap-1.5">
-                    <CheckCircle2 size={11} style={{ color: "#0D9488" }} /> {t}
+                    <CheckCircle2 size={11} style={{ color: "#34E0A1" }} /> {t}
                   </span>
                 ))}
               </div>
@@ -881,7 +881,7 @@ export default function Landing() {
             {/* Brand */}
             <div>
               <div className="flex items-center gap-2.5 mb-4">
-                <div style={{ width: 32, height: 32, borderRadius: 9, background: "linear-gradient(135deg, #0D9488 0%, #0F766E 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 9, background: "linear-gradient(135deg, #34E0A1 0%, #1FB87E 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Zap size={14} className="text-white" strokeWidth={2.5} />
                 </div>
                 <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 15, color: "var(--lp-fg)" }}>Flux Agent Studio</span>
@@ -944,8 +944,8 @@ export default function Landing() {
 
 function CanvasNode({ type, label, highlight = false }: { type: string; label: string; highlight?: boolean }) {
   return (
-    <div style={{ borderRadius: 10, border: highlight ? "1px solid rgba(13,148,136,0.40)" : "1px solid var(--lp-border-mid)", background: highlight ? "rgba(13,148,136,0.07)" : "rgba(255,255,255,0.03)", padding: "10px 14px" }}>
-      <div style={{ fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: highlight ? "#14B8A6" : "var(--lp-fg-subtle)", marginBottom: 4 }}>{type}</div>
+    <div style={{ borderRadius: 10, border: highlight ? "1px solid rgba(52,224,161,0.40)" : "1px solid var(--lp-border-mid)", background: highlight ? "rgba(52,224,161,0.07)" : "rgba(255,255,255,0.03)", padding: "10px 14px" }}>
+      <div style={{ fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: highlight ? "#34E0A1" : "var(--lp-fg-subtle)", marginBottom: 4 }}>{type}</div>
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--lp-fg)" }}>{label}</div>
     </div>
   );
@@ -961,7 +961,7 @@ function CanvasNodeCRM() {
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--lp-fg)", marginBottom: 8 }}>Lead criado automaticamente</div>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5" style={{ fontSize: 10, color: "var(--lp-fg-subtle)" }}><Brain size={9} />Score: 87/100</div>
-        <div className="flex items-center gap-1.5" style={{ fontSize: 10, color: "#14B8A6" }}><TrendingUp size={9} />Qualificado</div>
+        <div className="flex items-center gap-1.5" style={{ fontSize: 10, color: "#34E0A1" }}><TrendingUp size={9} />Qualificado</div>
       </div>
     </div>
   );
@@ -970,7 +970,7 @@ function CanvasNodeCRM() {
 function ChatBubble({ side, text }: { side: "bot" | "user"; text: string }) {
   const isBot = side === "bot";
   return (
-    <div style={{ borderRadius: isBot ? "16px 16px 16px 4px" : "16px 16px 4px 16px", background: isBot ? "var(--lp-bg-subtle)" : "rgba(13,148,136,0.15)", border: isBot ? "1px solid var(--lp-border)" : "1px solid rgba(13,148,136,0.20)", padding: "8px 12px", fontSize: 12, lineHeight: 1.5, color: "var(--lp-fg-muted)", marginLeft: isBot ? 0 : "auto" }}>
+    <div style={{ borderRadius: isBot ? "16px 16px 16px 4px" : "16px 16px 4px 16px", background: isBot ? "var(--lp-bg-subtle)" : "rgba(52,224,161,0.15)", border: isBot ? "1px solid var(--lp-border)" : "1px solid rgba(52,224,161,0.20)", padding: "8px 12px", fontSize: 12, lineHeight: 1.5, color: "var(--lp-fg-muted)", marginLeft: isBot ? 0 : "auto" }}>
       {text}
     </div>
   );

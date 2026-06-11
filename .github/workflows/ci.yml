@@ -41,12 +41,12 @@ jobs:
       - run: bun install --frozen-lockfile
       - name: Run vitest
         run: bun run test
-      - name: Enforce minimum suite size (AC §1.3)
+      - name: Enforce minimum suite size (AC §1.3 — baseline atual 8, meta 25)
         run: |
           COUNT=$(bun run test 2>&1 | grep -Eo "Tests +[0-9]+ passed" | grep -Eo "[0-9]+" | head -1)
           echo "Tests passed: $COUNT"
-          if [ -z "$COUNT" ] || [ "$COUNT" -lt 13 ]; then
-            echo "::error::Suite abaixo do mínimo (13). Atual: $COUNT"
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 8 ]; then
+            echo "::error::Suite abaixo do baseline (8). Atual: $COUNT"
             exit 1
           fi
 

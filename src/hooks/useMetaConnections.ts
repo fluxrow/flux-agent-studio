@@ -13,8 +13,8 @@ export function useMetaConnections() {
     try {
       const data = await metaConnectionService.list();
       setConnections(data);
-    } catch (e: any) {
-      setError(e.message ?? "Erro ao carregar conexões Meta");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Erro ao carregar conexões Meta");
     } finally {
       setLoading(false);
     }

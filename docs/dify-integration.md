@@ -161,11 +161,14 @@ src/ai/
 │   ├── dify.ts                 # Implementação do AIProvider para Dify
 │   └── index.ts                # Barrel — exporta difyProvider
 src/test/
-└── difyProvider.test.ts        # Testes unitários (fetch mockado)
+├── difyProvider.test.ts        # 10 testes unitários (fetch mockado, fallback mock)
+└── dify-smoke.test.ts          # 8 testes de smoke ponta a ponta (registry → runner)
 docs/
 └── dify-integration.md         # Este arquivo
 .env.example                    # Variáveis de exemplo documentadas
 ```
+
+> **Status dos testes (2026-06-12):** suite completa — 31/31 testes passando (6 arquivos), incluindo 10 unitários e 8 smoke tests do provider Dify. Todos rodando em modo mock, sem instância Dify real necessária.
 
 ---
 

@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_rate_limit_windows: {
+        Row: {
+          request_count: number
+          user_id: string
+          window_started_at: string
+        }
+        Insert: {
+          request_count?: number
+          user_id: string
+          window_started_at?: string
+        }
+        Update: {
+          request_count?: number
+          user_id?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       bot_versions: {
         Row: {
           bot_id: string
@@ -117,6 +135,147 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "bots_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calendar_events: {
+        Row: {
+          attendees: Json
+          calendar_id: string
+          created_at: string
+          description: string | null
+          end_at: string
+          etag: string | null
+          external_event_id: string
+          google_updated_at: string | null
+          id: string
+          lead_id: string | null
+          meet_link: string | null
+          sequence: number | null
+          session_id: string | null
+          start_at: string
+          status: string
+          summary: string
+          timezone: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          attendees?: Json
+          calendar_id?: string
+          created_at?: string
+          description?: string | null
+          end_at: string
+          etag?: string | null
+          external_event_id: string
+          google_updated_at?: string | null
+          id?: string
+          lead_id?: string | null
+          meet_link?: string | null
+          sequence?: number | null
+          session_id?: string | null
+          start_at: string
+          status?: string
+          summary?: string
+          timezone?: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          attendees?: Json
+          calendar_id?: string
+          created_at?: string
+          description?: string | null
+          end_at?: string
+          etag?: string | null
+          external_event_id?: string
+          google_updated_at?: string | null
+          id?: string
+          lead_id?: string | null
+          meet_link?: string | null
+          sequence?: number | null
+          session_id?: string | null
+          start_at?: string
+          status?: string
+          summary?: string
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calendar_watch_channels: {
+        Row: {
+          calendar_id: string
+          channel_id: string
+          channel_token: string
+          created_at: string
+          expires_at: string
+          id: string
+          resource_id: string | null
+          sync_token: string | null
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          calendar_id?: string
+          channel_id: string
+          channel_token: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          resource_id?: string | null
+          sync_token?: string | null
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          calendar_id?: string
+          channel_id?: string
+          channel_token?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          resource_id?: string | null
+          sync_token?: string | null
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_watch_channels_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -642,6 +801,223 @@ export type Database = {
           },
         ]
       }
+      meta_channel_connections: {
+        Row: {
+          access_token: string
+          created_at: string
+          display_name: string
+          error_message: string | null
+          id: string
+          ig_user_id: string | null
+          meta: Json
+          page_id: string | null
+          phone_number_id: string | null
+          platform: string
+          status: string
+          updated_at: string
+          webhook_verified: boolean
+          workspace_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          display_name?: string
+          error_message?: string | null
+          id?: string
+          ig_user_id?: string | null
+          meta?: Json
+          page_id?: string | null
+          phone_number_id?: string | null
+          platform: string
+          status?: string
+          updated_at?: string
+          webhook_verified?: boolean
+          workspace_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          display_name?: string
+          error_message?: string | null
+          id?: string
+          ig_user_id?: string | null
+          meta?: Json
+          page_id?: string | null
+          phone_number_id?: string | null
+          platform?: string
+          status?: string
+          updated_at?: string
+          webhook_verified?: boolean
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_channel_connections_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_conversations: {
+        Row: {
+          connection_id: string
+          contact_avatar: string | null
+          contact_external_id: string
+          contact_name: string
+          created_at: string
+          external_conversation_id: string
+          handoff_status: string
+          id: string
+          last_message_at: string
+          platform: string
+          preview: string
+          unread: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          connection_id: string
+          contact_avatar?: string | null
+          contact_external_id: string
+          contact_name?: string
+          created_at?: string
+          external_conversation_id: string
+          handoff_status?: string
+          id?: string
+          last_message_at?: string
+          platform: string
+          preview?: string
+          unread?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          connection_id?: string
+          contact_avatar?: string | null
+          contact_external_id?: string
+          contact_name?: string
+          created_at?: string
+          external_conversation_id?: string
+          handoff_status?: string
+          id?: string
+          last_message_at?: string
+          platform?: string
+          preview?: string
+          unread?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_conversations_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "meta_channel_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meta_conversations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_messages: {
+        Row: {
+          contact_external_id: string
+          conversation_id: string
+          created_at: string
+          direction: string
+          external_message_id: string
+          id: string
+          message_text: string | null
+          message_type: string
+          raw_payload: Json | null
+          sent_at: string
+          workspace_id: string
+        }
+        Insert: {
+          contact_external_id: string
+          conversation_id: string
+          created_at?: string
+          direction: string
+          external_message_id: string
+          id?: string
+          message_text?: string | null
+          message_type?: string
+          raw_payload?: Json | null
+          sent_at: string
+          workspace_id: string
+        }
+        Update: {
+          contact_external_id?: string
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          external_message_id?: string
+          id?: string
+          message_text?: string | null
+          message_type?: string
+          raw_payload?: Json | null
+          sent_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "meta_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meta_messages_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oauth_state_nonces: {
+        Row: {
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          nonce: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          nonce: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          nonce?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_state_nonces_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -668,6 +1044,119 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      public_ai_bot_rate_limit_windows: {
+        Row: {
+          bot_id: string
+          request_count: number
+          window_started_at: string
+        }
+        Insert: {
+          bot_id: string
+          request_count?: number
+          window_started_at?: string
+        }
+        Update: {
+          bot_id?: string
+          request_count?: number
+          window_started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_ai_bot_rate_limit_windows_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: true
+            referencedRelation: "bots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_ai_session_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          request_count: number
+          session_id: string
+          token: string
+          window_started_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          request_count?: number
+          session_id: string
+          token: string
+          window_started_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          request_count?: number
+          session_id?: string
+          token?: string
+          window_started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_ai_session_tokens_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_session_creation_rate_limit_windows: {
+        Row: {
+          bot_id: string
+          request_count: number
+          window_started_at: string
+        }
+        Insert: {
+          bot_id: string
+          request_count?: number
+          window_started_at?: string
+        }
+        Update: {
+          bot_id?: string
+          request_count?: number
+          window_started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_session_creation_rate_limit_windows_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: true
+            referencedRelation: "bots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_session_write_rate_limit_windows: {
+        Row: {
+          request_count: number
+          session_id: string
+          window_started_at: string
+        }
+        Insert: {
+          request_count?: number
+          session_id: string
+          window_started_at?: string
+        }
+        Update: {
+          request_count?: number
+          session_id?: string
+          window_started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_session_write_rate_limit_windows_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sessions: {
         Row: {
@@ -732,6 +1221,62 @@ export type Database = {
           },
           {
             foreignKeyName: "sessions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_calendar_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          default_calendar_id: string
+          email: string
+          expires_at: string
+          google_sub: string
+          id: string
+          refresh_token: string
+          scopes: string[]
+          status: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          default_calendar_id?: string
+          email: string
+          expires_at: string
+          google_sub: string
+          id?: string
+          refresh_token: string
+          scopes?: string[]
+          status?: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          default_calendar_id?: string
+          email?: string
+          expires_at?: string
+          google_sub?: string
+          id?: string
+          refresh_token?: string
+          scopes?: string[]
+          status?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_calendar_tokens_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -872,9 +1417,82 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      attach_public_attribution_to_lead: {
-        Args: { _lead_id: string; _session_id: string; _visitor_id: string }
+      attach_public_attribution_to_lead:
+        | {
+            Args: { _lead_id: string; _session_id: string; _visitor_id: string }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _lead_id: string
+              _session_id: string
+              _session_token: string
+              _visitor_id: string
+            }
+            Returns: undefined
+          }
+      consume_ai_rate_limit: {
+        Args: { max_requests?: number; target_user_id: string }
+        Returns: boolean
+      }
+      consume_public_ai_session: {
+        Args: {
+          max_bot_requests?: number
+          max_requests?: number
+          target_session_id: string
+          target_token: string
+        }
+        Returns: boolean
+      }
+      consume_public_session_write: {
+        Args: {
+          max_requests?: number
+          target_session_id: string
+          target_token: string
+        }
+        Returns: boolean
+      }
+      create_meta_channel_connection: {
+        Args: {
+          target_access_token: string
+          target_display_name: string
+          target_ig_user_id?: string
+          target_page_id?: string
+          target_phone_number_id?: string
+          target_platform: string
+          target_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          display_name: string
+          error_message: string
+          id: string
+          ig_user_id: string
+          meta: Json
+          page_id: string
+          phone_number_id: string
+          platform: string
+          status: string
+          updated_at: string
+          webhook_verified: boolean
+          workspace_id: string
+        }[]
+      }
+      delete_meta_connection: {
+        Args: { target_connection_id: string }
         Returns: undefined
+      }
+      find_meta_connection: {
+        Args: {
+          _page_id?: string
+          _phone_number_id?: string
+          _platform: string
+        }
+        Returns: {
+          id: string
+          status: string
+          workspace_id: string
+        }[]
       }
       get_public_bot: { Args: { _slug: string }; Returns: Json }
       has_workspace_role: {
@@ -888,6 +1506,28 @@ export type Database = {
       is_workspace_member: {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
+      }
+      list_meta_channel_connections: {
+        Args: { target_workspace_id: string }
+        Returns: {
+          created_at: string
+          display_name: string
+          error_message: string
+          id: string
+          ig_user_id: string
+          meta: Json
+          page_id: string
+          phone_number_id: string
+          platform: string
+          status: string
+          updated_at: string
+          webhook_verified: boolean
+          workspace_id: string
+        }[]
+      }
+      mark_meta_connection_verified: {
+        Args: { target_connection_id: string }
+        Returns: undefined
       }
       publish_bot: {
         Args: {
@@ -919,75 +1559,178 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      record_public_attribution: {
-        Args: {
-          _fbclid?: string
-          _gclid?: string
-          _landing_page?: string
-          _msclkid?: string
-          _referrer?: string
-          _session_id?: string
-          _slug: string
-          _ttclid?: string
-          _utm_campaign?: string
-          _utm_content?: string
-          _utm_medium?: string
-          _utm_source?: string
-          _utm_term?: string
-          _visitor_id: string
-        }
-        Returns: string
-      }
-      record_public_event: {
-        Args: {
-          _block_key?: string
-          _payload?: Json
-          _session_id: string
-          _type: string
-        }
-        Returns: undefined
-      }
-      record_public_lead: {
-        Args: {
-          _company?: string
-          _email?: string
-          _name: string
-          _phone?: string
-          _score?: number
-          _session_id: string
-          _tags?: string[]
-        }
-        Returns: string
-      }
-      record_public_message: {
-        Args: {
-          _block_key?: string
-          _role: string
-          _session_id: string
-          _text: string
-        }
-        Returns: undefined
-      }
+      record_public_attribution:
+        | {
+            Args: {
+              _fbclid?: string
+              _gclid?: string
+              _landing_page?: string
+              _msclkid?: string
+              _referrer?: string
+              _session_id: string
+              _session_token: string
+              _ttclid?: string
+              _utm_campaign?: string
+              _utm_content?: string
+              _utm_medium?: string
+              _utm_source?: string
+              _utm_term?: string
+              _visitor_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _fbclid?: string
+              _gclid?: string
+              _landing_page?: string
+              _msclkid?: string
+              _referrer?: string
+              _session_id?: string
+              _slug: string
+              _ttclid?: string
+              _utm_campaign?: string
+              _utm_content?: string
+              _utm_medium?: string
+              _utm_source?: string
+              _utm_term?: string
+              _visitor_id: string
+            }
+            Returns: string
+          }
+      record_public_event:
+        | {
+            Args: {
+              _block_key?: string
+              _payload?: Json
+              _session_id: string
+              _session_token: string
+              _type: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _block_key?: string
+              _payload?: Json
+              _session_id: string
+              _type: string
+            }
+            Returns: undefined
+          }
+      record_public_lead:
+        | {
+            Args: {
+              _company?: string
+              _email?: string
+              _name: string
+              _phone?: string
+              _score?: number
+              _session_id: string
+              _tags?: string[]
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _company?: string
+              _email?: string
+              _name: string
+              _phone?: string
+              _score?: number
+              _session_id: string
+              _session_token: string
+              _tags?: string[]
+            }
+            Returns: string
+          }
+      record_public_message:
+        | {
+            Args: {
+              _block_key?: string
+              _role: string
+              _session_id: string
+              _text: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _block_key?: string
+              _role: string
+              _session_id: string
+              _session_token: string
+              _text: string
+            }
+            Returns: undefined
+          }
       record_public_session: {
         Args: { _slug: string; _variables?: Json; _visitor_id: string }
         Returns: string
       }
-      record_public_visitor_profile: {
+      record_public_session_with_ai_token: {
+        Args: { _slug: string; _variables?: Json; _visitor_id: string }
+        Returns: {
+          ai_token: string
+          session_id: string
+        }[]
+      }
+      record_public_visitor_profile:
+        | {
+            Args: {
+              _browser?: string
+              _device_type?: string
+              _landing_page?: string
+              _language?: string
+              _os?: string
+              _referrer?: string
+              _session_id: string
+              _session_token: string
+              _timezone?: string
+              _user_agent?: string
+              _visitor_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _browser?: string
+              _device_type?: string
+              _landing_page?: string
+              _language?: string
+              _os?: string
+              _referrer?: string
+              _slug: string
+              _timezone?: string
+              _user_agent?: string
+              _visitor_id: string
+            }
+            Returns: string
+          }
+      set_meta_connection_status: {
         Args: {
-          _browser?: string
-          _device_type?: string
-          _landing_page?: string
-          _language?: string
-          _os?: string
-          _referrer?: string
-          _slug: string
-          _timezone?: string
-          _user_agent?: string
-          _visitor_id: string
+          target_connection_id: string
+          target_error_message?: string
+          target_status: string
+        }
+        Returns: undefined
+      }
+      slugify: { Args: { _input: string }; Returns: string }
+      store_meta_inbound: {
+        Args: {
+          _connection_id: string
+          _contact_external_id: string
+          _contact_name: string
+          _external_convo_id: string
+          _external_message_id: string
+          _message_text: string
+          _message_type: string
+          _platform: string
+          _raw_payload?: Json
+          _sent_at: string
         }
         Returns: string
       }
-      slugify: { Args: { _input: string }; Returns: string }
     }
     Enums: {
       bot_status: "ativo" | "rascunho" | "arquivado"

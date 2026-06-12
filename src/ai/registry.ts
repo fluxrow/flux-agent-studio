@@ -1,10 +1,11 @@
 import type { AIProvider, AIProviderId } from "./types";
-import { openaiProvider, anthropicProvider, geminiProvider } from "./providers";
+import { openaiProvider, anthropicProvider, geminiProvider, difyProvider } from "./providers";
 
 const registry: Record<AIProviderId, AIProvider> = {
   openai: openaiProvider,
   anthropic: anthropicProvider,
   gemini: geminiProvider,
+  dify: difyProvider,
 };
 
 export function getAIProvider(id: AIProviderId): AIProvider {

@@ -8,7 +8,7 @@
  */
 import type { ID, ISODate } from "@/types/common";
 
-export type AIProviderId = "openai" | "anthropic" | "gemini";
+export type AIProviderId = "openai" | "anthropic" | "gemini" | "dify";
 
 export interface AIModelInfo {
   id: string;

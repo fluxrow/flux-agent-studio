@@ -1,5 +1,6 @@
 import { buildMockProvider } from "./_mock";
 export { openaiProvider } from "./openai";
+export { difyProvider } from "./dify";
 
 export const anthropicProvider = buildMockProvider({
   id: "anthropic",

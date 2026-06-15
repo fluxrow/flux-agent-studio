@@ -59,7 +59,7 @@ const internal: NavItem[] = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, setOpen } = useSidebar();
   const collapsed = state === "collapsed";
   const { pathname } = useLocation();
   const { workspace } = useWorkspace();
@@ -107,7 +107,12 @@ export function AppSidebar() {
   const workspaceName = workspace?.name?.trim();
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-sidebar-border"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2.5 px-2 py-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-primary shadow-glow">

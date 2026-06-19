@@ -47,7 +47,19 @@ import { WorkspaceProvider } from "@/auth/WorkspaceProvider";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
 import { AdminRoute } from "@/auth/AdminRoute";
 
-const queryClient = new QueryClient();
+// Smoke-test 2026-06-19: defaults explícitos para evitar refetch ao trocar de aba
+// (default do React Query refetcha tudo no foco da janela, causando "refresh" visível).
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 5 * 60_000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: "always",
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

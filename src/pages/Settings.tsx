@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -38,6 +38,14 @@ export default function Settings() {
   const { user, signOut } = useAuth();
   const { workspace } = useWorkspace();
   const [seeding, setSeeding] = useState(false);
+  // Persist active tab in URL (survives navigation away/back and full reload).
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") ?? "profile";
+  const handleTabChange = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("tab", value);
+    setSearchParams(next, { replace: true });
+  };
 
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ??
@@ -79,7 +87,7 @@ export default function Settings() {
         <p className="text-muted-foreground text-sm mt-1">Gerencie sua conta, equipe, plano e segurança.</p>
       </div>
 
-      <Tabs defaultValue="profile" className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="bg-card/60 border border-border h-auto p-1 flex-wrap">
           <TabsTrigger value="profile"><User className="h-3.5 w-3.5 mr-1.5" />Perfil</TabsTrigger>
           <TabsTrigger value="workspace"><Building2 className="h-3.5 w-3.5 mr-1.5" />Workspace</TabsTrigger>

@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase as supabaseTyped } from "@/integrations/supabase/client";
 // Cast: meta_conversations / meta_messages live in a migration not yet reflected in generated types.
 const supabase = supabaseTyped as any;
-import { getCurrentWorkspaceId } from "@/domain/persistence/workspaceContext";
+import { getCurrentWorkspaceId, tryGetCurrentWorkspaceId } from "@/domain/persistence/workspaceContext";
 import type { MetaConversation, MetaMessage, MetaPlatform, MetaHandoffStatus } from "@/channels/meta/types";
 
 function mapConvRow(row: any): MetaConversation {
@@ -52,10 +52,15 @@ export function useMetaConversations(platformFilter?: MetaPlatform) {
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   const load = useCallback(async () => {
+    const workspaceId = tryGetCurrentWorkspaceId();
+    if (!workspaceId) {
+      // Workspace not ready yet — bail gracefully; effect will re-run when it is.
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const workspaceId = getCurrentWorkspaceId();
       let q = supabase
         .from("meta_conversations")
         .select("*")
@@ -79,7 +84,8 @@ export function useMetaConversations(platformFilter?: MetaPlatform) {
   useEffect(() => {
     load();
 
-    const workspaceId = getCurrentWorkspaceId();
+    const workspaceId = tryGetCurrentWorkspaceId();
+    if (!workspaceId) return;
     const ch = supabase
       .channel(`meta_conversations:${workspaceId}`)
       .on("postgres_changes", {

@@ -1,0 +1,228 @@
+{
+  "routes": [
+    {
+      "name": "dashboard",
+      "path": "/dashboard",
+      "status": "ok",
+      "tti_ms": 1926,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 371,
+      "final_url": "http://localhost:8080/dashboard"
+    },
+    {
+      "name": "bots",
+      "path": "/bots",
+      "status": "ok",
+      "tti_ms": 1922,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 360,
+      "final_url": "http://localhost:8080/bots"
+    },
+    {
+      "name": "leads",
+      "path": "/leads",
+      "status": "ok",
+      "tti_ms": 1958,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 362,
+      "final_url": "http://localhost:8080/leads"
+    },
+    {
+      "name": "conversations",
+      "path": "/conversations",
+      "status": "ok",
+      "tti_ms": 1885,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 361,
+      "final_url": "http://localhost:8080/conversations"
+    },
+    {
+      "name": "analytics",
+      "path": "/analytics",
+      "status": "ok",
+      "tti_ms": 1935,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 361,
+      "final_url": "http://localhost:8080/analytics"
+    },
+    {
+      "name": "templates",
+      "path": "/templates",
+      "status": "ok",
+      "tti_ms": 1964,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/templates"
+    },
+    {
+      "name": "variables",
+      "path": "/variables",
+      "status": "ok",
+      "tti_ms": 1950,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/variables"
+    },
+    {
+      "name": "tracking",
+      "path": "/tracking",
+      "status": "ok",
+      "tti_ms": 1847,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 360,
+      "final_url": "http://localhost:8080/tracking"
+    },
+    {
+      "name": "attribution",
+      "path": "/attribution",
+      "status": "ok",
+      "tti_ms": 1859,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/attribution"
+    },
+    {
+      "name": "revenue",
+      "path": "/revenue",
+      "status": "ok",
+      "tti_ms": 1888,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/revenue"
+    },
+    {
+      "name": "alerts",
+      "path": "/alerts",
+      "status": "ok",
+      "tti_ms": 1881,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/alerts"
+    },
+    {
+      "name": "channels",
+      "path": "/channels",
+      "status": "ok",
+      "tti_ms": 1834,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 360,
+      "final_url": "http://localhost:8080/channels"
+    },
+    {
+      "name": "forms",
+      "path": "/forms",
+      "status": "ok",
+      "tti_ms": 1884,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/forms"
+    },
+    {
+      "name": "settings",
+      "path": "/settings",
+      "status": "ok",
+      "tti_ms": 1871,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/settings"
+    },
+    {
+      "name": "knowledge",
+      "path": "/knowledge",
+      "status": "ok",
+      "tti_ms": 1854,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/knowledge"
+    },
+    {
+      "name": "ai-builder",
+      "path": "/ai-builder",
+      "status": "ok",
+      "tti_ms": 1854,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/ai-builder"
+    },
+    {
+      "name": "connectors",
+      "path": "/connectors",
+      "status": "ok",
+      "tti_ms": 1855,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/connectors"
+    },
+    {
+      "name": "system-health",
+      "path": "/system-health",
+      "status": "ok",
+      "tti_ms": 1958,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 372,
+      "final_url": "http://localhost:8080/dashboard"
+    },
+    {
+      "name": "qa",
+      "path": "/qa",
+      "status": "ok",
+      "tti_ms": 1843,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 371,
+      "final_url": "http://localhost:8080/dashboard"
+    },
+    {
+      "name": "beta",
+      "path": "/beta",
+      "status": "ok",
+      "tti_ms": 1831,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/beta"
+    },
+    {
+      "name": "updates",
+      "path": "/updates",
+      "status": "ok",
+      "tti_ms": 1829,
+      "console_errors": [],
+      "net_errors": [],
+      "net_calls": 359,
+      "final_url": "http://localhost:8080/updates"
+    }
+  ],
+  "refresh_test": {
+    "bots_calls": 359,
+    "back_to_dashboard_calls": 372,
+    "comment": "After QueryClient fix, expect fewer supabase calls on return."
+  },
+  "persistence_test": {
+    "settings_tabs_count": 14,
+    "settings_tab": {
+      "expected": "Sistema",
+      "actual": "Perfil",
+      "persisted": false
+    }
+  },
+  "console_global": []
+}

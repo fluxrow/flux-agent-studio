@@ -5,21 +5,26 @@ Deno.serve(async (req) => {
 
   const token = Deno.env.get('META_ACCESS_TOKEN');
   const phoneId = Deno.env.get('META_PHONE_NUMBER_ID');
-  const { to } = await req.json().catch(() => ({ to: '5541997830472' }));
+  const { action = 'send', to = '5541997830472', pin = '123456' } = await req.json().catch(() => ({}));
 
-  const res = await fetch(`https://graph.facebook.com/v21.0/${phoneId}/messages`, {
+  const url = `https://graph.facebook.com/v21.0/${phoneId}/${action === 'register' ? 'register' : 'messages'}`;
+  const body = action === 'register'
+    ? { messaging_product: 'whatsapp', pin }
+    : {
+        messaging_product: 'whatsapp',
+        to,
+        type: 'template',
+        template: { name: 'hello_world', language: { code: 'en_US' } },
+      };
+
+  const res = await fetch(url, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'template',
-      template: { name: 'hello_world', language: { code: 'en_US' } },
-    }),
+    body: JSON.stringify(body),
   });
 
-  const body = await res.text();
-  return new Response(JSON.stringify({ status: res.status, body: JSON.parse(body) }), {
+  const text = await res.text();
+  return new Response(JSON.stringify({ status: res.status, body: JSON.parse(text) }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     status: 200,
   });

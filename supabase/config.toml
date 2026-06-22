@@ -1,5 +1,8 @@
 project_id = "bgzczvsmfcnypwqveotx"
 
+[functions.whatsapp-test-send]
+verify_jwt = false
+
 # ---- Edge Functions ------------------------------------------------
 # Lovable AI function (managed by Lovable Cloud)
 [functions.lovable-ai]
